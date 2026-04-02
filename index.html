@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Sinh Thái Dương Trần | Documentation</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --bg-color: #ffffff; --text-color: #000000; --sidebar-bg: #000000; --sidebar-text: #ffffff; --accent-color: #ff00ff; --border-color: #000000; --light-gray: #f5f5f5; --font-mono: 'Courier New', Courier, monospace; }
+        body { margin: 0; padding: 0; font-family: var(--font-mono); background-color: var(--bg-color); color: var(--text-color); display: flex; min-height: 100vh; line-height: 1.6; }
+        .sidebar { width: 280px; background-color: var(--sidebar-bg); color: var(--sidebar-text); position: fixed; height: 100vh; overflow-y: auto; padding-top: 30px; border-right: 1px solid var(--border-color); }
+        .sidebar-logo { font-family: var(--font-mono); font-weight: bold; font-size: 22px; padding: 0 20px 30px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #333; margin-bottom: 20px; letter-spacing: 1px; }
+        .sidebar-logo img { width: 38px; height: 38px; filter: invert(1); object-fit: contain; }
+        .nav-group-title { font-family: var(--font-mono); font-size: 16px; font-weight: bold; padding: 15px 20px 8px 20px; color: #ffffff; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-item { padding: 8px 20px; cursor: pointer; font-size: 15px; color: #aaaaaa; transition: 0.2s; }
+        .nav-item:hover { color: #ffffff; background-color: #1a1a1a; }
+        .nav-item.active { color: var(--accent-color); font-weight: bold; }
+        .main-wrapper { margin-left: 280px; width: calc(100% - 280px); padding: 50px; box-sizing: border-box; }
+        .container-main { max-width: 800px; margin: 0 auto; }
+        h2.title-main { font-family: var(--font-mono); font-size: 34px; font-weight: 800; margin-top: 0; margin-bottom: 30px; border-bottom: 3px solid var(--border-color); padding-bottom: 10px; letter-spacing: -1px; }
+        .section-title { font-family: var(--font-mono); font-size: 18px; font-weight: bold; margin: 40px 0 15px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; text-transform: uppercase; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+        .form-control { width: 100%; padding: 12px; border: 1px solid var(--border-color); box-sizing: border-box; font-family: var(--font-mono); font-size: 15px; background-color: transparent; border-radius: 0; transition: all 0.2s; }
+        .form-control:focus { outline: none; background-color: var(--light-gray); box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        textarea.form-control { resize: vertical; min-height: 80px; }
+        .table-responsive { overflow-x: auto; margin-bottom: 10px; border: 1px solid var(--border-color); }
+        .schedule-table { width: 100%; border-collapse: collapse; min-width: 480px; }
+        .schedule-table th, .schedule-table td { border: 1px solid var(--border-color); padding: 10px; text-align: center; }
+        .schedule-table th { background-color: var(--border-color); color: var(--bg-color); font-weight: normal; }
+        .schedule-table td input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--border-color); cursor: pointer; }
+        .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .upload-card { position: relative; border: 1px dashed var(--border-color); padding: 20px; text-align: center; cursor: pointer; transition: 0.2s; background-color: var(--bg-color); }
+        .upload-card:hover { background-color: var(--light-gray); }
+        .upload-card.has-file { border-style: solid; border-width: 2px; background-color: var(--border-color); color: var(--bg-color); }
+        .upload-card .title { font-weight: bold; font-size: 14px; margin-bottom: 5px; font-family: var(--font-mono); text-transform: uppercase; }
+        .upload-card .subtitle { font-size: 12px; opacity: 0.8; }
+        .upload-card input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .file-status { margin-top: 10px; font-size: 12px; font-weight: bold; }
+        .upload-card.vneid-card { grid-column: 1 / -1; }
+        .btn-main { width: 100%; padding: 16px; background: var(--text-color); color: var(--bg-color); border: 2px solid var(--border-color); font-family: var(--font-mono); font-size: 18px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.2s; margin-top: 20px; }
+        .btn-main:hover { background: var(--bg-color); color: var(--text-color); box-shadow: 5px 5px 0px var(--border-color); transform: translate(-2px, -2px); }
+        .btn-main:disabled { background: #666; color: #ccc; cursor: not-allowed; box-shadow: none; border-color: #666; transform: none; }
+        .note { border: 1px solid var(--border-color); background-color: var(--light-gray); padding: 15px; font-size: 14px; margin-bottom: 20px; border-left: 5px solid var(--border-color); }
+        .hidden { display: none !important; }
+        #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; text-align: center; }
+        .spinner { width: 55px; height: 55px; border: 4px solid var(--light-gray); border-top: 4px solid var(--border-color); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @media (max-width: 768px) { body { flex-direction: column; } .sidebar { width: 100%; height: auto; position: static; padding-bottom: 10px; border-right: none; border-bottom: 1px solid var(--border-color); } .main-wrapper { margin-left: 0; width: 100%; padding: 20px; } .upload-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-logo"><img src="IMG_2356.JPG" alt="Logo" onerror="this.outerHTML='<span style=\'font-size: 28px;\'>◯</span>'">Dương Trần</div>
+        <div class="nav-group-title">Hồ Sơ Học Viên</div>
+        <div class="nav-item active" id="nav-step1" onclick="chuyenManHinh('step1')">Khởi Tạo Hồ Sơ</div>
+        <div class="nav-item" id="nav-tracuu" onclick="chuyenManHinh('box-tracuu')">Tra Cứu Dữ Liệu</div>
+        <div style="margin-top: 40px;" class="nav-group-title">Hỗ Trợ</div>
+        <div class="nav-item" onclick="alert('Hotline hỗ trợ kỹ thuật: 09xx.xxx.xxx')">Liên Hệ Giáo Viên</div>
+    </div>
+
+    <div class="main-wrapper">
+        <div id="box-tracuu" class="container-main hidden">
+            <h2 class="title-main">Tra Cứu Hồ Sơ</h2>
+            <div class="note">Nhập chính xác số CCCD và Hạng bằng lái để truy xuất dữ liệu đã nộp.</div>
+            <div class="form-group"><label>Số CCCD / Mã Định Danh:</label><input type="text" id="cccd_tracuu_input" class="form-control" placeholder="Ví dụ: 031092..."></div>
+            <div class="form-group"><label>Hạng Đào Tạo:</label>
+                <select id="hang_tracuu_input" class="form-control">
+                    <option value="">-- Lựa chọn --</option><option value="A1m">A1m</option><option value="Am">Am</option><option value="B.01">B.01</option><option value="B">B</option><option value="C1">C1</option><option value="Cm">Cm</option><option value="D1">D1</option><option value="D2">D2</option><option value="Dm">Dm</option><option value="CE">CE</option>
+                </select>
+            </div>
+            <button onclick="traCuuThuCong()" class="btn-main" id="btn-tracuu">TÌM KIẾM DỮ LIỆU</button>
+<div id="ket-qua-tracuu"></div>
+        </div>
+
+        <div class="container-main" id="step1">
+            <h2 class="title-main">Khởi Tạo Hồ Sơ</h2>
+            <div class="note">Receiver: <b>Dương Trần</b><br>Chỉ cần nhập thông tin cơ bản. Hệ thống OCR sẽ tự động đọc các dữ liệu cá nhân từ hình ảnh của bạn.</div>
+
+            <div class="section-title">I. Thông Tin Bắt Buộc</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label>Hạng Đào Tạo (*):</label>
+                    <select id="hang_dk" class="form-control">
+                        <option value="">-- Chọn Hạng --</option><option value="A1m">A1m</option><option value="Am">Am</option><option value="B.01">B.01</option><option value="B">B</option><option value="C1">C1</option><option value="Cm">Cm</option><option value="D1">D1</option><option value="D2">D2</option><option value="Dm">Dm</option><option value="CE">CE</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Ô thâm niên — chỉ hiện khi chọn hạng nâng hạng -->
+            <div id="box_tham_nien" style="display:none;" class="form-group">
+                <label>⭐ Số năm lái xe an toàn (*):</label>
+                <input type="number" id="nam_lai_xe_nop" class="form-control"
+                    min="1" max="50" placeholder="VD: 3 — Bắt buộc với hạng nâng hạng">
+                <small style="color:#888;">Dùng cho hạng D1, D2, Dm, CE, Cm — học viên tự khai</small>
+            </div>
+
+            <div class="section-title">II. Nguồn Giới Thiệu
+
+            <div class="section-title">II. Nguồn Giới Thiệu (Tùy chọn)</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group"><label>Họ Tên Người GT:</label><input type="text" id="nguoi_gt_nop" class="form-control" placeholder="Để trống nếu không có"></div>
+                <div class="form-group"><label>SĐT (Zalo) Người GT:</label><input type="tel" id="sdt_gt_nop" class="form-control" placeholder="Để trống nếu không có"></div>
+            </div>
+
+            <div class="section-title">III. Tải Lên Tệp Đính Kèm</div>
+            <div class="upload-grid">
+                <div class="upload-card vneid-card" id="card_vneid"><div class="title">[+] VNeID (Mức 2)</div><div class="subtitle">Khuyến khích sử dụng</div><input type="file" id="files_vneid" accept="image/*" multiple><div id="status_files_vneid" class="file-status"></div></div>
+                <div class="upload-card" id="card_cccd"><div class="title">[+] Thẻ CCCD</div><div class="subtitle">Mặt trước và sau</div><input type="file" id="files_cccd" accept="image/*" multiple><div id="status_files_cccd" class="file-status"></div></div>
+                <div class="upload-card" id="card_chan_dung"><div class="title">[+] Ảnh Chân Dung</div><div class="subtitle">Tỷ lệ 3x4</div><input type="file" id="files_chan_dung" accept="image/*" multiple><div id="status_files_chan_dung" class="file-status"></div></div>
+                <div class="upload-card" id="card_gplx"><div class="title">[+] GPLX Cũ</div><div class="subtitle">Nếu đã có bằng</div><input type="file" id="files_gplx" accept="image/*" multiple><div id="status_files_gplx" class="file-status"></div></div>
+                <div class="upload-card" id="card_vnetraffic"><div class="title">[+] VNeTraffic</div><div class="subtitle">Tùy chọn</div><input type="file" id="files_vnetraffic" accept="image/*" multiple><div id="status_files_vnetraffic" class="file-status"></div></div>
+            </div>
+
+            <button onclick="nopHoSo()" id="btnSubmit" class="btn-main">GỬI YÊU CẦU XỬ LÝ</button>
+        </div>
+
+        <div id="loading-overlay">
+            <div id="loading-spinner-box">
+                <div class="spinner"></div>
+                <div style="font-weight: bold; font-size: 18px; font-family: var(--font-mono);">Hệ thống đang trích xuất dữ liệu...</div>
+                <div style="margin-top: 10px;">Vui lòng giữ nguyên màn hình (tối đa 30s).</div>
+            </div>
+            <div id="timeout-box" class="hidden" style="text-align: center; border: 1px solid var(--border-color); padding: 40px; background: var(--bg-color);">
+                <h2 style="margin-top: 0; font-family: var(--font-mono);">[ SYSTEM QUEUE ]</h2>
+                <p>Hồ sơ đã vào hàng đợi AI xử lý.</p>
+                <button onclick="kiemTraLaiNgay()" class="btn-main" style="width: auto;">KIỂM TRA TRẠNG THÁI</button>
+            </div>
+        </div>
+
+        <div class="container-main hidden" id="step3">
+            <h2 class="title-main">Xác Nhận & Bổ Sung</h2>
+            <div class="note">Hệ thống AI đã phân tích tài liệu (Nếu bận, một số mục sẽ để trống). Vui lòng kiểm tra lại Phần I, sau đó bổ sung Lịch học và Liên hệ ở Phần II, III.</div>
+            
+            <input type="hidden" id="recordId"> 
+            
+            <div class="section-title">I. Dữ Liệu Cá Nhân</div>
+            <div class="form-group"><label>Họ và tên (In hoa):</label><input type="text" id="ho_va_ten_chk" class="form-control" style="font-weight:bold;" required></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group"><label>Số C.C.C.D:</label><input type="text" id="so_cccd_chk" class="form-control" required></div>
+                <div class="form-group"><label>Điện thoại cá nhân (*):</label><input type="tel" id="sdt_chk" class="form-control" required placeholder="Vui lòng điền số ĐT..."></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group"><label>Ngày sinh:</label><input type="text" id="ngay_sinh_chk" class="form-control" placeholder="DD/MM/YYYY"></div>
+                <div class="form-group"><label>Giới tính:</label><select id="gio_tinh_chk" class="form-control"><option value="">--</option><option value="Nam">Nam</option><option value="Nữ">Nữ</option></select></div>
+            </div>
+            <div class="form-group"><label>Nơi thường trú:</label><textarea id="noi_thuong_tru_chk" class="form-control" rows="2"></textarea></div>
+            <div class="form-group"><label>Nơi ở hiện tại:</label><textarea id="noi_o_hien_tai_chk" class="form-control" rows="2"></textarea></div>
+
+            <div class="section-title">II. Thời Gian Biểu & Công Việc</div>
+            <div class="form-group">
+                <label>Thời gian biểu học thực hành mong muốn:</label>
+                <div class="table-responsive">
+                    <table class="schedule-table">
+                        <thead><tr><th>Ca \ Thứ</th><th>T2</th><th>T3</th><th>T4</th><th>T5</th><th>T6</th><th>T7</th><th>CN</th></tr></thead>
+                        <tbody>
+                            <tr><td><b>Sáng</b></td><td><input type="checkbox" class="cb-schedule-chk" value="T2-Sáng"></td><td><input type="checkbox" class="cb-schedule-chk" value="T3-Sáng"></td><td><input type="checkbox" class="cb-schedule-chk" value="T4-Sáng"></td><td><input type="checkbox" class="cb-schedule-chk" value="T5-Sáng"></td><td><input type="checkbox" class="cb-schedule-chk" value="T6-Sáng"></td><td><input type="checkbox" class="cb-schedule-chk" value="T7-Sáng"></td><td><input type="checkbox" class="cb-schedule-chk" value="CN-Sáng"></td></tr>
+                            <tr><td><b>Chiều</b></td><td><input type="checkbox" class="cb-schedule-chk" value="T2-Chiều"></td><td><input type="checkbox" class="cb-schedule-chk" value="T3-Chiều"></td><td><input type="checkbox" class="cb-schedule-chk" value="T4-Chiều"></td><td><input type="checkbox" class="cb-schedule-chk" value="T5-Chiều"></td><td><input type="checkbox" class="cb-schedule-chk" value="T6-Chiều"></td><td><input type="checkbox" class="cb-schedule-chk" value="T7-Chiều"></td><td><input type="checkbox" class="cb-schedule-chk" value="CN-Chiều"></td></tr>
+                            <tr><td><b>Tối</b></td><td><input type="checkbox" class="cb-schedule-chk" value="T2-Tối"></td><td><input type="checkbox" class="cb-schedule-chk" value="T3-Tối"></td><td><input type="checkbox" class="cb-schedule-chk" value="T4-Tối"></td><td><input type="checkbox" class="cb-schedule-chk" value="T5-Tối"></td><td><input type="checkbox" class="cb-schedule-chk" value="T6-Tối"></td><td><input type="checkbox" class="cb-schedule-chk" value="T7-Tối"></td><td><input type="checkbox" class="cb-schedule-chk" value="CN-Tối"></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <input type="text" id="gio_hoc_khac_chk" class="form-control" placeholder="Ghi chú thêm về lịch học..." style="margin-top: 10px;">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label>Nghề nghiệp:</label>
+                    <select id="nghe_nghiep_chk" class="form-control" onchange="xuLyNghe()">
+                        <option value="">-- Lựa chọn --</option><option value="Công nhân">Công nhân</option><option value="Học sinh/Sinh viên">Học sinh/Sinh viên</option><option value="Nhân viên văn phòng">Nhân viên văn phòng</option><option value="Kinh doanh tự do">Kinh doanh tự do</option><option value="Khác">Khác...</option>
+                    </select>
+                    <input type="text" id="nghe_nghiep_khac_chk" class="form-control hidden" style="margin-top: 10px;">
+                </div>
+                <div class="form-group"><label>Trình độ văn hóa:</label><select id="hoc_luc_chk" class="form-control"><option value="THCS">THCS</option><option value="THPT" selected>THPT</option><option value="Trung cấp">Trung cấp</option><option value="Cao đẳng">Cao đẳng</option><option value="Đại học">Đại học</option></select></div>
+            </div>
+            <div class="form-group"><label>Nơi làm việc:</label><input type="text" id="noi_lam_viec_chk" class="form-control"></div>
+
+            <div class="section-title">III. Liên Hệ Khẩn Cấp (Bắt Buộc)</div>
+            <div class="form-group"><label>Họ tên người thân:</label><input type="text" id="nguoi_lh_ten_chk" class="form-control" required></div>
+            <div class="form-group"><label>SĐT người thân:</label><input type="tel" id="nguoi_lh_sdt_chk" class="form-control" required></div>
+            <div class="form-group"><label>Địa chỉ người thân:</label><input type="text" id="nguoi_lh_dia_chi_chk" class="form-control" required></div>
+
+            <button onclick="hoanTatHoSo()" id="btnFinal" class="btn-main">LƯU TRỮ VÀO HỆ THỐNG</button>
+        </div>
+        <!-- Màn hình xem lại hồ sơ đã hoàn tất -->
+        <div id="view-screen" class="container-main hidden">
+            <h2 class="title-main">[ HỒ SƠ CỦA BẠN ]</h2>
+            <div class="note" id="view-trang-thai-bar" style="font-weight:bold;"></div>
+
+            <div class="section-title">I. Thông Tin Cá Nhân</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                <div class="form-group"><label>Họ và tên:</label><div id="v_ho_va_ten" class="form-control" style="background:#f5f5f5;padding:10px;"></div></div>
+                <div class="form-group"><label>Số CCCD:</label><div id="v_so_cccd" class="form-control" style="background:#f5f5f5;padding:10px;"></div></div>
+                <div class="form-group"><label>Ngày sinh:</label><div id="v_ngay_sinh" class="form-control" style="background:#f5f5f5;padding:10px;"></div></div>
+                <div class="form-group"><label>Giới tính:</label><div id="v_gioi_tinh" class="form-control" style="background:#f5f5f5;padding:10px;"></div></div>
+                <div class="form-group"><label>SĐT:</label><div id="v_sdt" class="form-control" style="background:#f5f5f5;padding:10px;"></div></div>
+                <div class="form-group"><label>Dân tộc:</label><div id="v_dan_toc" class="form-control" style="background:#f5f5f5;padding:10px;"></div></div>
+            </div>
+            <div class="form-group"><label>Quê quán:</label><div id="v_que_quan" class="form-control" style="background:#f5f5f5;padding:10px;"></div></div>
+            <div class="form-group"><label>Thường trú:</label><div id="v_thuong_tru" class="form-control" style="background:#f5f5f5;padding:10px;"></div></div>
+            <div class="form-group"><label>Nơi ở hiện tại:</label><div id="v_noi_o" class="form-control" style="background:#f5f5f5;padding:10px;"></div></div>
+
+            <div class="section-title">II. Thông Tin Đăng Ký</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                <div class="form-group"><label>Hạng đào tạo:</label><div id="v_hang_dk" class="form-control" style="background:#f5f5f5;padding:10px;font-weight:bold;color:#009faa;"></div></div>
+                <div class="form-group"><label>Trạng thái:</label><div id="v_trang_thai" class="form-control" style="background:#f5f5f5;padding:10px;"></div></div>
+                <div class="form-group"><label>Khóa dự kiến:</label><div id="v_khoa" class="form-control" style="background:#f5f5f5;padding:10px;"></div></div>
+                <div class="form-group"><label>Bằng lái đã có:</label><div id="v_gplx" class="form-control" style="background:#f5f5f5;padding:10px;"></div></div>
+            </div>
+            <div class="form-group"><label>Lịch học thực hành:</label><div id="v_lich_hoc" class="form-control" style="background:#f5f5f5;padding:10px;min-height:40px;"></div></div>
+
+            <div class="section-title">III. Liên Hệ Khẩn Cấp</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                <div class="form-group"><label>Họ tên người thân:</label><div id="v_lh_ten" class="form-control" style="background:#f5f5f5;padding:10px;"></div></div>
+                <div class="form-group"><label>SĐT người thân:</label><div id="v_lh_sdt" class="form-control" style="background:#f5f5f5;padding:10px;"></div></div>
+            </div>
+            <div class="form-group"><label>Địa chỉ người thân:</label><div id="v_lh_dia_chi" class="form-control" style="background:#f5f5f5;padding:10px;"></div></div>
+
+            <button onclick="chuyenManHinh('box-tracuu')" class="btn-main" style="background:#555;">← QUAY LẠI TRA CỨU</button>
+        </div>
+        <div id="success-screen" class="container-main hidden" style="text-align: center; padding: 50px 20px; border: 1px solid var(--border-color);">
+            <h1 style="font-family: var(--font-mono); margin: 0; font-size: 36px;">[ THÀNH CÔNG ]</h1>
+            <p style="margin-top: 20px; font-size: 16px;">Hồ sơ của bạn đã được tiếp nhận và xử lý.</p>
+            <button onclick="location.reload()" class="btn-main" style="width: auto; padding: 12px 40px;">KẾT THÚC PHIÊN</button>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://wazvziouhwkdthekpajv.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhenZ6aW91aHdrZHRoZWtwYWp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMDMzODIsImV4cCI6MjA4Nzc3OTM4Mn0.SRA9ukFbbj69oqofug3erF-Y0G7JH7Ik5e6iMP8nbyU';
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        ['files_vneid', 'files_vnetraffic', 'files_cccd', 'files_gplx', 'files_chan_dung'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.addEventListener('change', e => {
+                const count = e.target.files.length;
+                document.getElementById('status_' + id).innerHTML = count > 0 ? `[ Đã đính kèm ${count} tệp ]` : '';
+                document.getElementById('card_' + id.replace('files_', '')).classList.toggle('has-file', count > 0);
+            });
+        });
+        const HANG_NANG_HANG = ["D1", "D2", "Dm", "CE", "Cm"];
+        document.getElementById('hang_dk').addEventListener('change', function() {
+            const hang = this.value;
+            const box = document.getElementById('box_tham_nien');
+            box.style.display = HANG_NANG_HANG.includes(hang) ? 'block' : 'none';
+            document.getElementById('nam_lai_xe_nop').required = HANG_NANG_HANG.includes(hang);
+        });
+        function xuLyNghe() {
+            const val = document.getElementById(`nghe_nghiep_chk`).value;
+            document.getElementById(`nghe_nghiep_khac_chk`).classList.toggle('hidden', val !== 'Khác');
+        }
+
+        function chuyenManHinh(id) {
+            ['step1', 'box-tracuu', 'loading-overlay', 'step3', 'success-screen', 'view-screen'].forEach(s => {
+                let el = document.getElementById(s); if(el) el.classList.add('hidden');
+            });
+            let target = document.getElementById(id);
+            if(target) { target.classList.remove('hidden'); target.style.display = id === 'loading-overlay' ? 'flex' : 'block'; }
+            
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if(id === 'step1' || id === 'step3') document.getElementById('nav-step1').classList.add('active');
+            else if (id === 'box-tracuu') document.getElementById('nav-tracuu').classList.add('active');
+        }
+        
+        async function uploadFiles(inputId, folderPrefix) {
+            const input = document.getElementById(inputId); let urls = [];
+            if(input.files.length > 0) {
+                let c = 0; 
+                for(let file of input.files) {
+                    c++; const fileName = `${Date.now()}_${c}_${folderPrefix}_${file.name.replace(/[^a-zA-Z0-9.]/g, '')}`;
+                    const { data } = await db.storage.from('kho-anh-hoc-vien').upload(fileName, file);
+                    if(data) urls.push(db.storage.from('kho-anh-hoc-vien').getPublicUrl(fileName).data.publicUrl);
+                }
+            } return urls;
+        }
+
+        function getSchedule() {
+            let slots = []; document.querySelectorAll(`.cb-schedule-chk:checked`).forEach(cb => slots.push(cb.value));
+            let note = document.getElementById(`gio_hoc_khac_chk`).value.trim();
+            let dict = {}; slots.forEach(s => { let p = s.split('-'); if(!dict[p[0]]) dict[p[0]]=[]; dict[p[0]].push(p[1]); });
+            let readable = Object.keys(dict).map(d => `${d}(${dict[d].join(', ')})`).join('; ');
+            if(note) readable += readable ? ` | Ghi chú: ${note}` : `Ghi chú: ${note}`;
+            return { raw: slots, note: note, readable: readable };
+        }
+
+        window.temp_hs_bosung = {};
+
+        async function nopHoSo() {
+            const hang = document.getElementById('hang_dk').value;
+            const cccd_raw = ""; // CCCD sẽ do AI đọc từ ảnh
+            if(!hang || !cccd_raw.trim()) return alert("Hệ thống từ chối: Thiếu trường dữ liệu bắt buộc (*)");
+            
+            const cccd = cccd_raw.replace(/\s/g, ''); 
+
+            document.getElementById('btnSubmit').innerText = "ĐANG ĐỒNG BỘ..."; document.getElementById('btnSubmit').disabled = true;
+
+            try {
+                // ⚡️ TẢI TOÀN BỘ VỀ VÀ LỌC CẢ HẠNG LẪN CCCD Ở JAVASCRIPT
+                const { data: allData, error: fetchErr } = await db.from('ho_so_online').select('*').order('created_at',{ascending:false});
+                if(fetchErr) throw fetchErr;
+
+                const existing = allData.filter(item => {
+                    if (item.hang_dk !== hang) return false;
+                    if (!item.thong_tin_bo_sung) return false;
+                    let info = typeof item.thong_tin_bo_sung === 'string' ? JSON.parse(item.thong_tin_bo_sung) : item.thong_tin_bo_sung;
+                    let dbCccd = (info.so_cccd_goc || info.so_cccd || "").replace(/\s/g, '');
+                    return dbCccd === cccd;
+                });
+
+                if(existing && existing.length > 0) {
+                    let hs = existing[0];
+                    if(hs.trang_thai === 'HOAN_TAT') return alert("Khóa dữ liệu: Hồ sơ hạng này của bạn đã hoàn tất trước đó.");
+                    if(confirm("Xung đột dữ liệu: Đã tồn tại bản nháp hạng này. Chuyển sang chế độ khôi phục?")) {
+                        if(hs.trang_thai === 'CHO_XU_LY') { chuyenManHinh('loading-overlay'); langNgheKetQua(hs.id); } 
+                        else hienThiFormXacNhan(hs);
+                    } else { document.getElementById('btnSubmit').innerText = "GỬI YÊU CẦU XỬ LÝ"; document.getElementById('btnSubmit').disabled = false; }
+                    return;
+                }
+
+                chuyenManHinh('loading-overlay'); document.getElementById('loading-spinner-box').classList.remove('hidden'); document.getElementById('timeout-box').classList.add('hidden');
+                
+                const anh = { files_vneid: await uploadFiles('files_vneid','vneid'), files_cccd: await uploadFiles('files_cccd','cccd'), files_gplx: await uploadFiles('files_gplx','gplx'), files_chan_dung: await uploadFiles('files_chan_dung','cd'), files_vnetraffic: await uploadFiles('files_vnetraffic','vt') };
+                if(!Object.values(anh).some(a=>a.length>0)) { alert("Lỗi: Không tìm thấy tệp đính kèm!"); location.reload(); return; }
+
+                const bosung = {
+                    nguoi_nop: "Dương Trần", 
+                    so_cccd_goc: cccd, 
+                    nguoi_gioi_thieu: document.getElementById('nguoi_gt_nop').value.trim(),
+                    sdt_nguoi_gioi_thieu: document.getElementById('sdt_gt_nop').value.trim(), 
+                    nam_lai_xe: document.getElementById('nam_lai_xe_nop').value || "",
+                };
+
+                const { data, error } = await db.from('ho_so_online').insert({ ho_ten: "Chưa xác định", sdt: "", hang_dk: hang, anh_data: anh, trang_thai: 'CHO_XU_LY', thong_tin_bo_sung: bosung }).select();
+                if(error) throw error;
+                
+                langNgheKetQua(data[0].id);
+            } catch(e) { alert("Lỗi: "+e.message); location.reload(); }
+        }
+
+        function langNgheKetQua(id) {
+            let attempts = 0; document.getElementById('recordId').value = id; 
+            const interval = setInterval(async () => {
+                attempts++; const { data } = await db.from('ho_so_online').select('*').eq('id', id).single();
+                if(data && data.trang_thai === 'CHO_KHACH_XEM') { clearInterval(interval); hienThiFormXacNhan(data); }
+                if(attempts >= 35) { clearInterval(interval); document.getElementById('loading-spinner-box').classList.add('hidden'); document.getElementById('timeout-box').classList.remove('hidden'); }
+            }, 2000); 
+        }
+
+        async function kiemTraLaiNgay() {
+            const id = document.getElementById('recordId').value;
+            const { data } = await db.from('ho_so_online').select('*').eq('id', id).single();
+            if(data && data.trang_thai === 'CHO_KHACH_XEM') hienThiFormXacNhan(data);
+            else alert("Vẫn đang trong quá trình phân tích. Vui lòng thử lại!");
+        }
+
+        function hienThiFormXacNhan(hs) {
+            chuyenManHinh('step3'); document.getElementById('recordId').value = hs.id;
+            const i = typeof hs.thong_tin_bo_sung === 'string' ? JSON.parse(hs.thong_tin_bo_sung) : (hs.thong_tin_bo_sung || {});
+            
+            window.temp_hs_bosung = i; 
+
+            document.getElementById('ho_va_ten_chk').value = (i.ho_va_ten || hs.ho_ten || "").toUpperCase();
+            if (document.getElementById('ho_va_ten_chk').value === "CHƯA XÁC ĐỊNH") document.getElementById('ho_va_ten_chk').value = "";
+            
+            document.getElementById('so_cccd_chk').value = i.so_cccd || i.so_cccd_goc || hs.so_cccd || "";
+            document.getElementById('sdt_chk').value = i.sdt || hs.sdt || "";
+            document.getElementById('ngay_sinh_chk').value = i.ngay_sinh || hs.ngay_sinh || "";
+            
+            const gt = i.gioi_tinh || hs.gioi_tinh || "";
+            if(gt) { document.getElementById('gio_tinh_chk').value = gt.toLowerCase().includes('nam') ? 'Nam' : 'Nữ'; }
+            
+            document.getElementById('noi_thuong_tru_chk').value = i.noi_thuong_tru || i.noi_cu_tru || hs.noi_thuong_tru || i.dia_chi || "";
+            document.getElementById('noi_o_hien_tai_chk').value = i.noi_o_hien_tai || hs.noi_o_hien_tai || "";
+
+            const raw = i.gio_hoc_raw || { raw_list: [], note: "" };
+            document.querySelectorAll('.cb-schedule-chk').forEach(cb => cb.checked = false);
+            if(Array.isArray(raw.raw_list)) raw.raw_list.forEach(v => { let cb = document.querySelector(`.cb-schedule-chk[value="${v}"]`); if(cb) cb.checked = true; });
+            document.getElementById('gio_hoc_khac_chk').value = raw.note || "";
+
+            let nghe = i.nghe_nghiep || "";
+            const selNghe = document.getElementById('nghe_nghiep_chk'); const inpNghe = document.getElementById('nghe_nghiep_khac_chk');
+            let found = Array.from(selNghe.options).some(opt => opt.value === nghe);
+            if(found) selNghe.value = nghe; else if(nghe) { selNghe.value = 'Khác'; inpNghe.classList.remove('hidden'); inpNghe.value = nghe; }
+            
+            if(i.hoc_luc) document.getElementById('hoc_luc_chk').value = i.hoc_luc;
+            document.getElementById('noi_lam_viec_chk').value = i.noi_lam_viec || "";
+            document.getElementById('nguoi_lh_ten_chk').value = i.nguoi_lien_he_ten || "";
+            document.getElementById('nguoi_lh_sdt_chk').value = i.nguoi_lien_he_sdt || "";
+            document.getElementById('nguoi_lh_dia_chi_chk').value = i.nguoi_lien_he_dia_chi || "";
+        }
+
+        async function hoanTatHoSo() {
+            const hoten = document.getElementById('ho_va_ten_chk').value;
+            const sdt = document.getElementById('sdt_chk').value;
+            const lh_ten = document.getElementById('nguoi_lh_ten_chk').value;
+            const lh_sdt = document.getElementById('nguoi_lh_sdt_chk').value;
+            
+            if(!hoten || !sdt) return alert("Vui lòng điền đủ Họ tên và SĐT cá nhân ở phần I !");
+            if(!lh_ten || !lh_sdt) return alert("Vui lòng điền thông tin Người liên hệ khẩn cấp ở phần III !");
+
+            document.getElementById('btnFinal').innerText = "ĐANG LƯU DỮ LIỆU..."; document.getElementById('btnFinal').disabled = true;
+            const sched = getSchedule();
+            let nghe = document.getElementById('nghe_nghiep_chk').value; if(nghe==='Khác') nghe = document.getElementById('nghe_nghiep_khac_chk').value;
+
+            const updateData = {
+                ...(window.temp_hs_bosung || {}),
+                ngay_sinh: document.getElementById('ngay_sinh_chk').value, 
+                gioi_tinh: document.getElementById('gio_tinh_chk').value,
+                so_cccd: document.getElementById('so_cccd_chk').value, 
+                sdt: sdt,
+                noi_thuong_tru: document.getElementById('noi_thuong_tru_chk').value, 
+                noi_o_hien_tai: document.getElementById('noi_o_hien_tai_chk').value,
+                nghe_nghiep: nghe, 
+                noi_lam_viec: document.getElementById('noi_lam_viec_chk').value, 
+                hoc_luc: document.getElementById('hoc_luc_chk').value,
+                gio_hoc_thuc_hanh: sched.readable, 
+                gio_hoc_raw: { raw_list: sched.raw, note: sched.note },
+                nguoi_lien_he_ten: lh_ten, 
+                nguoi_lien_he_sdt: lh_sdt, 
+                nguoi_lien_he_dia_chi: document.getElementById('nguoi_lh_dia_chi_chk').value
+            };
+
+            const { error } = await db.from('ho_so_online').update({ ho_ten: hoten.toUpperCase(), sdt: sdt, thong_tin_bo_sung: updateData, trang_thai: 'KHACH_DA_SUA' }).eq('id', document.getElementById('recordId').value);
+            if(!error) chuyenManHinh('success-screen'); else { alert("Lỗi ghi: " + error.message); document.getElementById('btnFinal').disabled = false; }
+        }
+
+        async function traCuuThuCong() {
+            const cccd = document.getElementById('cccd_tracuu_input').value.replace(/\s/g,'').trim();
+            const hang = document.getElementById('hang_tracuu_input').value;
+            if(!cccd || !hang) return alert("Vui lòng nhập CCCD và chọn hạng!");
+
+            document.getElementById('btn-tracuu').innerText = "ĐANG TÌM...";
+            document.getElementById('btn-tracuu').disabled = true;
+
+            try {
+                const { data, error } = await db.from('ho_so_online')
+                    .select('*')
+                    .eq('hang_dk', hang)
+                    .eq('trang_thai', 'HOAN_TAT');
+
+                if(error) throw error;
+
+                const hs = data.find(item => {
+                    const i = typeof item.thong_tin_bo_sung === 'string'
+                        ? JSON.parse(item.thong_tin_bo_sung)
+                        : (item.thong_tin_bo_sung || {});
+                    return (i.so_cccd || '').replace(/\s/g,'') === cccd ||
+                           (i.so_cccd_goc || '').replace(/\s/g,'') === cccd;
+                });
+
+                if(!hs) {
+                    alert("Không tìm thấy hồ sơ!\nCCCD: " + cccd + "\nHạng: " + hang);
+                    return;
+                }
+
+                // Hiện kết quả ngay trong trang — không cần chuyển màn hình
+                const i = typeof hs.thong_tin_bo_sung === 'string'
+                    ? JSON.parse(hs.thong_tin_bo_sung)
+                    : (hs.thong_tin_bo_sung || {});
+                window._hs_hien_tai = hs;
+                window._i_hien_tai = i;
+
+                document.getElementById('ket-qua-tracuu').innerHTML = `
+                    <div style="border:2px solid #000;margin-top:24px;">
+
+                        <div style="background:#000;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
+                            <span style="font-family:var(--font-mono);font-size:18px;font-weight:bold;color:#fff;letter-spacing:1px;">
+                                [ HỒ SƠ — ${hs.hang_dk} ]
+                            </span>
+                            <span style="font-family:var(--font-mono);font-size:13px;padding:4px 12px;border:1px solid;
+                                color:${i.trang_thai_ho_so==='Đang học'?'#ff00ff':i.trang_thai_ho_so==='Tốt nghiệp'?'#aaa':'#fff'};
+                                border-color:${i.trang_thai_ho_so==='Đang học'?'#ff00ff':i.trang_thai_ho_so==='Tốt nghiệp'?'#aaa':'#555'};">
+                                ${i.trang_thai_ho_so || 'ĐÃ TIẾP NHẬN'}
+                            </span>
+                        </div>
+
+                        <div style="padding:20px;background:#fff;">
+
+                            <div style="font-family:var(--font-mono);font-size:11px;color:#999;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">
+                                I. Thông tin cá nhân
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #000;">
+                                ${[
+                                    ['Họ và tên', (i.ho_va_ten||hs.ho_ten||'—').toUpperCase()],
+                                    ['Số CCCD', i.so_cccd||i.so_cccd_goc||'—'],
+                                    ['Ngày sinh', i.ngay_sinh||'—'],
+                                    ['Giới tính', i.gioi_tinh||'—'],
+                                    ['SĐT', i.sdt||hs.sdt||'—'],
+                                    ['Dân tộc', i.dan_toc||'—'],
+                                ].map(([k,v],idx)=>`
+                                    <div style="padding:10px 14px;border-bottom:1px solid #eee;${idx%2===0?'border-right:1px solid #eee;':''}">
+                                        <div style="font-size:11px;color:#999;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">${k}</div>
+                                        <div style="font-size:14px;font-family:var(--font-mono);margin-top:3px;font-weight:bold;">${v}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <div style="border:1px solid #eee;border-top:none;">
+                                ${[
+                                    ['Quê quán', i.que_quan||'—'],
+                                    ['Hộ khẩu thường trú', i.noi_thuong_tru||'—'],
+                                    ['Nơi ở hiện tại', i.noi_o_hien_tai||'—'],
+                                ].map(([k,v])=>`
+                                    <div style="padding:10px 14px;border-bottom:1px solid #eee;">
+                                        <div style="font-size:11px;color:#999;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">${k}</div>
+                                        <div style="font-size:14px;font-family:var(--font-mono);margin-top:3px;">${v}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <div style="font-family:var(--font-mono);font-size:11px;color:#999;text-transform:uppercase;letter-spacing:2px;margin:20px 0 12px;">
+                                II. Thông tin đăng ký
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #000;">
+                                ${[
+                                    ['Hạng đào tạo', hs.hang_dk||'—'],
+                                    ['Khóa dự kiến', i.khoa_du_kien||'—'],
+                                    ['Bằng lái đã có', i.hang_gplx_da_co||'—'],
+                                    ['Trình độ', i.hoc_luc||'—'],
+                                    ['Nghề nghiệp', i.nghe_nghiep||'—'],
+                                    ['Nơi làm việc', i.noi_lam_viec||'—'],
+                                ].map(([k,v],idx)=>`
+                                    <div style="padding:10px 14px;border-bottom:1px solid #eee;${idx%2===0?'border-right:1px solid #eee;':''}">
+                                        <div style="font-size:11px;color:#999;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">${k}</div>
+                                        <div style="font-size:14px;font-family:var(--font-mono);margin-top:3px;${k==='Hạng đào tạo'?'font-weight:bold;color:#ff00ff;':''}">${v}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div style="border:1px solid #eee;border-top:none;padding:10px 14px;">
+                                <div style="font-size:11px;color:#999;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">Lịch học thực hành</div>
+                                <div style="font-size:14px;font-family:var(--font-mono);margin-top:3px;">${i.gio_hoc_thuc_hanh||'—'}</div>
+                            </div>
+
+                            <div style="font-family:var(--font-mono);font-size:11px;color:#999;text-transform:uppercase;letter-spacing:2px;margin:20px 0 12px;">
+                                III. Liên hệ khẩn cấp
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #000;">
+                                ${[
+                                    ['Họ tên', i.nguoi_lien_he_ten||'—'],
+                                    ['SĐT', i.nguoi_lien_he_sdt||'—'],
+                                ].map(([k,v],idx)=>`
+                                    <div style="padding:10px 14px;${idx%2===0?'border-right:1px solid #eee;':''}">
+                                        <div style="font-size:11px;color:#999;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">${k}</div>
+                                        <div style="font-size:14px;font-family:var(--font-mono);margin-top:3px;">${v}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div style="border:1px solid #eee;border-top:none;padding:10px 14px;">
+                                <div style="font-size:11px;color:#999;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">Địa chỉ</div>
+                                <div style="font-size:14px;font-family:var(--font-mono);margin-top:3px;">${i.nguoi_lien_he_dia_chi||'—'}</div>
+                            </div>
+
+                        </div>
+
+                        <div style="padding:0 20px 20px;background:#fff;">
+                            <button onclick="document.getElementById('form-bo-sung').style.display='block';this.style.display='none'"
+                                style="width:100%;padding:14px;background:#fff;color:#000;border:2px solid #000;font-family:var(--font-mono);font-size:15px;font-weight:bold;cursor:pointer;text-transform:uppercase;letter-spacing:1px;transition:0.2s;"
+                                onmouseover="this.style.background='#000';this.style.color='#fff'"
+                                onmouseout="this.style.background='#fff';this.style.color='#000'">
+                                ✏ BỔ SUNG / CHỈNH SỬA THÔNG TIN
+                            </button>
+                        </div>
+
+                        <div id="form-bo-sung" style="display:none;border-top:2px solid #000;padding:20px;background:#f5f5f5;">
+                            <div style="font-family:var(--font-mono);font-size:11px;color:#999;text-transform:uppercase;letter-spacing:2px;margin-bottom:15px;">
+                                Chỉ điền ô cần bổ sung — để trống = giữ nguyên cũ
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                                <div><label style="font-size:12px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">SĐT cá nhân:</label>
+                                    <input id="bs_sdt" class="form-control" style="margin-top:5px;" placeholder="${i.sdt||hs.sdt||'Chưa có'}"></div>
+                                <div><label style="font-size:12px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">Nghề nghiệp:</label>
+                                    <select id="bs_nghe" class="form-control" style="margin-top:5px;" onchange="var ô=document.getElementById('bs_nghe_khac');ô.style.display=this.value==='Khác'?'block':'none';">
+                                        <option value="">-- Giữ nguyên (${i.nghe_nghiep||'Chưa có'}) --</option>
+                                        <option value="Công nhân">Công nhân</option>
+                                        <option value="Học sinh/Sinh viên">Học sinh/Sinh viên</option>
+                                        <option value="Nhân viên văn phòng">Nhân viên văn phòng</option>
+                                        <option value="Kinh doanh tự do">Kinh doanh tự do</option>
+                                        <option value="Lái xe">Lái xe</option>
+                                        <option value="Nông nghiệp">Nông nghiệp</option>
+                                        <option value="Khác">Khác...</option>
+                                    </select>
+                                    <input id="bs_nghe_khac" class="form-control" placeholder="Nhập nghề nghiệp..." style="display:none;margin-top:6px;"></div>
+                                <div><label style="font-size:12px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">Nơi làm việc:</label>
+                                    <input id="bs_noilam" class="form-control" style="margin-top:5px;" placeholder="${i.noi_lam_viec||'Chưa có'}"></div>
+                                <div><label style="font-size:12px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">Trình độ học lực:</label>
+                                    <select id="bs_hocluc" class="form-control" style="margin-top:5px;">
+                                        <option value="">-- Giữ nguyên (${i.hoc_luc||'THPT'}) --</option>
+                                        <option value="THCS">THCS</option>
+                                        <option value="THPT">THPT</option>
+                                        <option value="Trung cấp">Trung cấp</option>
+                                        <option value="Cao đẳng">Cao đẳng</option>
+                                        <option value="Đại học">Đại học</option>
+                                    </select></div>
+                            </div>
+                            <div style="margin-top:12px;">
+                                <label style="font-size:12px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">Nơi ở hiện tại:</label>
+                                <input id="bs_noio" class="form-control" style="margin-top:5px;" placeholder="${i.noi_o_hien_tai||'Chưa có'}">
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:12px;">
+                                <div><label style="font-size:12px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">Họ tên người thân:</label>
+                                    <input id="bs_lh_ten" class="form-control" style="margin-top:5px;" placeholder="${i.nguoi_lien_he_ten||'Chưa có'}"></div>
+                                <div><label style="font-size:12px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">SĐT người thân:</label>
+                                    <input id="bs_lh_sdt" class="form-control" style="margin-top:5px;" placeholder="${i.nguoi_lien_he_sdt||'Chưa có'}"></div>
+                            </div>
+                            <div style="margin-top:12px;">
+                                <label style="font-size:12px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">Địa chỉ người thân:</label>
+                                <input id="bs_lh_dc" class="form-control" style="margin-top:5px;" placeholder="${i.nguoi_lien_he_dia_chi||'Chưa có'}">
+                            </div>
+                            <div style="margin-top:15px;">
+                                <label style="font-size:12px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">Lịch học thực hành:</label>
+                                <div style="overflow-x:auto;margin-top:8px;border:1px solid #000;">
+                                    <table class="schedule-table">
+                                        <thead><tr><th>Ca \\ Thứ</th><th>T2</th><th>T3</th><th>T4</th><th>T5</th><th>T6</th><th>T7</th><th>CN</th></tr></thead>
+                                        <tbody>
+                                            <tr><td><b>Sáng</b></td>${['T2','T3','T4','T5','T6','T7','CN'].map(t=>`<td><input type="checkbox" class="cb-bs-schedule" value="${t}-Sáng" ${(i.gio_hoc_thuc_hanh||'').includes(t+'-Sáng')?'checked':''}></td>`).join('')}</tr>
+                                            <tr><td><b>Chiều</b></td>${['T2','T3','T4','T5','T6','T7','CN'].map(t=>`<td><input type="checkbox" class="cb-bs-schedule" value="${t}-Chiều" ${(i.gio_hoc_thuc_hanh||'').includes(t+'-Chiều')?'checked':''}></td>`).join('')}</tr>
+                                            <tr><td><b>Tối</b></td>${['T2','T3','T4','T5','T6','T7','CN'].map(t=>`<td><input type="checkbox" class="cb-bs-schedule" value="${t}-Tối" ${(i.gio_hoc_thuc_hanh||'').includes(t+'-Tối')?'checked':''}></td>`).join('')}</tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <input id="bs_gio_hoc_khac" class="form-control" placeholder="Ghi chú thêm về lịch học..." style="margin-top:8px;">
+                            </div>
+                            <button id="btn-luu-bosung" onclick="luuBoSung()"
+                                style="width:100%;padding:14px;background:#000;color:#ff00ff;border:2px solid #000;font-family:var(--font-mono);font-size:16px;font-weight:bold;cursor:pointer;text-transform:uppercase;letter-spacing:2px;margin-top:20px;transition:0.2s;"
+                                onmouseover="this.style.background='#ff00ff';this.style.color='#000'"
+                                onmouseout="this.style.background='#000';this.style.color='#ff00ff'">
+                                LƯU BỔ SUNG
+                            </button>
+                        </div>
+
+                    </div>
+                `;
+
+            } catch(e) {
+                alert("Lỗi: " + e.message);
+            } finally {
+                document.getElementById('btn-tracuu').innerText = "TÌM KIẾM DỮ LIỆU";
+                document.getElementById('btn-tracuu').disabled = false;
+            }
+        }
+        function hienThiManHinhXem(hs) {
+            const i = typeof hs.thong_tin_bo_sung === 'string'
+                ? JSON.parse(hs.thong_tin_bo_sung)
+                : (hs.thong_tin_bo_sung || {});
+
+            // Điền thông tin vào các ô read-only
+            document.getElementById('v_ho_va_ten').innerText   = (i.ho_va_ten || hs.ho_ten || "").toUpperCase() || "—";
+            document.getElementById('v_so_cccd').innerText     = i.so_cccd || i.so_cccd_goc || "—";
+            document.getElementById('v_ngay_sinh').innerText   = i.ngay_sinh || "—";
+            document.getElementById('v_gioi_tinh').innerText   = i.gioi_tinh || "—";
+            document.getElementById('v_sdt').innerText         = i.sdt || hs.sdt || "—";
+            document.getElementById('v_dan_toc').innerText     = i.dan_toc || "—";
+            document.getElementById('v_que_quan').innerText    = i.que_quan || "—";
+            document.getElementById('v_thuong_tru').innerText  = i.noi_thuong_tru || "—";
+            document.getElementById('v_noi_o').innerText       = i.noi_o_hien_tai || "—";
+            document.getElementById('v_hang_dk').innerText     = hs.hang_dk || "—";
+            document.getElementById('v_trang_thai').innerText  = i.trang_thai_ho_so || "Đã hoàn tất";
+            document.getElementById('v_khoa').innerText        = i.khoa_du_kien || "—";
+            document.getElementById('v_gplx').innerText        = i.hang_gplx_da_co || "—";
+            document.getElementById('v_lich_hoc').innerText    = i.gio_hoc_thuc_hanh || "—";
+            document.getElementById('v_lh_ten').innerText      = i.nguoi_lien_he_ten || "—";
+            document.getElementById('v_lh_sdt').innerText      = i.nguoi_lien_he_sdt || "—";
+            document.getElementById('v_lh_dia_chi').innerText  = i.nguoi_lien_he_dia_chi || "—";
+
+            // Thanh trạng thái màu xanh/cam
+            const bar = document.getElementById('view-trang-thai-bar');
+            const ts = i.trang_thai_ho_so || "";
+            bar.style.background = ts === 'Đang học' ? '#e8f5e9' :
+                                   ts === 'Tốt nghiệp' ? '#e3f2fd' :
+                                   ts === 'Mới nộp' ? '#fff8e1' : '#f5f5f5';
+            bar.style.color = '#333';
+            bar.innerText = `📋 Hồ sơ hạng ${hs.hang_dk} — Trạng thái: ${ts || "Đã tiếp nhận"}`;
+
+            chuyenManHinh('view-screen');
+        }
+        async function luuBoSung() {
+            const hs_id = window._hs_hien_tai.id;
+            const cu = window._i_hien_tai;
+            const lay = (id, fallback) => document.getElementById(id).value.trim() || fallback || '';
+
+            const moi = {
+                ...cu,
+                sdt:                 lay('bs_sdt',     cu.sdt),
+                nghe_nghiep:         lay('bs_nghe',    cu.nghe_nghiep),
+                noi_lam_viec:        lay('bs_noilam',  cu.noi_lam_viec),
+                hoc_luc:             lay('bs_hocluc',  cu.hoc_luc),
+                noi_o_hien_tai:      lay('bs_noio',    cu.noi_o_hien_tai),
+                nguoi_lien_he_ten:   lay('bs_lh_ten',  cu.nguoi_lien_he_ten),
+                nguoi_lien_he_sdt:   lay('bs_lh_sdt',  cu.nguoi_lien_he_sdt),
+                nguoi_lien_he_dia_chi: lay('bs_lh_dc', cu.nguoi_lien_he_dia_chi),
+                gio_hoc_thuc_hanh: (function() {
+                    const checked = [...document.querySelectorAll('.cb-bs-schedule:checked')].map(cb => cb.value);
+                    if(checked.length === 0) return cu.gio_hoc_thuc_hanh || '';
+                    const note = document.getElementById('bs_gio_hoc_khac').value.trim();
+                    return checked.join(', ') + (note ? ' | ' + note : '');
+                })(),
+                gio_hoc_raw: (function() {
+                    const checked = [...document.querySelectorAll('.cb-bs-schedule:checked')].map(cb => cb.value);
+                    if(checked.length === 0) return cu.gio_hoc_raw || {};
+                    return { raw_list: checked, note: document.getElementById('bs_gio_hoc_khac').value.trim() };
+                })(),
+            };
+
+            document.getElementById('btn-luu-bosung').innerText = 'ĐANG LƯU...';
+            document.getElementById('btn-luu-bosung').disabled = true;
+
+            try {
+                const { error } = await db.from('ho_so_online')
+                    .update({ thong_tin_bo_sung: moi })
+                    .eq('id', hs_id);
+
+                if(error) throw error;
+
+                alert("✅ Đã lưu bổ sung thành công!\nAgent sẽ đồng bộ về máy tính trong vòng 60 giây.");
+                document.getElementById('form-bo-sung').style.display = 'none';
+                document.getElementById('ket-qua-tracuu').innerHTML = '';
+
+            } catch(e) {
+                alert("Lỗi lưu: " + e.message);
+                document.getElementById('btn-luu-bosung').disabled = false;
+                document.getElementById('btn-luu-bosung').innerText = 'LƯU BỔ SUNG';
+            }
+        }
+    </script>
+</body>
+</html>
