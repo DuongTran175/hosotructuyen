@@ -288,8 +288,10 @@
 
         async function nopHoSo() {
             const hang = document.getElementById('hang_dk').value;
-            const cccd_raw = ""; // CCCD sẽ do AI đọc từ ảnh
-            if(!hang || !cccd_raw.trim()) return alert("Hệ thống từ chối: Thiếu trường dữ liệu bắt buộc (*)");
+            if(!hang) return alert("Vui lòng chọn Hạng đào tạo!");
+            const co_anh = ['files_vneid','files_cccd','files_gplx','files_chan_dung','files_vnetraffic']
+                .some(id => document.getElementById(id).files.length > 0);
+            if(!co_anh) return alert("Vui lòng chọn ít nhất 1 ảnh giấy tờ!");
             
             const cccd = cccd_raw.replace(/\s/g, ''); 
 
