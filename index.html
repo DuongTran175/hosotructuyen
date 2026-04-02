@@ -55,9 +55,9 @@
         <div class="sidebar-logo"><img src="IMG_2356.JPG" alt="Logo" onerror="this.outerHTML='<span style=\'font-size: 28px;\'>◯</span>'">Dương Trần</div>
         <div class="nav-group-title">Hồ Sơ Học Viên</div>
         <div class="nav-item active" id="nav-step1" onclick="chuyenManHinh('step1')">Khởi Tạo Hồ Sơ</div>
-        <div class="nav-item" id="nav-tracuu" onclick="chuyenManHinh('box-tracuu')">Tra Cứu Dữ Liệu</div>
+        <div class="nav-item" id="nav-tracuu" onclick="chuyenManHinh('box-tracuu')">Tra Cứu Hồ sơ</div>
         <div style="margin-top: 40px;" class="nav-group-title">Hỗ Trợ</div>
-        <div class="nav-item" onclick="alert('Hotline hỗ trợ kỹ thuật: 09xx.xxx.xxx')">Liên Hệ Giáo Viên</div>
+        <div class="nav-item" onclick="alert('Hotline hỗ trợ kỹ thuật: 0902.077.049')">Liên Hệ Giáo Viên</div>
     </div>
 
     <div class="main-wrapper">
@@ -76,9 +76,9 @@
 
         <div class="container-main" id="step1">
             <h2 class="title-main">Khởi Tạo Hồ Sơ</h2>
-            <div class="note">Receiver: <b>Dương Trần</b><br>Chỉ cần nhập thông tin cơ bản. Hệ thống OCR sẽ tự động đọc các dữ liệu cá nhân từ hình ảnh của bạn.</div>
+            <div class="note">Receiver: <b>Dương Trần</b><br>Chỉ cần nhập thông tin cơ bản. Hệ thống sẽ tự động đọc các dữ liệu cá nhân từ hình ảnh của bạn.</div>
 
-            <div class="section-title">I. Thông Tin Bắt Buộc</div>
+            <div class="section-title">I. THÔNG TIN BẮT BUỘC</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="form-group">
                     <label>Hạng Đào Tạo (*):</label>
@@ -96,19 +96,19 @@
                 <small style="color:#888;">Dùng cho hạng D1, D2, Dm, CE, Cm — học viên tự khai</small>
             </div>
 
-            <div class="section-title">II. Nguồn Giới Thiệu (Tùy chọn)</div>
+            <div class="section-title">II. NGƯỜI GIỚI THIỆU (Tùy chọn)</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="form-group"><label>Họ Tên Người GT:</label><input type="text" id="nguoi_gt_nop" class="form-control" placeholder="Để trống nếu không có"></div>
                 <div class="form-group"><label>SĐT (Zalo) Người GT:</label><input type="tel" id="sdt_gt_nop" class="form-control" placeholder="Để trống nếu không có"></div>
             </div>
 
-            <div class="section-title">III. Tải Lên Tệp Đính Kèm</div>
+            <div class="section-title">III. TẢI ẢNH TỆP ĐÍNH KÈM</div>
             <div class="upload-grid">
                 <div class="upload-card vneid-card" id="card_vneid"><div class="title">[+] VNeID (Mức 2)</div><div class="subtitle">Khuyến khích sử dụng</div><input type="file" id="files_vneid" accept="image/*" multiple><div id="status_files_vneid" class="file-status"></div></div>
                 <div class="upload-card" id="card_cccd"><div class="title">[+] Thẻ CCCD</div><div class="subtitle">Mặt trước và sau</div><input type="file" id="files_cccd" accept="image/*" multiple><div id="status_files_cccd" class="file-status"></div></div>
                 <div class="upload-card" id="card_chan_dung"><div class="title">[+] Ảnh Chân Dung</div><div class="subtitle">Tỷ lệ 3x4</div><input type="file" id="files_chan_dung" accept="image/*" multiple><div id="status_files_chan_dung" class="file-status"></div></div>
-                <div class="upload-card" id="card_gplx"><div class="title">[+] GPLX Cũ</div><div class="subtitle">Nếu đã có bằng</div><input type="file" id="files_gplx" accept="image/*" multiple><div id="status_files_gplx" class="file-status"></div></div>
-                <div class="upload-card" id="card_vnetraffic"><div class="title">[+] VNeTraffic</div><div class="subtitle">Tùy chọn</div><input type="file" id="files_vnetraffic" accept="image/*" multiple><div id="status_files_vnetraffic" class="file-status"></div></div>
+                <div class="upload-card" id="card_gplx"><div class="title">[+] GPLX (2 mặt)</div><div class="subtitle">Nếu đã có bằng lái</div><input type="file" id="files_gplx" accept="image/*" multiple><div id="status_files_gplx" class="file-status"></div></div>
+                <div class="upload-card" id="card_vnetraffic"><div class="title">[+] VNeTraffic</div><div class="subtitle">Ảnh đăng nhập</div><input type="file" id="files_vnetraffic" accept="image/*" multiple><div id="status_files_vnetraffic" class="file-status"></div></div>
             </div>
 
             <button onclick="nopHoSo()" id="btnSubmit" class="btn-main">GỬI YÊU CẦU XỬ LÝ</button>
