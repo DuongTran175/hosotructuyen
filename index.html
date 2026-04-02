@@ -292,8 +292,8 @@
             const co_anh = ['files_vneid','files_cccd','files_gplx','files_chan_dung','files_vnetraffic']
                 .some(id => document.getElementById(id).files.length > 0);
             if(!co_anh) return alert("Vui lòng chọn ít nhất 1 ảnh giấy tờ!");
-            
-            const cccd = cccd_raw.replace(/\s/g, ''); 
+
+            const cccd = ""; 
 
             document.getElementById('btnSubmit').innerText = "ĐANG ĐỒNG BỘ..."; document.getElementById('btnSubmit').disabled = true;
 
@@ -302,13 +302,8 @@
                 const { data: allData, error: fetchErr } = await db.from('ho_so_online').select('*').order('created_at',{ascending:false});
                 if(fetchErr) throw fetchErr;
 
-                const existing = allData.filter(item => {
-                    if (item.hang_dk !== hang) return false;
-                    if (!item.thong_tin_bo_sung) return false;
-                    let info = typeof item.thong_tin_bo_sung === 'string' ? JSON.parse(item.thong_tin_bo_sung) : item.thong_tin_bo_sung;
-                    let dbCccd = (info.so_cccd_goc || info.so_cccd || "").replace(/\s/g, '');
-                    return dbCccd === cccd;
-                });
+                // Không lọc theo CCCD vì AI sẽ đọc từ ảnh
+                const existing = [];
 
                 if(existing && existing.length > 0) {
                     let hs = existing[0];
