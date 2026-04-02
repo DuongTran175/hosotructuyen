@@ -96,8 +96,6 @@
                 <small style="color:#888;">Dùng cho hạng D1, D2, Dm, CE, Cm — học viên tự khai</small>
             </div>
 
-            <div class="section-title">II. Nguồn Giới Thiệu
-
             <div class="section-title">II. Nguồn Giới Thiệu (Tùy chọn)</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="form-group"><label>Họ Tên Người GT:</label><input type="text" id="nguoi_gt_nop" class="form-control" placeholder="Để trống nếu không có"></div>
@@ -224,7 +222,6 @@
             <button onclick="location.reload()" class="btn-main" style="width: auto; padding: 12px 40px;">KẾT THÚC PHIÊN</button>
         </div>
     </div>
-    </div>
 
     <script>
         const SUPABASE_URL = 'https://wazvziouhwkdthekpajv.supabase.co';
@@ -252,14 +249,24 @@
         }
 
         function chuyenManHinh(id) {
-            ['step1', 'box-tracuu', 'loading-overlay', 'step3', 'success-screen', 'view-screen'].forEach(s => {
-                let el = document.getElementById(s); if(el) el.classList.add('hidden');
+            // Ẩn tất cả container (dùng cả class hidden lẫn display:none để chắc chắn)
+            ['step1', 'box-tracuu', 'step3', 'success-screen', 'view-screen'].forEach(s => {
+                const el = document.getElementById(s);
+                if (el) { el.classList.add('hidden'); el.style.display = 'none'; }
             });
-            let target = document.getElementById(id);
-            if(target) { target.classList.remove('hidden'); target.style.display = id === 'loading-overlay' ? 'flex' : 'block'; }
-            
+            // Loading overlay dùng display:none riêng
+            const lo = document.getElementById('loading-overlay');
+            if (lo) lo.style.display = 'none';
+
+            // Hiện đúng target
+            const target = document.getElementById(id);
+            if (target) {
+                target.classList.remove('hidden');
+                target.style.display = id === 'loading-overlay' ? 'flex' : 'block';
+            }
+
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            if(id === 'step1' || id === 'step3') document.getElementById('nav-step1').classList.add('active');
+            if (id === 'step1' || id === 'step3') document.getElementById('nav-step1').classList.add('active');
             else if (id === 'box-tracuu') document.getElementById('nav-tracuu').classList.add('active');
         }
         
@@ -275,8 +282,8 @@
             } return urls;
         }
 
-        function getSchedule(ctx) {
-            if (!ctx || !ctx.querySelector) ctx = document;
+        function getSchedule(container) {
+            const ctx = container && container.querySelector ? container : document;
             let slots = []; document.querySelectorAll(`.cb-schedule-chk:checked`).forEach(cb => slots.push(cb.value));
             let note = document.getElementById(`gio_hoc_khac_chk`).value.trim();
             let dict = {}; slots.forEach(s => { let p = s.split('-'); if(!dict[p[0]]) dict[p[0]]=[]; dict[p[0]].push(p[1]); });
@@ -357,8 +364,6 @@
         }
 
         function hienThiFormXacNhan(hs) {
-            chuyenManHinh('step3');
-            document.getElementById('recordId').value = hs.id;
             const i = typeof hs.thong_tin_bo_sung === 'string'
                 ? JSON.parse(hs.thong_tin_bo_sung)
                 : (hs.thong_tin_bo_sung || {});
@@ -366,32 +371,62 @@
             window.temp_hs_bosung = i;
             window._hs_id_xacnhan = hs.id;
 
-            document.getElementById('ho_va_ten_chk').value = (i.ho_va_ten || hs.ho_ten || '').toUpperCase().replace('CHƯA XÁC ĐỊNH','');
-            document.getElementById('so_cccd_chk').value   = i.so_cccd || i.so_cccd_goc || '';
-            document.getElementById('sdt_chk').value       = i.sdt || hs.sdt || '';
-            document.getElementById('ngay_sinh_chk').value = i.ngay_sinh || '';
+            // 1. Ẩn spinner và timeout box
+            document.getElementById('loading-spinner-box').classList.add('hidden');
+            document.getElementById('timeout-box').classList.add('hidden');
 
-            const gt = i.gioi_tinh || '';
-            if (gt) document.getElementById('gio_tinh_chk').value = gt.toLowerCase().includes('nam') ? 'Nam' : 'Nữ';
+            // 2. Tạo formDiv trong overlay (chỉ tạo 1 lần)
+            let formDiv = document.getElementById('inline-xacnhan');
+            if (!formDiv) {
+                formDiv = document.createElement('div');
+                formDiv.id = 'inline-xacnhan';
+                formDiv.style.cssText = [
+                    'width:100%',
+                    'max-width:720px',
+                    'max-height:92vh',
+                    'overflow-y:auto',
+                    'background:#fff',
+                    'padding:30px',
+                    'box-sizing:border-box',
+                    'text-align:left',
+                    'border:2px solid #000'
+                ].join(';');
+                document.getElementById('loading-overlay').appendChild(formDiv);
+            }
 
-            document.getElementById('noi_thuong_tru_chk').value  = i.noi_thuong_tru || i.dia_chi || '';
-            document.getElementById('noi_o_hien_tai_chk').value  = i.noi_o_hien_tai || '';
-            document.getElementById('hoc_luc_chk').value         = i.hoc_luc || 'THPT';
-            document.getElementById('noi_lam_viec_chk').value    = i.noi_lam_viec || '';
-            document.getElementById('nguoi_lh_ten_chk').value    = i.nguoi_lien_he_ten || '';
-            document.getElementById('nguoi_lh_sdt_chk').value    = i.nguoi_lien_he_sdt || '';
-            document.getElementById('nguoi_lh_dia_chi_chk').value = i.nguoi_lien_he_dia_chi || '';
+            // 3. Clone nội dung step3 vào formDiv
+            const step3 = document.getElementById('step3');
+            formDiv.innerHTML = step3.innerHTML;
 
-            const raw = i.gio_hoc_raw || { raw_list: [], note: '' };
-            document.querySelectorAll('.cb-schedule-chk').forEach(cb => cb.checked = false);
-            if (Array.isArray(raw.raw_list)) raw.raw_list.forEach(v => {
-                const cb = document.querySelector('.cb-schedule-chk[value="' + v + '"]');
-                if (cb) cb.checked = true;
-            });
-            document.getElementById('gio_hoc_khac_chk').value = raw.note || '';
+            // 4. Helper: lấy element trong formDiv
+            const q = (sel) => formDiv.querySelector(sel);
+            const set = (id, val) => { const el = q('#' + id); if (el) el.value = val || ''; };
 
-            const selNghe = document.getElementById('nghe_nghiep_chk');
-            const inpNghe = document.getElementById('nghe_nghiep_khac_chk');
+            // 5. Điền dữ liệu cá nhân
+            let tenFinal = (i.ho_va_ten || hs.ho_ten || '').toUpperCase();
+            if (tenFinal === 'CHƯA XÁC ĐỊNH') tenFinal = '';
+            set('ho_va_ten_chk', tenFinal);
+            set('so_cccd_chk',   i.so_cccd || i.so_cccd_goc || '');
+            set('sdt_chk',       i.sdt || hs.sdt || '');
+            set('ngay_sinh_chk', i.ngay_sinh || '');
+            set('noi_thuong_tru_chk',  i.noi_thuong_tru || i.dia_chi || '');
+            set('noi_o_hien_tai_chk',  i.noi_o_hien_tai || '');
+            set('hoc_luc_chk',         i.hoc_luc || 'THPT');
+            set('noi_lam_viec_chk',    i.noi_lam_viec || '');
+            set('nguoi_lh_ten_chk',    i.nguoi_lien_he_ten || '');
+            set('nguoi_lh_sdt_chk',    i.nguoi_lien_he_sdt || '');
+            set('nguoi_lh_dia_chi_chk', i.nguoi_lien_he_dia_chi || '');
+            set('recordId', hs.id);
+
+            // 6. Giới tính
+            const gtEl = q('#gio_tinh_chk');
+            if (gtEl && i.gioi_tinh) {
+                gtEl.value = i.gioi_tinh.toLowerCase().includes('nam') ? 'Nam' : 'Nữ';
+            }
+
+            // 7. Nghề nghiệp
+            const selNghe = q('#nghe_nghiep_chk');
+            const inpNghe = q('#nghe_nghiep_khac_chk');
             if (selNghe && i.nghe_nghiep) {
                 const found = Array.from(selNghe.options).some(o => o.value === i.nghe_nghiep);
                 if (found) {
@@ -401,60 +436,74 @@
                     if (inpNghe) { inpNghe.classList.remove('hidden'); inpNghe.value = i.nghe_nghiep; }
                 }
             }
+            if (selNghe) {
+                selNghe.onchange = function () {
+                    if (inpNghe) inpNghe.classList.toggle('hidden', this.value !== 'Khác');
+                };
+            }
+
+            // 8. Lịch học
+            const raw = i.gio_hoc_raw || { raw_list: [], note: '' };
+            formDiv.querySelectorAll('.cb-schedule-chk').forEach(cb => { cb.checked = false; });
+            if (Array.isArray(raw.raw_list)) {
+                raw.raw_list.forEach(v => {
+                    const cb = formDiv.querySelector('.cb-schedule-chk[value="' + v + '"]');
+                    if (cb) cb.checked = true;
+                });
+            }
+            const gioKhac = q('#gio_hoc_khac_chk');
+            if (gioKhac) gioKhac.value = raw.note || '';
+
+            // 9. Kết nối nút LƯU
+            const btnFinal = q('#btnFinal');
+            if (btnFinal) btnFinal.onclick = hoanTatHoSo;
+
+            // 10. Hiển thị overlay
+            document.getElementById('loading-overlay').style.display = 'flex';
         }
 
-
         async function hoanTatHoSo() {
-            const hoten  = document.getElementById('ho_va_ten_chk').value;
-            const sdt    = document.getElementById('sdt_chk').value;
-            const lh_ten = document.getElementById('nguoi_lh_ten_chk').value;
-            const lh_sdt = document.getElementById('nguoi_lh_sdt_chk').value;
+            const formDiv = document.getElementById('inline-xacnhan') || document;
+            const getVal = (id) => (formDiv.querySelector ? formDiv.querySelector('#'+id) : document.getElementById(id))?.value || '';
+            const hoten = getVal('ho_va_ten_chk');
+            const sdt = getVal('sdt_chk');
+            const lh_ten = getVal('nguoi_lh_ten_chk');
+            const lh_sdt = getVal('nguoi_lh_sdt_chk');
+            
+            if(!hoten || !sdt) return alert("Vui lòng điền đủ Họ tên và SĐT cá nhân ở phần I !");
+            if(!lh_ten || !lh_sdt) return alert("Vui lòng điền thông tin Người liên hệ khẩn cấp ở phần III !");
 
-            if (!hoten || !sdt) return alert("Vui lòng điền đủ Họ tên và SĐT cá nhân ở phần I!");
-            if (!lh_ten || !lh_sdt) return alert("Vui lòng điền thông tin Người liên hệ khẩn cấp ở phần III!");
-
-            document.getElementById('btnFinal').innerText = "ĐANG LƯU DỮ LIỆU...";
-            document.getElementById('btnFinal').disabled = true;
-
-            const sched = getSchedule(document);
-            let nghe = document.getElementById('nghe_nghiep_chk').value;
-            if (nghe === 'Khác') nghe = document.getElementById('nghe_nghiep_khac_chk').value;
+            const btnFinal = formDiv.querySelector ? (formDiv.querySelector('#btnFinal')||document.getElementById('btnFinal')) : document.getElementById('btnFinal');
+            btnFinal.innerText = "ĐANG LƯU DỮ LIỆU..."; btnFinal.disabled = true;
+            const sched = getSchedule(formDiv);
+            let nghe = getVal('nghe_nghiep_chk'); if(nghe==='Khác') nghe = getVal('nghe_nghiep_khac_chk');
 
             const updateData = {
                 ...(window.temp_hs_bosung || {}),
-                ngay_sinh:    document.getElementById('ngay_sinh_chk').value,
-                gioi_tinh:    document.getElementById('gio_tinh_chk').value,
-                so_cccd:      document.getElementById('so_cccd_chk').value,
-                sdt:          sdt,
-                noi_thuong_tru:        document.getElementById('noi_thuong_tru_chk').value,
-                noi_o_hien_tai:        document.getElementById('noi_o_hien_tai_chk').value,
-                nghe_nghiep:           nghe,
-                noi_lam_viec:          document.getElementById('noi_lam_viec_chk').value,
-                hoc_luc:               document.getElementById('hoc_luc_chk').value,
-                gio_hoc_thuc_hanh:     sched.readable,
-                gio_hoc_raw:           { raw_list: sched.raw, note: sched.note },
-                nguoi_lien_he_ten:     lh_ten,
-                nguoi_lien_he_sdt:     lh_sdt,
-                nguoi_lien_he_dia_chi: document.getElementById('nguoi_lh_dia_chi_chk').value
+                ngay_sinh: getVal('ngay_sinh_chk'),
+                gioi_tinh: getVal('gio_tinh_chk'),
+                so_cccd: getVal('so_cccd_chk'),
+                sdt: sdt,
+                noi_thuong_tru: getVal('noi_thuong_tru_chk'),
+                noi_o_hien_tai: getVal('noi_o_hien_tai_chk'),
+                nghe_nghiep: nghe,
+                noi_lam_viec: getVal('noi_lam_viec_chk'),
+                hoc_luc: getVal('hoc_luc_chk'),
+                gio_hoc_thuc_hanh: sched.readable,
+                gio_hoc_raw: { raw_list: sched.raw, note: sched.note },
+                nguoi_lien_he_ten: lh_ten,
+                nguoi_lien_he_sdt: lh_sdt,
+                nguoi_lien_he_dia_chi: getVal('nguoi_lh_dia_chi_chk')
             };
 
-            const hs_id = window._hs_id_xacnhan || document.getElementById('recordId').value;
-            const { error } = await db.from('ho_so_online').update({
-                ho_ten: hoten.toUpperCase(),
-                sdt: sdt,
-                thong_tin_bo_sung: updateData,
-                trang_thai: 'KHACH_DA_SUA'
-            }).eq('id', hs_id);
-
-            if (!error) {
-                chuyenManHinh('success-screen');
-            } else {
-                alert("Lỗi ghi: " + error.message);
-                document.getElementById('btnFinal').innerText = "LƯU TRỮ VÀO HỆ THỐNG";
-                document.getElementById('btnFinal').disabled = false;
-            }
+            const hs_id = (formDiv.querySelector ? formDiv.querySelector('#recordId') : document.getElementById('recordId'))?.value || document.getElementById('recordId').value;
+            const { error } = await db.from('ho_so_online').update({ ho_ten: hoten.toUpperCase(), sdt: sdt, thong_tin_bo_sung: updateData, trang_thai: 'KHACH_DA_SUA' }).eq('id', hs_id);
+            if(!error) {
+                document.getElementById('loading-overlay').style.display = 'none';
+                alert('✅ Hồ sơ đã được lưu thành công! Chúng tôi sẽ liên hệ với bạn sớm.');
+                location.reload();
+            } else { alert("Lỗi ghi: " + error.message); btnFinal.disabled = false; }
         }
-
 
         async function traCuuThuCong() {
             const cccd = document.getElementById('cccd_tracuu_input').value.replace(/\s/g,'').trim();
