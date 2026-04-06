@@ -531,7 +531,7 @@
                 const { data, error } = await db.from('ho_so_online')
                     .select('*')
                     .eq('hang_dk', hang)
-                    .eq('trang_thai', 'HOAN_TAT');
+                    .in('trang_thai', ['HOAN_TAT', 'CHO_KHACH_XEM', 'KHACH_DA_SUA', 'LOI_XU_LY', 'DANG_XU_LY']);
 
                 if(error) throw error;
 
@@ -776,7 +776,7 @@
             const moi = {
                 ...cu,
                 sdt:                 lay('bs_sdt',     cu.sdt),
-                nghe_nghiep:         lay('bs_nghe',    cu.nghe_nghiep),
+                nghe_nghiep:         (document.getElementById('bs_nghe').value === 'Khác' ? lay('bs_nghe_khac', cu.nghe_nghiep) : lay('bs_nghe', cu.nghe_nghiep)),
                 noi_lam_viec:        lay('bs_noilam',  cu.noi_lam_viec),
                 hoc_luc:             lay('bs_hocluc',  cu.hoc_luc),
                 noi_o_hien_tai:      lay('bs_noio',    cu.noi_o_hien_tai),
@@ -801,12 +801,17 @@
 
             try {
                 const { error } = await db.from('ho_so_online')
-                    .update({ thong_tin_bo_sung: moi })
+                    .update({
+                        thong_tin_bo_sung: moi,
+                        sdt: moi.sdt || window._hs_hien_tai.sdt || '',
+                        trang_thai: 'KHACH_DA_SUA',
+                        cap_nhat_luc: new Date().toISOString()
+                    })
                     .eq('id', hs_id);
 
                 if(error) throw error;
 
-                alert("✅ Đã lưu bổ sung thành công!\nAgent sẽ đồng bộ về máy tính trong vòng 60 giây.");
+                alert("✅ Đã lưu bổ sung thành công!\nHệ thống sẽ tự động đồng bộ về máy tính.");
                 document.getElementById('form-bo-sung').style.display = 'none';
                 document.getElementById('ket-qua-tracuu').innerHTML = '';
 
