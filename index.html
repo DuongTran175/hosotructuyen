@@ -752,6 +752,41 @@
                                 </div>
                                 <input id="bs_gio_hoc_khac" class="form-control" placeholder="Ghi chú thêm về lịch học..." style="margin-top:8px;">
                             </div>
+                            <div style="margin-top:20px;border-top:2px dashed #000;padding-top:15px;">
+                                <div style="font-family:var(--font-mono);font-size:11px;color:#999;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">
+                                    IV. Upload lại ảnh giấy tờ (nếu thiếu)
+                                </div>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                                    <div class="upload-card" id="bs_card_vneid" style="padding:14px;border:1px dashed #888;position:relative;cursor:pointer;">
+                                        <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] VNeID</div>
+                                        <div style="font-size:11px;color:#888;">Ảnh Căn cước điện tử</div>
+                                        <input type="file" id="bs_files_vneid" accept="image/*" multiple style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;"
+                                            onchange="this.parentElement.style.borderColor='#000';this.parentElement.style.borderStyle='solid';this.nextElementSibling.innerText='Đã chọn '+this.files.length+' ảnh'">
+                                        <div style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
+                                    </div>
+                                    <div class="upload-card" id="bs_card_cccd" style="padding:14px;border:1px dashed #888;position:relative;cursor:pointer;">
+                                        <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] CCCD</div>
+                                        <div style="font-size:11px;color:#888;">Mặt trước + sau</div>
+                                        <input type="file" id="bs_files_cccd" accept="image/*" multiple style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;"
+                                            onchange="this.parentElement.style.borderColor='#000';this.parentElement.style.borderStyle='solid';this.nextElementSibling.innerText='Đã chọn '+this.files.length+' ảnh'">
+                                        <div style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
+                                    </div>
+                                    <div class="upload-card" id="bs_card_gplx" style="padding:14px;border:1px dashed #888;position:relative;cursor:pointer;">
+                                        <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] GPLX cũ</div>
+                                        <div style="font-size:11px;color:#888;">Bằng lái đã có</div>
+                                        <input type="file" id="bs_files_gplx" accept="image/*" multiple style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;"
+                                            onchange="this.parentElement.style.borderColor='#000';this.parentElement.style.borderStyle='solid';this.nextElementSibling.innerText='Đã chọn '+this.files.length+' ảnh'">
+                                        <div style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
+                                    </div>
+                                    <div class="upload-card" id="bs_card_chan_dung" style="padding:14px;border:1px dashed #888;position:relative;cursor:pointer;">
+                                        <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] Chân dung</div>
+                                        <div style="font-size:11px;color:#888;">Ảnh 3x4</div>
+                                        <input type="file" id="bs_files_chan_dung" accept="image/*" multiple style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;"
+                                            onchange="this.parentElement.style.borderColor='#000';this.parentElement.style.borderStyle='solid';this.nextElementSibling.innerText='Đã chọn '+this.files.length+' ảnh'">
+                                        <div style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
+                                    </div>
+                                </div>
+                            </div>
                             <button id="btn-luu-bosung" onclick="luuBoSung()"
                                 style="width:100%;padding:14px;background:#000;color:#ff00ff;border:2px solid #000;font-family:var(--font-mono);font-size:16px;font-weight:bold;cursor:pointer;text-transform:uppercase;letter-spacing:2px;margin-top:20px;transition:0.2s;"
                                 onmouseover="this.style.background='#ff00ff';this.style.color='#000'"
@@ -805,6 +840,21 @@
 
             chuyenManHinh('view-screen');
         }
+        async function uploadBoSungFiles(inputId, folderPrefix) {
+            const input = document.getElementById(inputId);
+            if (!input || input.files.length === 0) return [];
+            const sid = getSessionId();
+            let urls = [];
+            let c = 0;
+            for (let file of input.files) {
+                c++;
+                const fileName = `${sid}_bs_${Date.now()}_${c}_${folderPrefix}_${file.name.replace(/[^a-zA-Z0-9.]/g, '')}`;
+                const { data } = await db.storage.from('kho-anh-hoc-vien').upload(fileName, file);
+                if (data) urls.push(db.storage.from('kho-anh-hoc-vien').getPublicUrl(fileName).data.publicUrl);
+            }
+            return urls;
+        }
+
         async function luuBoSung() {
             const hs_id = window._hs_hien_tai.id;
             const cu = window._i_hien_tai;
@@ -837,18 +887,52 @@
             document.getElementById('btn-luu-bosung').disabled = true;
 
             try {
+                // Upload ảnh bổ sung nếu có
+                _sessionId = '';  // Reset session ID cho upload mới
+                const anh_vneid = await uploadBoSungFiles('bs_files_vneid', 'vneid');
+                const anh_cccd = await uploadBoSungFiles('bs_files_cccd', 'cccd');
+                const anh_gplx = await uploadBoSungFiles('bs_files_gplx', 'gplx');
+                const anh_cd = await uploadBoSungFiles('bs_files_chan_dung', 'cd');
+
+                const co_anh_moi = anh_vneid.length + anh_cccd.length + anh_gplx.length + anh_cd.length > 0;
+
+                // Gộp ảnh mới vào anh_data cũ
+                let anh_data_cu = window._hs_hien_tai.anh_data || {};
+                if (typeof anh_data_cu === 'string') {
+                    try { anh_data_cu = JSON.parse(anh_data_cu); } catch(e) { anh_data_cu = {}; }
+                }
+                const anh_data_moi = {
+                    files_vneid: [...(anh_data_cu.files_vneid || []), ...anh_vneid],
+                    files_cccd: [...(anh_data_cu.files_cccd || []), ...anh_cccd],
+                    files_gplx: [...(anh_data_cu.files_gplx || []), ...anh_gplx],
+                    files_chan_dung: [...(anh_data_cu.files_chan_dung || []), ...anh_cd],
+                    files_vnetraffic: anh_data_cu.files_vnetraffic || [],
+                };
+
+                if (co_anh_moi) {
+                    document.getElementById('btn-luu-bosung').innerText = 'ĐANG UPLOAD ẢNH...';
+                }
+
+                const updatePayload = {
+                    thong_tin_bo_sung: moi,
+                    sdt: moi.sdt || window._hs_hien_tai.sdt || '',
+                    trang_thai: co_anh_moi ? 'CHO_XU_LY' : 'KHACH_DA_SUA',
+                    cap_nhat_luc: new Date().toISOString()
+                };
+                if (co_anh_moi) {
+                    updatePayload.anh_data = anh_data_moi;
+                }
+
                 const { error } = await db.from('ho_so_online')
-                    .update({
-                        thong_tin_bo_sung: moi,
-                        sdt: moi.sdt || window._hs_hien_tai.sdt || '',
-                        trang_thai: 'KHACH_DA_SUA',
-                        cap_nhat_luc: new Date().toISOString()
-                    })
+                    .update(updatePayload)
                     .eq('id', hs_id);
 
                 if(error) throw error;
 
-                alert("✅ Đã lưu bổ sung thành công!\nHệ thống sẽ tự động đồng bộ về máy tính.");
+                const msg = co_anh_moi
+                    ? "✅ Đã lưu bổ sung + upload ảnh mới!\nHệ thống sẽ quét lại ảnh và đồng bộ về máy tính."
+                    : "✅ Đã lưu bổ sung thành công!\nHệ thống sẽ tự động đồng bộ về máy tính.";
+                alert(msg);
                 document.getElementById('form-bo-sung').style.display = 'none';
                 document.getElementById('ket-qua-tracuu').innerHTML = '';
 
