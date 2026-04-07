@@ -8,7 +8,7 @@
     <style>
         :root { --bg-color: #ffffff; --text-color: #000000; --sidebar-bg: #000000; --sidebar-text: #ffffff; --accent-color: #ff00ff; --border-color: #000000; --light-gray: #f5f5f5; --font-mono: 'Courier New', Courier, monospace; }
         body { margin: 0; padding: 0; font-family: var(--font-mono); background-color: var(--bg-color); color: var(--text-color); display: flex; min-height: 100vh; line-height: 1.6; }
-        .sidebar { width: 280px; background-color: var(--sidebar-bg); color: var(--sidebar-text); position: fixed; height: 100vh; overflow-y: auto; padding-top: 30px; border-right: 1px solid var(--border-color); }
+        .sidebar { width: 280px; background-color: var(--sidebar-bg); color: var(--sidebar-text); position: fixed; height: 100vh; overflow-y: auto; padding-top: 30px; border-right: 1px solid var(--border-color); z-index: 100; }
         .sidebar-logo { font-family: var(--font-mono); font-weight: bold; font-size: 22px; padding: 0 20px 30px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #333; margin-bottom: 20px; letter-spacing: 1px; }
         .sidebar-logo img { width: 38px; height: 38px; filter: invert(1); object-fit: contain; }
         .nav-group-title { font-family: var(--font-mono); font-size: 16px; font-weight: bold; padding: 15px 20px 8px 20px; color: #ffffff; text-transform: uppercase; letter-spacing: 1px; }
@@ -47,9 +47,102 @@
         .spinner { width: 55px; height: 55px; border: 4px solid var(--light-gray); border-top: 4px solid var(--border-color); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @media (max-width: 768px) { body { flex-direction: column; } .sidebar { width: 100%; height: auto; position: static; padding-bottom: 10px; border-right: none; border-bottom: 1px solid var(--border-color); } .main-wrapper { margin-left: 0; width: 100%; padding: 20px; } .upload-grid { grid-template-columns: 1fr; } }
+
+        /* ===== ONBOARDING: Welcome Modal ===== */
+        .welcome-overlay { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.92); z-index:999999; justify-content:center; align-items:center; }
+        .welcome-modal { background:#fff; max-width:560px; width:92%; max-height:90vh; overflow-y:auto; border:3px solid #000; position:relative; }
+        .welcome-header { background:#000; color:#fff; padding:24px 28px; font-family:var(--font-mono); }
+        .welcome-header h2 { margin:0; font-size:22px; letter-spacing:1px; }
+        .welcome-header p { margin:8px 0 0; font-size:13px; color:#aaa; }
+        .welcome-body { padding:24px 28px; }
+        .welcome-step { display:flex; gap:16px; margin-bottom:20px; align-items:flex-start; }
+        .welcome-step-num { flex-shrink:0; width:36px; height:36px; background:#000; color:#ff00ff; font-family:var(--font-mono); font-weight:bold; font-size:16px; display:flex; align-items:center; justify-content:center; }
+        .welcome-step-content h4 { margin:0 0 4px; font-family:var(--font-mono); font-size:14px; }
+        .welcome-step-content p { margin:0; font-size:13px; color:#666; line-height:1.5; }
+        .welcome-btn { width:100%; padding:16px; background:#000; color:#ff00ff; border:2px solid #000; font-family:var(--font-mono); font-size:16px; font-weight:bold; cursor:pointer; text-transform:uppercase; letter-spacing:2px; transition:0.2s; margin-top:10px; }
+        .welcome-btn:hover { background:#ff00ff; color:#000; }
+        .welcome-skip { display:block; text-align:center; margin-top:12px; font-size:12px; color:#999; cursor:pointer; font-family:var(--font-mono); }
+        .welcome-skip:hover { color:#000; }
+
+        /* ===== ONBOARDING: Progress Bar ===== */
+        .progress-bar-container { display:flex; align-items:center; justify-content:center; margin-bottom:30px; padding:0 10px; }
+        .progress-step { display:flex; align-items:center; gap:0; }
+        .progress-circle { width:32px; height:32px; border:2px solid #ccc; background:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:bold; font-size:13px; color:#ccc; transition:0.3s; flex-shrink:0; }
+        .progress-circle.active { border-color:#000; background:#000; color:#ff00ff; }
+        .progress-circle.done { border-color:#000; background:#000; color:#fff; }
+        .progress-label { font-family:var(--font-mono); font-size:11px; color:#ccc; margin-left:6px; white-space:nowrap; transition:0.3s; }
+        .progress-label.active, .progress-label.done { color:#000; font-weight:bold; }
+        .progress-line { width:40px; height:2px; background:#ccc; margin:0 8px; flex-shrink:0; transition:0.3s; }
+        .progress-line.done { background:#000; }
+        @media (max-width: 600px) { .progress-label { display:none; } .progress-line { width:24px; } }
+
+        /* ===== ONBOARDING: Upload Card Instructions ===== */
+        .upload-card { position:relative; }
+        .upload-help-btn { position:absolute; top:6px; right:8px; width:22px; height:22px; background:#000; color:#fff; border:none; font-family:var(--font-mono); font-size:13px; font-weight:bold; cursor:pointer; z-index:2; display:flex; align-items:center; justify-content:center; transition:0.2s; }
+        .upload-help-btn:hover { background:#ff00ff; }
+        .upload-instruction { display:none; background:#f9f9f9; border:1px solid #ddd; border-top:2px solid #000; padding:14px; margin-top:8px; font-size:12px; line-height:1.6; font-family:var(--font-mono); }
+        .upload-instruction.show { display:block; }
+        .upload-instruction ol { margin:6px 0 0; padding-left:20px; }
+        .upload-instruction li { margin-bottom:4px; }
+        .upload-instruction .tip { background:#fff8e1; padding:8px 10px; margin-top:8px; border-left:3px solid #ff9800; font-size:11px; }
+
+        /* ===== ONBOARDING: Inline Validation ===== */
+        .field-hint { font-size:11px; color:#999; margin-top:4px; font-family:var(--font-mono); transition:0.3s; }
+        .field-hint.error { color:#d32f2f; font-weight:bold; }
+        .form-control.input-error { border-color:#d32f2f !important; background:#fff5f5 !important; }
+        .form-control.input-ok { border-color:#2e7d32 !important; }
     </style>
 </head>
 <body>
+
+    <!-- ===== WELCOME MODAL ===== -->
+    <div class="welcome-overlay" id="welcome-modal">
+        <div class="welcome-modal">
+            <div class="welcome-header">
+                <h2>Chào mừng đến với Hệ Sinh Thái Dương Trần</h2>
+                <p>Hệ thống đăng ký hồ sơ học lái xe trực tuyến</p>
+            </div>
+            <div class="welcome-body">
+                <div style="font-family:var(--font-mono);font-size:12px;color:#999;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">Quy trình 4 bước đơn giản</div>
+
+                <div class="welcome-step">
+                    <div class="welcome-step-num">1</div>
+                    <div class="welcome-step-content">
+                        <h4>Chuẩn bị ảnh giấy tờ</h4>
+                        <p>Chụp màn hình <b>VNeID</b> (ứng dụng định danh điện tử) hoặc chụp ảnh <b>CCCD</b> hai mặt. Nếu đã có bằng lái cũ, chụp thêm ảnh <b>GPLX</b>.</p>
+                    </div>
+                </div>
+                <div class="welcome-step">
+                    <div class="welcome-step-num">2</div>
+                    <div class="welcome-step-content">
+                        <h4>Chọn hạng & tải ảnh lên</h4>
+                        <p>Chọn <b>hạng đào tạo</b> (A1, B, C,...) rồi tải ảnh giấy tờ vào các ô tương ứng. AI sẽ tự động đọc thông tin từ ảnh.</p>
+                    </div>
+                </div>
+                <div class="welcome-step">
+                    <div class="welcome-step-num">3</div>
+                    <div class="welcome-step-content">
+                        <h4>Kiểm tra & bổ sung</h4>
+                        <p>Sau khi AI xử lý xong, bạn sẽ được chuyển sang form để <b>kiểm tra dữ liệu</b>, chọn lịch học và điền thông tin liên hệ khẩn cấp.</p>
+                    </div>
+                </div>
+                <div class="welcome-step">
+                    <div class="welcome-step-num">4</div>
+                    <div class="welcome-step-content">
+                        <h4>Hoàn tất</h4>
+                        <p>Nhấn <b>Lưu trữ</b> — hồ sơ sẽ được gửi đến giáo viên. Bạn có thể tra cứu lại bằng số CCCD bất cứ lúc nào.</p>
+                    </div>
+                </div>
+
+                <div style="background:#f5f5f5;padding:14px;margin:10px 0 16px;border-left:4px solid #ff00ff;font-size:12px;line-height:1.6;">
+                    <b>VNeID là gì?</b> Là ứng dụng định danh điện tử quốc gia. Tải miễn phí trên App Store / Google Play. Đăng nhập bằng số CCCD → vào mục <b>"Thông tin công dân"</b> → chụp màn hình trang thông tin cá nhân.
+                </div>
+
+                <button class="welcome-btn" onclick="dongWelcome()">BẮT ĐẦU ĐĂNG KÝ</button>
+                <span class="welcome-skip" onclick="dongWelcome(true)">Tôi đã biết cách dùng — bỏ qua</span>
+            </div>
+        </div>
+    </div>
 
     <div class="sidebar">
         <div class="sidebar-logo"><img src="IMG_2356.JPG" alt="Logo" onerror="this.outerHTML='<span style=\'font-size: 28px;\'>◯</span>'">Dương Trần</div>
@@ -75,6 +168,29 @@
         </div>
 
         <div class="container-main" id="step1">
+            <!-- Progress Bar -->
+            <div class="progress-bar-container" id="progress-bar">
+                <div class="progress-step">
+                    <div class="progress-circle active" id="prog-1">1</div>
+                    <span class="progress-label active">Tải ảnh</span>
+                </div>
+                <div class="progress-line" id="prog-line-1"></div>
+                <div class="progress-step">
+                    <div class="progress-circle" id="prog-2">2</div>
+                    <span class="progress-label">AI xử lý</span>
+                </div>
+                <div class="progress-line" id="prog-line-2"></div>
+                <div class="progress-step">
+                    <div class="progress-circle" id="prog-3">3</div>
+                    <span class="progress-label">Bổ sung</span>
+                </div>
+                <div class="progress-line" id="prog-line-3"></div>
+                <div class="progress-step">
+                    <div class="progress-circle" id="prog-4">4</div>
+                    <span class="progress-label">Hoàn tất</span>
+                </div>
+            </div>
+
             <h2 class="title-main">Khởi Tạo Hồ Sơ</h2>
             <div class="note">Receiver: <b>Dương Trần</b><br>Chỉ cần nhập thông tin cơ bản. Hệ thống OCR sẽ tự động đọc các dữ liệu cá nhân từ hình ảnh của bạn.</div>
 
@@ -104,11 +220,90 @@
 
             <div class="section-title">III. Tải Lên Tệp Đính Kèm</div>
             <div class="upload-grid">
-                <div class="upload-card vneid-card" id="card_vneid"><div class="title">[+] VNeID (Mức 2)</div><div class="subtitle">Khuyến khích sử dụng</div><input type="file" id="files_vneid" accept="image/*" multiple><div id="status_files_vneid" class="file-status"></div></div>
-                <div class="upload-card" id="card_cccd"><div class="title">[+] Thẻ CCCD</div><div class="subtitle">Mặt trước và sau</div><input type="file" id="files_cccd" accept="image/*" multiple><div id="status_files_cccd" class="file-status"></div></div>
-                <div class="upload-card" id="card_chan_dung"><div class="title">[+] Ảnh Chân Dung</div><div class="subtitle">Tỷ lệ 3x4</div><input type="file" id="files_chan_dung" accept="image/*" multiple><div id="status_files_chan_dung" class="file-status"></div></div>
-                <div class="upload-card" id="card_gplx"><div class="title">[+] GPLX Cũ</div><div class="subtitle">Nếu đã có bằng</div><input type="file" id="files_gplx" accept="image/*" multiple><div id="status_files_gplx" class="file-status"></div></div>
-                <div class="upload-card" id="card_vnetraffic"><div class="title">[+] VNeTraffic</div><div class="subtitle">Tùy chọn</div><input type="file" id="files_vnetraffic" accept="image/*" multiple><div id="status_files_vnetraffic" class="file-status"></div></div>
+                <div class="upload-card vneid-card" id="card_vneid">
+                    <button class="upload-help-btn" onclick="event.stopPropagation();toggleHelp('help_vneid')" title="Hướng dẫn">?</button>
+                    <div class="title">[+] VNeID (Mức 2)</div>
+                    <div class="subtitle">Khuyến khích sử dụng — Nhấn ? để xem hướng dẫn</div>
+                    <input type="file" id="files_vneid" accept="image/*" multiple>
+                    <div id="status_files_vneid" class="file-status"></div>
+                    <div class="upload-instruction" id="help_vneid">
+                        <b>📱 Cách lấy ảnh VNeID:</b>
+                        <ol>
+                            <li>Mở ứng dụng <b>VNeID</b> trên điện thoại (tải miễn phí trên App Store / Google Play)</li>
+                            <li>Đăng nhập bằng số CCCD và mã PIN</li>
+                            <li>Vào mục <b>"Thông tin công dân"</b> hoặc <b>"Căn cước điện tử"</b></li>
+                            <li><b>Chụp màn hình</b> (screenshot) trang thông tin cá nhân — cuộn xuống chụp thêm nếu cần</li>
+                            <li>Tải lên tất cả ảnh màn hình vào ô này</li>
+                        </ol>
+                        <div class="tip">💡 <b>Mẹo:</b> Nếu chưa có VNeID, bạn có thể dùng ảnh CCCD thẻ cứng (mặt trước + mặt sau) ở ô bên dưới thay thế.</div>
+                    </div>
+                </div>
+                <div class="upload-card" id="card_cccd">
+                    <button class="upload-help-btn" onclick="event.stopPropagation();toggleHelp('help_cccd')" title="Hướng dẫn">?</button>
+                    <div class="title">[+] Thẻ CCCD</div>
+                    <div class="subtitle">Mặt trước và sau</div>
+                    <input type="file" id="files_cccd" accept="image/*" multiple>
+                    <div id="status_files_cccd" class="file-status"></div>
+                    <div class="upload-instruction" id="help_cccd">
+                        <b>🪪 Cách chụp CCCD:</b>
+                        <ol>
+                            <li>Đặt thẻ CCCD trên nền phẳng, sáng</li>
+                            <li>Chụp <b>mặt trước</b> (có ảnh chân dung, họ tên, số CCCD)</li>
+                            <li>Chụp <b>mặt sau</b> (có đặc điểm nhận dạng, ngày cấp)</li>
+                            <li>Đảm bảo ảnh rõ nét, không bị mờ hay chói sáng</li>
+                        </ol>
+                        <div class="tip">💡 <b>Lưu ý:</b> Nếu đã có VNeID thì không bắt buộc phải chụp CCCD. Chỉ cần 1 trong 2 là đủ.</div>
+                    </div>
+                </div>
+                <div class="upload-card" id="card_chan_dung">
+                    <button class="upload-help-btn" onclick="event.stopPropagation();toggleHelp('help_chan_dung')" title="Hướng dẫn">?</button>
+                    <div class="title">[+] Ảnh Chân Dung</div>
+                    <div class="subtitle">Tỷ lệ 3x4</div>
+                    <input type="file" id="files_chan_dung" accept="image/*" multiple>
+                    <div id="status_files_chan_dung" class="file-status"></div>
+                    <div class="upload-instruction" id="help_chan_dung">
+                        <b>📸 Yêu cầu ảnh chân dung:</b>
+                        <ol>
+                            <li>Ảnh chụp mặt thẳng, nền trắng hoặc xanh</li>
+                            <li>Tỷ lệ <b>3x4 cm</b> (giống ảnh hộ chiếu)</li>
+                            <li>Không đeo kính râm, không đội mũ</li>
+                            <li>Mặc áo có cổ, tóc gọn gàng</li>
+                        </ol>
+                        <div class="tip">💡 <b>Mẹo:</b> Có thể dùng ảnh chụp bằng điện thoại — đảm bảo đủ sáng và rõ mặt.</div>
+                    </div>
+                </div>
+                <div class="upload-card" id="card_gplx">
+                    <button class="upload-help-btn" onclick="event.stopPropagation();toggleHelp('help_gplx')" title="Hướng dẫn">?</button>
+                    <div class="title">[+] GPLX Cũ</div>
+                    <div class="subtitle">Nếu đã có bằng lái</div>
+                    <input type="file" id="files_gplx" accept="image/*" multiple>
+                    <div id="status_files_gplx" class="file-status"></div>
+                    <div class="upload-instruction" id="help_gplx">
+                        <b>🚗 Khi nào cần bằng lái cũ?</b>
+                        <ol>
+                            <li>Nếu bạn <b>đã có bằng lái</b> (ví dụ: A1 → lên B, hoặc B → lên C)</li>
+                            <li>Chụp ảnh <b>mặt trước</b> bằng lái xe hiện tại</li>
+                            <li>Đảm bảo nhìn rõ: hạng, số GPLX, ngày cấp</li>
+                        </ol>
+                        <div class="tip">💡 <b>Nếu chưa có bằng lái nào</b> (ví dụ: thi A1 hoặc B lần đầu) thì bỏ qua ô này.</div>
+                    </div>
+                </div>
+                <div class="upload-card" id="card_vnetraffic">
+                    <button class="upload-help-btn" onclick="event.stopPropagation();toggleHelp('help_vnetraffic')" title="Hướng dẫn">?</button>
+                    <div class="title">[+] VNeTraffic</div>
+                    <div class="subtitle">Tùy chọn</div>
+                    <input type="file" id="files_vnetraffic" accept="image/*" multiple>
+                    <div id="status_files_vnetraffic" class="file-status"></div>
+                    <div class="upload-instruction" id="help_vnetraffic">
+                        <b>📋 VNeTraffic là gì?</b>
+                        <ol>
+                            <li>Ứng dụng tra cứu vi phạm giao thông</li>
+                            <li>Chụp màn hình trang <b>thông tin bằng lái</b> trong app</li>
+                            <li>Dùng để xác minh hạng bằng hiện tại</li>
+                        </ol>
+                        <div class="tip">💡 <b>Không bắt buộc</b> — chỉ cần khi giáo viên yêu cầu.</div>
+                    </div>
+                </div>
             </div>
 
             <button onclick="nopHoSo()" id="btnSubmit" class="btn-main">GỬI YÊU CẦU XỬ LÝ</button>
@@ -228,12 +423,77 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhenZ6aW91aHdrZHRoZWtwYWp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMDMzODIsImV4cCI6MjA4Nzc3OTM4Mn0.SRA9ukFbbj69oqofug3erF-Y0G7JH7Ik5e6iMP8nbyU';
         const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        // ===== ONBOARDING: Welcome Modal =====
+        function kiemTraWelcome() {
+            const daXem = localStorage.getItem('dt_welcome_done');
+            if (!daXem) {
+                const modal = document.getElementById('welcome-modal');
+                modal.style.display = 'flex';
+            }
+        }
+        function dongWelcome(boQua) {
+            document.getElementById('welcome-modal').style.display = 'none';
+            if (boQua) {
+                localStorage.setItem('dt_welcome_done', 'skip');
+            } else {
+                localStorage.setItem('dt_welcome_done', 'read');
+                // Tự động mở hướng dẫn VNeID cho người mới
+                setTimeout(() => toggleHelp('help_vneid', true), 300);
+            }
+        }
+        window.addEventListener('DOMContentLoaded', kiemTraWelcome);
+
+        // ===== ONBOARDING: Toggle Upload Help =====
+        function toggleHelp(id, forceShow) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (forceShow) {
+                el.classList.add('show');
+                el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                el.classList.toggle('show');
+            }
+        }
+
+        // ===== ONBOARDING: Progress Bar =====
+        function capNhatProgress(buoc) {
+            // buoc: 1 = Tải ảnh, 2 = AI xử lý, 3 = Bổ sung, 4 = Hoàn tất
+            for (let i = 1; i <= 4; i++) {
+                const circle = document.getElementById('prog-' + i);
+                const label = circle ? circle.nextElementSibling || circle.parentElement.querySelector('.progress-label') : null;
+                if (!circle) continue;
+
+                circle.classList.remove('active', 'done');
+                if (label) label.classList.remove('active', 'done');
+
+                if (i < buoc) {
+                    circle.classList.add('done');
+                    circle.innerHTML = '✓';
+                    if (label) label.classList.add('done');
+                } else if (i === buoc) {
+                    circle.classList.add('active');
+                    circle.innerHTML = i;
+                    if (label) label.classList.add('active');
+                } else {
+                    circle.innerHTML = i;
+                }
+            }
+            for (let i = 1; i <= 3; i++) {
+                const line = document.getElementById('prog-line-' + i);
+                if (line) line.classList.toggle('done', i < buoc);
+            }
+        }
+
         ['files_vneid', 'files_vnetraffic', 'files_cccd', 'files_gplx', 'files_chan_dung'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.addEventListener('change', e => {
                 const count = e.target.files.length;
                 document.getElementById('status_' + id).innerHTML = count > 0 ? `[ Đã đính kèm ${count} tệp ]` : '';
                 document.getElementById('card_' + id.replace('files_', '')).classList.toggle('has-file', count > 0);
+                // Đóng hướng dẫn khi đã chọn file
+                const helpId = 'help_' + id.replace('files_', '');
+                const helpEl = document.getElementById(helpId);
+                if (helpEl && count > 0) helpEl.classList.remove('show');
             });
         });
         const HANG_NANG_HANG = ["D1", "D2", "Dm", "CE", "Cm"];
@@ -307,10 +567,23 @@
 
         async function nopHoSo() {
             const hang = document.getElementById('hang_dk').value;
-            if(!hang) return alert("Vui lòng chọn Hạng đào tạo!");
+            if(!hang) {
+                document.getElementById('hang_dk').classList.add('input-error');
+                document.getElementById('hang_dk').focus();
+                hienHint('hang_dk', 'Vui lòng chọn Hạng đào tạo trước khi gửi!');
+                return;
+            }
+            document.getElementById('hang_dk').classList.remove('input-error');
+            xoaHint('hang_dk');
+
             const co_anh = ['files_vneid','files_cccd','files_gplx','files_chan_dung','files_vnetraffic']
                 .some(id => document.getElementById(id).files.length > 0);
-            if(!co_anh) return alert("Vui lòng chọn ít nhất 1 ảnh giấy tờ!");
+            if(!co_anh) {
+                // Mở hướng dẫn VNeID nếu chưa có ảnh
+                toggleHelp('help_vneid', true);
+                alert("Vui lòng tải lên ít nhất 1 ảnh giấy tờ!\n\nNhấn nút [?] trên mỗi ô để xem hướng dẫn chi tiết.");
+                return;
+            }
             const cccd = "";
 
             // Reset session ID cho mỗi lần nộp mới
@@ -341,8 +614,9 @@
                     return;
                 }
 
+                capNhatProgress(2);
                 chuyenManHinh('loading-overlay'); document.getElementById('loading-spinner-box').classList.remove('hidden'); document.getElementById('timeout-box').classList.add('hidden');
-                
+
                 const anh = { files_vneid: await uploadFiles('files_vneid','vneid'), files_cccd: await uploadFiles('files_cccd','cccd'), files_gplx: await uploadFiles('files_gplx','gplx'), files_chan_dung: await uploadFiles('files_chan_dung','cd'), files_vnetraffic: await uploadFiles('files_vnetraffic','vt') };
                 if(!Object.values(anh).some(a=>a.length>0)) { alert("Lỗi: Không tìm thấy tệp đính kèm!"); location.reload(); return; }
 
@@ -415,6 +689,7 @@
         }
 
         function hienThiFormXacNhan(hs) {
+            capNhatProgress(3);
             const i = typeof hs.thong_tin_bo_sung === 'string'
                 ? JSON.parse(hs.thong_tin_bo_sung)
                 : (hs.thong_tin_bo_sung || {});
@@ -521,8 +796,22 @@
             const lh_ten = getVal('nguoi_lh_ten_chk');
             const lh_sdt = getVal('nguoi_lh_sdt_chk');
             
-            if(!hoten || !sdt) return alert("Vui lòng điền đủ Họ tên và SĐT cá nhân ở phần I !");
-            if(!lh_ten || !lh_sdt) return alert("Vui lòng điền thông tin Người liên hệ khẩn cấp ở phần III !");
+            // Inline validation
+            let loi = false;
+            [['ho_va_ten_chk', hoten, 'Vui lòng điền họ tên'],
+             ['sdt_chk', sdt, 'Vui lòng điền số điện thoại'],
+             ['nguoi_lh_ten_chk', lh_ten, 'Vui lòng điền họ tên người thân'],
+             ['nguoi_lh_sdt_chk', lh_sdt, 'Vui lòng điền SĐT người thân']
+            ].forEach(([id, val, msg]) => {
+                const el = formDiv.querySelector('#' + id) || document.getElementById(id);
+                if (!val) {
+                    if (el) { el.classList.add('input-error'); el.classList.remove('input-ok'); }
+                    if (!loi) { el && el.focus(); loi = true; }
+                } else {
+                    if (el) { el.classList.remove('input-error'); el.classList.add('input-ok'); }
+                }
+            });
+            if (loi) return alert("Vui lòng điền đủ các thông tin bắt buộc (đánh dấu viền đỏ)!");
 
             const btnFinal = formDiv.querySelector ? (formDiv.querySelector('#btnFinal')||document.getElementById('btnFinal')) : document.getElementById('btnFinal');
             btnFinal.innerText = "ĐANG LƯU DỮ LIỆU..."; btnFinal.disabled = true;
@@ -550,6 +839,7 @@
             const hs_id = (formDiv.querySelector ? formDiv.querySelector('#recordId') : document.getElementById('recordId'))?.value || document.getElementById('recordId').value;
             const { error } = await db.from('ho_so_online').update({ ho_ten: hoten.toUpperCase(), sdt: sdt, thong_tin_bo_sung: updateData, trang_thai: 'KHACH_DA_SUA' }).eq('id', hs_id);
             if(!error) {
+                capNhatProgress(4);
                 document.getElementById('loading-overlay').style.display = 'none';
                 alert('✅ Hồ sơ đã được lưu thành công! Chúng tôi sẽ liên hệ với bạn sớm.');
                 location.reload();
@@ -942,6 +1232,34 @@
                 document.getElementById('btn-luu-bosung').innerText = 'LƯU BỔ SUNG';
             }
         }
+        // ===== ONBOARDING: Inline Hint Helpers =====
+        function hienHint(inputId, msg) {
+            let hint = document.getElementById('hint_' + inputId);
+            const input = document.getElementById(inputId);
+            if (!hint && input) {
+                hint = document.createElement('div');
+                hint.id = 'hint_' + inputId;
+                hint.className = 'field-hint error';
+                input.parentElement.appendChild(hint);
+            }
+            if (hint) { hint.textContent = '⚠ ' + msg; hint.className = 'field-hint error'; }
+        }
+        function xoaHint(inputId) {
+            const hint = document.getElementById('hint_' + inputId);
+            if (hint) hint.remove();
+        }
+
+        // Xoá viền đỏ khi người dùng bắt đầu nhập
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('input-error')) {
+                e.target.classList.remove('input-error');
+            }
+        });
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('input-error')) {
+                e.target.classList.remove('input-error');
+            }
+        });
     </script>
 </body>
 </html>
