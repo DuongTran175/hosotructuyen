@@ -362,19 +362,56 @@
         }
 
         function langNgheKetQua(id) {
-            let attempts = 0; document.getElementById('recordId').value = id; 
+            let attempts = 0; document.getElementById('recordId').value = id;
             const interval = setInterval(async () => {
-                attempts++; const { data } = await db.from('ho_so_online').select('*').eq('id', id).single();
-                if(data && data.trang_thai === 'CHO_KHACH_XEM') { clearInterval(interval); hienThiFormXacNhan(data); }
-                if(attempts >= 35) { clearInterval(interval); document.getElementById('loading-spinner-box').classList.add('hidden'); document.getElementById('timeout-box').classList.remove('hidden'); }
-            }, 2000); 
+                attempts++;
+                try {
+                    const { data } = await db.from('ho_so_online').select('*').eq('id', id).single();
+                    if (!data) return;
+
+                    if (data.trang_thai === 'CHO_KHACH_XEM' || data.trang_thai === 'KHACH_DA_SUA' || data.trang_thai === 'HOAN_TAT') {
+                        clearInterval(interval);
+                        hienThiFormXacNhan(data);
+                        return;
+                    }
+
+                    if (data.trang_thai === 'LOI_XU_LY') {
+                        clearInterval(interval);
+                        // Lỗi OCR nhưng vẫn có thể có dữ liệu một phần → cho điền bổ sung
+                        if (data.thong_tin_bo_sung && Object.keys(typeof data.thong_tin_bo_sung === 'string' ? JSON.parse(data.thong_tin_bo_sung) : data.thong_tin_bo_sung).length > 2) {
+                            hienThiFormXacNhan(data);
+                        } else {
+                            document.getElementById('loading-spinner-box').classList.add('hidden');
+                            document.getElementById('timeout-box').classList.remove('hidden');
+                            document.querySelector('#timeout-box p').innerHTML =
+                                'Hệ thống gặp sự cố khi xử lý.<br>Bạn có thể <b>kiểm tra lại</b> hoặc tra cứu bằng CCCD ở mục <b>Tra Cứu Dữ Liệu</b>.';
+                        }
+                        return;
+                    }
+                } catch(e) { console.error('Polling error:', e); }
+
+                if (attempts >= 60) {
+                    clearInterval(interval);
+                    document.getElementById('loading-spinner-box').classList.add('hidden');
+                    document.getElementById('timeout-box').classList.remove('hidden');
+                }
+            }, 2000);
         }
 
         async function kiemTraLaiNgay() {
             const id = document.getElementById('recordId').value;
             const { data } = await db.from('ho_so_online').select('*').eq('id', id).single();
-            if(data && data.trang_thai === 'CHO_KHACH_XEM') hienThiFormXacNhan(data);
-            else alert("Vẫn đang trong quá trình phân tích. Vui lòng thử lại!");
+            if (!data) return alert("Không tìm thấy hồ sơ!");
+
+            if (['CHO_KHACH_XEM', 'KHACH_DA_SUA', 'HOAN_TAT'].includes(data.trang_thai)) {
+                hienThiFormXacNhan(data);
+            } else if (data.trang_thai === 'LOI_XU_LY') {
+                if (confirm("Hệ thống gặp lỗi khi xử lý. Bạn có muốn điền thông tin thủ công?")) {
+                    hienThiFormXacNhan(data);
+                }
+            } else {
+                alert("Hệ thống vẫn đang xử lý (" + data.trang_thai + "). Vui lòng thử lại sau!");
+            }
         }
 
         function hienThiFormXacNhan(hs) {
