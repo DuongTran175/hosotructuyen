@@ -401,6 +401,10 @@
                 <div class="form-group"><label>Bằng lái đã có:</label><div id="v_gplx" class="form-control" style="background:#f5f5f5;padding:10px;"></div></div>
             </div>
             <div class="form-group"><label>Lịch học thực hành:</label><div id="v_lich_hoc" class="form-control" style="background:#f5f5f5;padding:10px;min-height:40px;"></div></div>
+            <div class="form-group" id="v_tham_nien_box" style="display:none;">
+                <label>Thâm niên lái xe an toàn:</label>
+                <div id="v_nam_lai_xe" class="form-control" style="background:#fff8e1;padding:10px;font-weight:bold;color:#e65100;"></div>
+            </div>
 
             <div class="section-title">III. Liên Hệ Khẩn Cấp</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
@@ -952,6 +956,11 @@
                                 <div style="font-size:11px;color:#999;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">Lịch học thực hành</div>
                                 <div style="font-size:14px;font-family:var(--font-mono);margin-top:3px;">${i.gio_hoc_thuc_hanh||'—'}</div>
                             </div>
+                            ${['D1','D2','Dm','CE','Cm'].includes(hs.hang_dk) ? `
+                            <div style="border:1px solid #eee;border-top:none;padding:10px 14px;background:#fff8e1;">
+                                <div style="font-size:11px;color:#999;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">Thâm niên lái xe an toàn</div>
+                                <div style="font-size:14px;font-family:var(--font-mono);margin-top:3px;font-weight:bold;color:#e65100;">${i.nam_lai_xe ? i.nam_lai_xe + ' năm' : '—'}</div>
+                            </div>` : ''}
 
                             <div style="font-family:var(--font-mono);font-size:11px;color:#999;text-transform:uppercase;letter-spacing:2px;margin:20px 0 12px;">
                                 III. Liên hệ khẩn cấp
@@ -1118,6 +1127,18 @@
             document.getElementById('v_lh_ten').innerText      = i.nguoi_lien_he_ten || "—";
             document.getElementById('v_lh_sdt').innerText      = i.nguoi_lien_he_sdt || "—";
             document.getElementById('v_lh_dia_chi').innerText  = i.nguoi_lien_he_dia_chi || "—";
+
+            // Thâm niên — chỉ hiện với hạng nâng hạng
+            const HANG_NANG_HANG_XEM = ['D1','D2','Dm','CE','Cm'];
+            const thamNienBox = document.getElementById('v_tham_nien_box');
+            if (thamNienBox) {
+                if (HANG_NANG_HANG_XEM.includes(hs.hang_dk) && i.nam_lai_xe) {
+                    document.getElementById('v_nam_lai_xe').innerText = i.nam_lai_xe + ' năm';
+                    thamNienBox.style.display = 'block';
+                } else {
+                    thamNienBox.style.display = 'none';
+                }
+            }
 
             // Thanh trạng thái màu xanh/cam
             const bar = document.getElementById('view-trang-thai-bar');
