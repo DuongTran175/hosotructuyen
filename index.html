@@ -204,14 +204,12 @@
                 </div>
             </div>
 
-            <!-- Ô thâm niên — chỉ hiện khi chọn hạng nâng hạng, tự tính từ ngày cấp bằng -->
+            <!-- Ô thâm niên — chỉ hiện khi chọn hạng nâng hạng -->
             <div id="box_tham_nien" style="display:none;" class="form-group">
-                <label>⭐ Thâm niên lái xe an toàn:</label>
-                <div id="tham_nien_display" style="background:#fff8e1;border:1px solid #ffe0b2;border-radius:8px;padding:10px 14px;font-weight:bold;color:#e65100;font-size:15px;">
-                    — (tự động tính từ ngày cấp GPLX khi tải ảnh)
-                </div>
-                <input type="hidden" id="nam_lai_xe_nop">
-                <small style="color:#888;">Hệ thống tự tính = Năm hiện tại − Năm cấp GPLX từ ảnh bằng lái bạn tải lên</small>
+                <label>⭐ Số năm lái xe an toàn (*):</label>
+                <input type="number" id="nam_lai_xe_nop" class="form-control"
+                    min="1" max="50" placeholder="VD: 3 — Số năm tính từ ngày trúng tuyển / ngày đạt kết quả">
+                <small style="color:#888;">Tính từ ngày trúng tuyển hoặc ngày đạt kết quả ghi ở mặt sau bằng lái</small>
             </div>
 
             <div class="section-title">II. Nguồn Giới Thiệu (Tùy chọn)</div>
@@ -343,15 +341,12 @@
             <div class="form-group"><label>Nơi thường trú:</label><textarea id="noi_thuong_tru_chk" class="form-control" rows="2"></textarea></div>
             <div class="form-group"><label>Nơi ở hiện tại:</label><textarea id="noi_o_hien_tai_chk" class="form-control" rows="2"></textarea></div>
 
-            <!-- Thâm niên lái xe — chỉ hiện khi hạng nâng hạng, tự tính từ ngày cấp GPLX -->
+            <!-- Thâm niên lái xe — chỉ hiện khi hạng nâng hạng -->
             <div id="tham_nien_chk_box" style="display:none; margin-bottom:16px;">
                 <div class="section-title">⭐ Thâm Niên Lái Xe An Toàn</div>
                 <div style="background:#fff8e1;border:1px solid #ffe0b2;border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px;">
                     <span style="font-size:28px;font-weight:bold;color:#e65100;" id="tham_nien_chk_value">—</span>
-                    <div>
-                        <div style="font-size:13px;color:#666;">Tự động tính từ ngày cấp GPLX trên ảnh bằng lái bạn đã tải lên</div>
-                        <div style="font-size:12px;color:#999;" id="tham_nien_chk_note"></div>
-                    </div>
+                    <div style="font-size:13px;color:#666;">Số năm bạn đã nhập — tính từ ngày trúng tuyển / ngày đạt kết quả ở mặt sau bằng lái</div>
                 </div>
             </div>
 
@@ -798,32 +793,14 @@
             const gioKhac = q('#gio_hoc_khac_chk');
             if (gioKhac) gioKhac.value = raw.note || '';
 
-            // 9. Thâm niên lái xe — tự tính từ ngày cấp GPLX trong thong_tin_bo_sung
+            // 9. Thâm niên lái xe — hiển thị giá trị người dùng đã nhập
             const HANG_NANG = ['D1','D2','Dm','CE','Cm'];
             const thamNienBox = q('#tham_nien_chk_box');
             if (thamNienBox && HANG_NANG.includes(hs.hang_dk)) {
                 thamNienBox.style.display = 'block';
-                const ngayGplx = i.ngay_cap_gplx || '';
-                if (ngayGplx) {
-                    const namHienTai = new Date().getFullYear();
-                    let namCapBang = null;
-                    // Thử các định dạng DD/MM/YYYY hoặc DD-MM-YYYY
-                    const dongDau = ngayGplx.split('\n')[0].trim();
-                    const m1 = dongDau.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
-                    if (m1) namCapBang = parseInt(m1[3]);
-                    else { const m2 = dongDau.match(/(\d{4})/); if (m2) namCapBang = parseInt(m2[1]); }
-
-                    if (namCapBang) {
-                        const thamNien = Math.max(0, namHienTai - namCapBang);
-                        const valEl = q('#tham_nien_chk_value');
-                        const noteEl = q('#tham_nien_chk_note');
-                        if (valEl) valEl.textContent = thamNien + ' năm';
-                        if (noteEl) noteEl.textContent = 'Cấp bằng năm ' + namCapBang + ' → ' + namHienTai + ' − ' + namCapBang + ' = ' + thamNien + ' năm';
-                    }
-                } else {
-                    const valEl = q('#tham_nien_chk_value');
-                    if (valEl) valEl.textContent = '— (chưa đọc được ngày cấp GPLX)';
-                }
+                const namLaiXe = i.nam_lai_xe || '';
+                const valEl = q('#tham_nien_chk_value');
+                if (valEl) valEl.textContent = namLaiXe ? namLaiXe + ' năm' : '— (chưa nhập)';
             }
 
             // 10. Kết nối nút LƯU
@@ -864,10 +841,8 @@
             const sched = getSchedule(formDiv);
             let nghe = getVal('nghe_nghiep_chk'); if(nghe==='Khác') nghe = getVal('nghe_nghiep_khac_chk');
 
-            // Lấy thâm niên đã tính (nếu có)
-            const thamNienEl = formDiv.querySelector ? formDiv.querySelector('#tham_nien_chk_value') : null;
-            const thamNienText = thamNienEl ? thamNienEl.textContent.replace(' năm','').trim() : '';
-            const namLaiXe = /^\d+$/.test(thamNienText) ? thamNienText : ((window.temp_hs_bosung || {}).nam_lai_xe || '');
+            // Giữ lại thâm niên từ dữ liệu đã nộp ban đầu
+            const namLaiXe = (window.temp_hs_bosung || {}).nam_lai_xe || '';
 
             const updateData = {
                 ...(window.temp_hs_bosung || {}),
