@@ -150,7 +150,7 @@
         <div class="nav-item active" id="nav-step1" onclick="chuyenManHinh('step1')">Khởi Tạo Hồ Sơ</div>
         <div class="nav-item" id="nav-tracuu" onclick="chuyenManHinh('box-tracuu')">Tra Cứu Dữ Liệu</div>
         <div style="margin-top: 40px;" class="nav-group-title">Hỗ Trợ</div>
-        <div class="nav-item" onclick="alert('Hotline hỗ trợ kỹ thuật: 09xx.xxx.xxx')">Liên Hệ Giáo Viên</div>
+        <div class="nav-item" onclick="alert('Hotline hỗ trợ kỹ thuật: 0902.077.049')">Liên Hệ Giáo Viên</div>
     </div>
 
     <div class="main-wrapper">
@@ -204,12 +204,14 @@
                 </div>
             </div>
 
-            <!-- Ô thâm niên — chỉ hiện khi chọn hạng nâng hạng -->
+            <!-- Ô thâm niên — chỉ hiện khi chọn hạng nâng hạng, tự tính từ ngày cấp bằng -->
             <div id="box_tham_nien" style="display:none;" class="form-group">
-                <label>⭐ Số năm lái xe an toàn (*):</label>
-                <input type="number" id="nam_lai_xe_nop" class="form-control"
-                    min="1" max="50" placeholder="VD: 3 — Bắt buộc với hạng nâng hạng">
-                <small style="color:#888;">Dùng cho hạng D1, D2, Dm, CE, Cm — học viên tự khai</small>
+                <label>⭐ Thâm niên lái xe an toàn:</label>
+                <div id="tham_nien_display" style="background:#fff8e1;border:1px solid #ffe0b2;border-radius:8px;padding:10px 14px;font-weight:bold;color:#e65100;font-size:15px;">
+                    — (tự động tính từ ngày cấp GPLX khi tải ảnh)
+                </div>
+                <input type="hidden" id="nam_lai_xe_nop">
+                <small style="color:#888;">Hệ thống tự tính = Năm hiện tại − Năm cấp GPLX từ ảnh bằng lái bạn tải lên</small>
             </div>
 
             <div class="section-title">II. Nguồn Giới Thiệu (Tùy chọn)</div>
@@ -340,6 +342,18 @@
             </div>
             <div class="form-group"><label>Nơi thường trú:</label><textarea id="noi_thuong_tru_chk" class="form-control" rows="2"></textarea></div>
             <div class="form-group"><label>Nơi ở hiện tại:</label><textarea id="noi_o_hien_tai_chk" class="form-control" rows="2"></textarea></div>
+
+            <!-- Thâm niên lái xe — chỉ hiện khi hạng nâng hạng, tự tính từ ngày cấp GPLX -->
+            <div id="tham_nien_chk_box" style="display:none; margin-bottom:16px;">
+                <div class="section-title">⭐ Thâm Niên Lái Xe An Toàn</div>
+                <div style="background:#fff8e1;border:1px solid #ffe0b2;border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px;">
+                    <span style="font-size:28px;font-weight:bold;color:#e65100;" id="tham_nien_chk_value">—</span>
+                    <div>
+                        <div style="font-size:13px;color:#666;">Tự động tính từ ngày cấp GPLX trên ảnh bằng lái bạn đã tải lên</div>
+                        <div style="font-size:12px;color:#999;" id="tham_nien_chk_note"></div>
+                    </div>
+                </div>
+            </div>
 
             <div class="section-title">II. Thời Gian Biểu & Công Việc</div>
             <div class="form-group">
@@ -784,7 +798,35 @@
             const gioKhac = q('#gio_hoc_khac_chk');
             if (gioKhac) gioKhac.value = raw.note || '';
 
-            // 9. Kết nối nút LƯU
+            // 9. Thâm niên lái xe — tự tính từ ngày cấp GPLX trong thong_tin_bo_sung
+            const HANG_NANG = ['D1','D2','Dm','CE','Cm'];
+            const thamNienBox = q('#tham_nien_chk_box');
+            if (thamNienBox && HANG_NANG.includes(hs.hang_dk)) {
+                thamNienBox.style.display = 'block';
+                const ngayGplx = i.ngay_cap_gplx || '';
+                if (ngayGplx) {
+                    const namHienTai = new Date().getFullYear();
+                    let namCapBang = null;
+                    // Thử các định dạng DD/MM/YYYY hoặc DD-MM-YYYY
+                    const dongDau = ngayGplx.split('\n')[0].trim();
+                    const m1 = dongDau.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+                    if (m1) namCapBang = parseInt(m1[3]);
+                    else { const m2 = dongDau.match(/(\d{4})/); if (m2) namCapBang = parseInt(m2[1]); }
+
+                    if (namCapBang) {
+                        const thamNien = Math.max(0, namHienTai - namCapBang);
+                        const valEl = q('#tham_nien_chk_value');
+                        const noteEl = q('#tham_nien_chk_note');
+                        if (valEl) valEl.textContent = thamNien + ' năm';
+                        if (noteEl) noteEl.textContent = 'Cấp bằng năm ' + namCapBang + ' → ' + namHienTai + ' − ' + namCapBang + ' = ' + thamNien + ' năm';
+                    }
+                } else {
+                    const valEl = q('#tham_nien_chk_value');
+                    if (valEl) valEl.textContent = '— (chưa đọc được ngày cấp GPLX)';
+                }
+            }
+
+            // 10. Kết nối nút LƯU
             const btnFinal = q('#btnFinal');
             if (btnFinal) btnFinal.onclick = hoanTatHoSo;
 
@@ -822,6 +864,11 @@
             const sched = getSchedule(formDiv);
             let nghe = getVal('nghe_nghiep_chk'); if(nghe==='Khác') nghe = getVal('nghe_nghiep_khac_chk');
 
+            // Lấy thâm niên đã tính (nếu có)
+            const thamNienEl = formDiv.querySelector ? formDiv.querySelector('#tham_nien_chk_value') : null;
+            const thamNienText = thamNienEl ? thamNienEl.textContent.replace(' năm','').trim() : '';
+            const namLaiXe = /^\d+$/.test(thamNienText) ? thamNienText : ((window.temp_hs_bosung || {}).nam_lai_xe || '');
+
             const updateData = {
                 ...(window.temp_hs_bosung || {}),
                 ngay_sinh: getVal('ngay_sinh_chk'),
@@ -837,7 +884,8 @@
                 gio_hoc_raw: { raw_list: sched.raw, note: sched.note },
                 nguoi_lien_he_ten: lh_ten,
                 nguoi_lien_he_sdt: lh_sdt,
-                nguoi_lien_he_dia_chi: getVal('nguoi_lh_dia_chi_chk')
+                nguoi_lien_he_dia_chi: getVal('nguoi_lh_dia_chi_chk'),
+                nam_lai_xe: namLaiXe,
             };
 
             const hs_id = (formDiv.querySelector ? formDiv.querySelector('#recordId') : document.getElementById('recordId'))?.value || document.getElementById('recordId').value;
