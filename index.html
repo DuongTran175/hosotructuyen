@@ -780,6 +780,15 @@
                 formDiv.insertBefore(banner, formDiv.firstChild);
             }
 
+            // 3c. Banner cảnh báo OCR không định danh được — khi backend không đọc được CCCD + SĐT từ ảnh
+            if (i.khong_dinh_danh_duoc) {
+                const warn = document.createElement('div');
+                warn.style.cssText = 'background:#ffe9d6;border:1px solid #ff6f00;border-left:5px solid #e65100;border-radius:8px;padding:12px 16px;margin-bottom:16px;color:#5d2e00;font-size:14px;line-height:1.5;';
+                warn.innerHTML = '<b style="font-size:15px;">⚠️ Hệ thống không nhận diện được CCCD và số điện thoại từ ảnh</b><br>'
+                    + 'Ảnh VNeID/GPLX có thể bị mờ, thiếu, hoặc thông tin chưa rõ. Vui lòng <b>nhập thủ công</b> các trường thông tin cá nhân bên dưới rồi bấm "Xác nhận".';
+                formDiv.insertBefore(warn, formDiv.firstChild);
+            }
+
             // 4. Helper: lấy element trong formDiv
             const q = (sel) => formDiv.querySelector(sel);
             const set = (id, val) => { const el = q('#' + id); if (el) el.value = val || ''; };
@@ -851,10 +860,11 @@
                 setText('gplx_noi_cap_view',  gplxNoi);
             }
 
-            // 9. Thâm niên lái xe — hiển thị giá trị người dùng đã nhập
+            // 9. Thâm niên lái xe — chỉ hiện khi KHÔNG có ngày trúng tuyển (tức chưa auto-tính được)
             const HANG_NANG = ['D1','D2','Dm','CE','Cm'];
             const thamNienBox = q('#tham_nien_chk_box');
-            if (thamNienBox && HANG_NANG.includes(hs.hang_dk)) {
+            const ngayTT = (i.ngay_trung_tuyen || '').trim();
+            if (thamNienBox && HANG_NANG.includes(hs.hang_dk) && !ngayTT) {
                 thamNienBox.style.display = 'block';
                 const namLaiXe = i.nam_lai_xe || '';
                 const valEl = q('#tham_nien_chk_value');
