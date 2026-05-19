@@ -341,6 +341,18 @@
             <div class="form-group"><label>Nơi thường trú:</label><textarea id="noi_thuong_tru_chk" class="form-control" rows="2"></textarea></div>
             <div class="form-group"><label>Nơi ở hiện tại:</label><textarea id="noi_o_hien_tai_chk" class="form-control" rows="2"></textarea></div>
 
+            <!-- Thông tin GPLX đã quét được — chỉ hiện khi có data -->
+            <div id="gplx_info_box" style="display:none;background:#f0f9fb;border:1px solid #0781A7;border-radius:8px;padding:12px 16px;margin-bottom:16px;">
+                <div style="font-weight:bold;color:#0781A7;margin-bottom:8px;">📋 Thông tin GPLX đã quét được</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:14px;">
+                    <div><b>Hạng đã có:</b> <span id="gplx_hang_view">—</span></div>
+                    <div><b>Số GPLX:</b> <span id="gplx_so_view">—</span></div>
+                    <div><b>Ngày cấp:</b> <span id="gplx_ngay_cap_view">—</span></div>
+                    <div><b>Nơi cấp:</b> <span id="gplx_noi_cap_view">—</span></div>
+                </div>
+                <div style="font-size:12px;color:#666;margin-top:6px;font-style:italic;">Dữ liệu chỉ để tham khảo. Vui lòng kiểm tra và bổ sung các thông tin còn thiếu ở trên.</div>
+            </div>
+
             <!-- Thâm niên lái xe — chỉ hiện khi hạng nâng hạng -->
             <div id="tham_nien_chk_box" style="display:none; margin-bottom:16px;">
                 <div class="section-title">⭐ Thâm Niên Lái Xe An Toàn</div>
@@ -830,6 +842,21 @@
             }
             const gioKhac = q('#gio_hoc_khac_chk');
             if (gioKhac) gioKhac.value = raw.note || '';
+
+            // 8b. Thông tin GPLX đã quét được — chỉ hiện box khi AI đọc được data
+            const gplxBox = q('#gplx_info_box');
+            const gplxHang  = i.hang_gplx_da_co || '';
+            const gplxSo    = i.so_gplx || '';
+            const gplxNgay  = i.ngay_cap_gplx || '';
+            const gplxNoi   = i.noi_cap_gplx || '';
+            if (gplxBox && (gplxHang || gplxSo || gplxNgay || gplxNoi)) {
+                gplxBox.style.display = 'block';
+                const setText = (id, val) => { const el = q('#' + id); if (el) el.textContent = val || '—'; };
+                setText('gplx_hang_view',     gplxHang);
+                setText('gplx_so_view',       gplxSo);
+                setText('gplx_ngay_cap_view', gplxNgay);
+                setText('gplx_noi_cap_view',  gplxNoi);
+            }
 
             // 9. Thâm niên lái xe — hiển thị giá trị người dùng đã nhập
             const HANG_NANG = ['D1','D2','Dm','CE','Cm'];
