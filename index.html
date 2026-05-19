@@ -649,40 +649,78 @@
         }
 
         function langNgheKetQua(id) {
-            let attempts = 0; document.getElementById('recordId').value = id;
-            const interval = setInterval(async () => {
-                attempts++;
+            document.getElementById('recordId').value = id;
+            let resolved = false;
+            let channel = null;
+            let interval = null;
+            let timeout = null;
+
+            const cleanup = () => {
+                try { if (channel) db.removeChannel(channel); } catch(e) {}
+                if (interval) clearInterval(interval);
+                if (timeout) clearTimeout(timeout);
+                channel = null; interval = null; timeout = null;
+            };
+
+            const handleData = (data) => {
+                if (resolved || !data) return;
+                if (data.trang_thai === 'CHO_KHACH_XEM' || data.trang_thai === 'KHACH_DA_SUA' || data.trang_thai === 'HOAN_TAT') {
+                    resolved = true;
+                    cleanup();
+                    hienThiFormXacNhan(data);
+                    return;
+                }
+                if (data.trang_thai === 'LOI_XU_LY') {
+                    resolved = true;
+                    cleanup();
+                    const info = typeof data.thong_tin_bo_sung === 'string'
+                        ? JSON.parse(data.thong_tin_bo_sung)
+                        : (data.thong_tin_bo_sung || {});
+                    if (info && Object.keys(info).length > 2) {
+                        hienThiFormXacNhan(data);
+                    } else {
+                        document.getElementById('loading-spinner-box').classList.add('hidden');
+                        document.getElementById('timeout-box').classList.remove('hidden');
+                        document.querySelector('#timeout-box p').innerHTML =
+                            'Hệ thống gặp sự cố khi xử lý.<br>Bạn có thể <b>kiểm tra lại</b> hoặc tra cứu bằng CCCD ở mục <b>Tra Cứu Dữ Liệu</b>.';
+                    }
+                }
+            };
+
+            // 1. Realtime: nhận update tức thì khi AI hoàn tất
+            try {
+                channel = db.channel(`hs_${id}`)
+                    .on('postgres_changes',
+                        { event: 'UPDATE', schema: 'public', table: 'ho_so_online', filter: `id=eq.${id}` },
+                        payload => handleData(payload.new))
+                    .subscribe();
+            } catch(e) { console.warn('Realtime subscribe lỗi, dùng polling:', e); }
+
+            // 2. Fallback polling mỗi 3s (đề phòng Realtime mất kết nối / chưa bật)
+            interval = setInterval(async () => {
+                if (resolved) return;
                 try {
                     const { data } = await db.from('ho_so_online').select('*').eq('id', id).single();
-                    if (!data) return;
-
-                    if (data.trang_thai === 'CHO_KHACH_XEM' || data.trang_thai === 'KHACH_DA_SUA' || data.trang_thai === 'HOAN_TAT') {
-                        clearInterval(interval);
-                        hienThiFormXacNhan(data);
-                        return;
-                    }
-
-                    if (data.trang_thai === 'LOI_XU_LY') {
-                        clearInterval(interval);
-                        // Lỗi OCR nhưng vẫn có thể có dữ liệu một phần → cho điền bổ sung
-                        if (data.thong_tin_bo_sung && Object.keys(typeof data.thong_tin_bo_sung === 'string' ? JSON.parse(data.thong_tin_bo_sung) : data.thong_tin_bo_sung).length > 2) {
-                            hienThiFormXacNhan(data);
-                        } else {
-                            document.getElementById('loading-spinner-box').classList.add('hidden');
-                            document.getElementById('timeout-box').classList.remove('hidden');
-                            document.querySelector('#timeout-box p').innerHTML =
-                                'Hệ thống gặp sự cố khi xử lý.<br>Bạn có thể <b>kiểm tra lại</b> hoặc tra cứu bằng CCCD ở mục <b>Tra Cứu Dữ Liệu</b>.';
-                        }
-                        return;
-                    }
+                    handleData(data);
                 } catch(e) { console.error('Polling error:', e); }
+            }, 3000);
 
-                if (attempts >= 60) {
-                    clearInterval(interval);
-                    document.getElementById('loading-spinner-box').classList.add('hidden');
-                    document.getElementById('timeout-box').classList.remove('hidden');
-                }
-            }, 2000);
+            // 3. Timeout cứng 5 phút (thay vì 2 phút cũ)
+            timeout = setTimeout(() => {
+                if (resolved) return;
+                resolved = true;
+                cleanup();
+                document.getElementById('loading-spinner-box').classList.add('hidden');
+                document.getElementById('timeout-box').classList.remove('hidden');
+            }, 300000);
+
+            // 4. Initial fetch: nếu AI đã xong trước khi subscribe → bắt ngay
+            (async () => {
+                try {
+                    const { data } = await db.from('ho_so_online').select('*').eq('id', id).single();
+                    handleData(data);
+                } catch(e) {}
+            })();
         }
 
         async function kiemTraLaiNgay() {
@@ -885,17 +923,41 @@
                 const { data, error } = await db.from('ho_so_online')
                     .select('*')
                     .eq('hang_dk', hang)
-                    .in('trang_thai', ['HOAN_TAT', 'CHO_KHACH_XEM', 'KHACH_DA_SUA', 'LOI_XU_LY', 'DANG_XU_LY']);
+                    .in('trang_thai', ['HOAN_TAT', 'CHO_KHACH_XEM', 'KHACH_DA_SUA', 'LOI_XU_LY', 'DANG_XU_LY'])
+                    .order('cap_nhat_luc', { ascending: false, nullsFirst: false })
+                    .order('created_at', { ascending: false });
 
                 if(error) throw error;
 
-                const hs = data.find(item => {
-                    const i = typeof item.thong_tin_bo_sung === 'string'
-                        ? JSON.parse(item.thong_tin_bo_sung)
-                        : (item.thong_tin_bo_sung || {});
+                // Lọc tất cả row khớp CCCD
+                const _parseTtbs = (item) => {
+                    try {
+                        return typeof item.thong_tin_bo_sung === 'string'
+                            ? JSON.parse(item.thong_tin_bo_sung)
+                            : (item.thong_tin_bo_sung || {});
+                    } catch(e) { return {}; }
+                };
+                const matches = data.filter(item => {
+                    const i = _parseTtbs(item);
                     return (i.so_cccd || '').replace(/\s/g,'') === cccd ||
                            (i.so_cccd_goc || '').replace(/\s/g,'') === cccd;
                 });
+
+                // Sort: ưu tiên row có nhiều field thong_tin_bo_sung có giá trị nhất
+                // (tránh chọn phải row do desktop push tạo nhưng thiếu dữ liệu AI scan)
+                matches.sort((a, b) => {
+                    const ia = _parseTtbs(a);
+                    const ib = _parseTtbs(b);
+                    const ca = Object.values(ia).filter(v => v !== null && v !== undefined && String(v).trim() !== '').length;
+                    const cb = Object.values(ib).filter(v => v !== null && v !== undefined && String(v).trim() !== '').length;
+                    if (cb !== ca) return cb - ca;
+                    // Tie-break: row có anh_data đầy đủ hơn
+                    const aa = a.anh_data ? Object.keys(typeof a.anh_data === 'string' ? JSON.parse(a.anh_data || '{}') : (a.anh_data || {})).length : 0;
+                    const ab = b.anh_data ? Object.keys(typeof b.anh_data === 'string' ? JSON.parse(b.anh_data || '{}') : (b.anh_data || {})).length : 0;
+                    return ab - aa;
+                });
+
+                const hs = matches[0];
 
                 if(!hs) {
                     alert("Không tìm thấy hồ sơ!\nCCCD: " + cccd + "\nHạng: " + hang);
