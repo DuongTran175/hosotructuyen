@@ -617,39 +617,9 @@
             document.getElementById('btnSubmit').innerText = "ĐANG ĐỒNG BỘ..."; document.getElementById('btnSubmit').disabled = true;
 
             try {
-                // ⚡️ TẢI TOÀN BỘ VỀ VÀ LỌC CẢ HẠNG LẪN CCCD Ở JAVASCRIPT
-                const { data: allData, error: fetchErr } = await db.from('ho_so_online').select('*').order('created_at',{ascending:false});
-                if(fetchErr) throw fetchErr;
-
-                const existing = allData.filter(item => {
-                    if (item.hang_dk !== hang) return false;
-                    if (!item.thong_tin_bo_sung) return false;
-                    let info = typeof item.thong_tin_bo_sung === 'string' ? JSON.parse(item.thong_tin_bo_sung) : item.thong_tin_bo_sung;
-                    let dbCccd = (info.so_cccd_goc || info.so_cccd || "").replace(/\s/g, '');
-                    return dbCccd === cccd;
-                });
-
-                if(existing && existing.length > 0) {
-                    let hs = existing[0];
-                    if(hs.trang_thai === 'HOAN_TAT') {
-                        return alert("✅ Học viên này đã hoàn tất hồ sơ hạng " + hang + " trước đó.\n\nNếu cần điều chỉnh, vui lòng liên hệ trung tâm.");
-                    }
-                    const msg = "ℹ️ Học viên này đã nộp hồ sơ hạng " + hang + " trước đó rồi.\n\n"
-                              + "Bấm OK để mở lại hồ sơ cũ — bạn có thể kiểm tra và bổ sung thông tin còn thiếu.\n"
-                              + "Bấm Cancel để hủy.";
-                    if(confirm(msg)) {
-                        if(hs.trang_thai === 'CHO_XU_LY') {
-                            chuyenManHinh('loading-overlay');
-                            langNgheKetQua(hs.id);
-                        } else {
-                            hienThiFormXacNhan(hs);
-                        }
-                    } else {
-                        document.getElementById('btnSubmit').innerText = "GỬI YÊU CẦU XỬ LÝ";
-                        document.getElementById('btnSubmit').disabled = false;
-                    }
-                    return;
-                }
+                // KHÔNG còn FE duplicate check — server đã có 3-tier fallback (CCCD → SDT → HoTen+Hạng+60ph)
+                // FE filter cũ bị lỗi: dùng cccd="" hardcoded → match nhầm các hồ sơ rác → form mở ra rỗng.
+                // Khi server phát hiện trùng nó sẽ tự UPDATE record cũ, không tạo dòng mới.
 
                 capNhatProgress(2);
                 chuyenManHinh('loading-overlay'); document.getElementById('loading-spinner-box').classList.remove('hidden'); document.getElementById('timeout-box').classList.add('hidden');
