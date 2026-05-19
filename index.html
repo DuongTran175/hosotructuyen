@@ -631,11 +631,23 @@
 
                 if(existing && existing.length > 0) {
                     let hs = existing[0];
-                    if(hs.trang_thai === 'HOAN_TAT') return alert("Khóa dữ liệu: Hồ sơ hạng này của bạn đã hoàn tất trước đó.");
-                    if(confirm("Xung đột dữ liệu: Đã tồn tại bản nháp hạng này. Chuyển sang chế độ khôi phục?")) {
-                        if(hs.trang_thai === 'CHO_XU_LY') { chuyenManHinh('loading-overlay'); langNgheKetQua(hs.id); } 
-                        else hienThiFormXacNhan(hs);
-                    } else { document.getElementById('btnSubmit').innerText = "GỬI YÊU CẦU XỬ LÝ"; document.getElementById('btnSubmit').disabled = false; }
+                    if(hs.trang_thai === 'HOAN_TAT') {
+                        return alert("✅ Học viên này đã hoàn tất hồ sơ hạng " + hang + " trước đó.\n\nNếu cần điều chỉnh, vui lòng liên hệ trung tâm.");
+                    }
+                    const msg = "ℹ️ Học viên này đã nộp hồ sơ hạng " + hang + " trước đó rồi.\n\n"
+                              + "Bấm OK để mở lại hồ sơ cũ — bạn có thể kiểm tra và bổ sung thông tin còn thiếu.\n"
+                              + "Bấm Cancel để hủy.";
+                    if(confirm(msg)) {
+                        if(hs.trang_thai === 'CHO_XU_LY') {
+                            chuyenManHinh('loading-overlay');
+                            langNgheKetQua(hs.id);
+                        } else {
+                            hienThiFormXacNhan(hs);
+                        }
+                    } else {
+                        document.getElementById('btnSubmit').innerText = "GỬI YÊU CẦU XỬ LÝ";
+                        document.getElementById('btnSubmit').disabled = false;
+                    }
                     return;
                 }
 
@@ -759,6 +771,8 @@
 
             window.temp_hs_bosung = i;
             window._hs_id_xacnhan = hs.id;
+            // Đánh dấu form đang ở chế độ KHÔI PHỤC (hồ sơ cũ) thay vì lần nộp mới
+            window._is_recovery_mode = !!(hs.trang_thai === 'CHO_KHACH_XEM' || hs.trang_thai === 'KHACH_DA_SUA' || hs.trang_thai === 'HOAN_TAT');
 
             // 1. Ẩn spinner và timeout box
             document.getElementById('loading-spinner-box').classList.add('hidden');
@@ -786,6 +800,15 @@
             // 3. Clone nội dung step3 vào formDiv
             const step3 = document.getElementById('step3');
             formDiv.innerHTML = step3.innerHTML;
+
+            // 3b. Banner khôi phục — chỉ hiện khi mở lại hồ sơ cũ
+            if (window._is_recovery_mode) {
+                const banner = document.createElement('div');
+                banner.style.cssText = 'background:#fff3cd;border:1px solid #ffc107;border-left:5px solid #ff9800;border-radius:8px;padding:12px 16px;margin-bottom:16px;color:#7a5a00;font-size:14px;line-height:1.5;';
+                banner.innerHTML = '<b style="font-size:15px;">📋 Khôi phục hồ sơ đã nộp trước đó</b><br>'
+                    + 'Đây là dữ liệu hồ sơ bạn đã gửi trước đây. Vui lòng <b>kiểm tra lại</b> và <b>bổ sung các thông tin còn thiếu</b> rồi bấm "Xác nhận" để cập nhật.';
+                formDiv.insertBefore(banner, formDiv.firstChild);
+            }
 
             // 4. Helper: lấy element trong formDiv
             const q = (sel) => formDiv.querySelector(sel);
