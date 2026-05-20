@@ -270,8 +270,14 @@
                 <div class="progress-step"><div class="progress-circle">3</div><span class="progress-label">Xác nhận</span></div>
             </div>
 
-            <h2 class="title-main">Bước 2 — Bằng Lái Đã Có</h2>
-            <div class="note">Tích các loại bằng lái <b>bạn đang sở hữu</b>. Nếu <b>chưa có bằng nào</b> → tải ảnh trang chủ VNeTraffic để xác minh.</div>
+            <h2 class="title-main">Bước 2 — Bằng Lái & VNeTraffic</h2>
+            <div class="note">Tích các loại bằng lái <b>bạn đang sở hữu</b>. Ảnh trang chủ VNeTraffic <b>luôn bắt buộc</b> với mọi hạng.</div>
+
+            <!-- Banner data từ VNeID OCR sau Page 1 -->
+            <div id="banner_vneid_ocr" class="hidden" style="background:#e8f5e9;border-left:4px solid #2e7d32;padding:12px;margin-bottom:16px;font-family:var(--font-mono);font-size:13px;">
+                <b>✓ Đã nhận dạng VNeID:</b>
+                <div id="banner_vneid_ocr_content" style="margin-top:6px;"></div>
+            </div>
 
             <div class="section-title">Loại bằng lái hiện có</div>
             <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">
@@ -314,11 +320,11 @@
                 </div>
             </div>
 
-            <!-- Block VNeTraffic — hiện khi không tick bằng nào -->
-            <div id="block_vnetraffic" class="hidden">
+            <!-- Block VNeTraffic — LUÔN HIỂN THỊ, BẮT BUỘC -->
+            <div id="block_vnetraffic">
                 <div class="section-title">Ảnh Trang Chủ VNeTraffic (Bắt Buộc)</div>
                 <div class="note" style="border-left-color:#ff9800;">
-                    <b>⚠ Bạn chưa tick có bằng nào</b> — vui lòng tải ảnh <b>trang chủ VNeTraffic</b> để hệ thống xác nhận bạn chưa có giấy phép lái xe.
+                    <b>⚠ Bắt buộc với mọi hạng</b> — vui lòng tải ảnh <b>trang chủ app VNeTraffic</b> (sau khi đăng nhập, hiển thị thông tin GPLX của bạn).
                 </div>
                 <div class="upload-grid">
                     <div class="upload-card" id="card_vnetraffic">
@@ -567,11 +573,20 @@
             const hasOto = document.getElementById('cb_co_bang_oto').checked;
             document.getElementById('block_gplx_moto').classList.toggle('hidden', !hasMoto);
             document.getElementById('block_gplx_oto').classList.toggle('hidden', !hasOto);
-            // Nếu KHÔNG có bằng nào → bắt buộc up VNeTraffic
-            document.getElementById('block_vnetraffic').classList.toggle('hidden', hasMoto || hasOto);
+            // VNeTraffic LUÔN bắt buộc — không ẩn nữa
         }
 
         function quayLaiPage1() {
+            // Xóa row Supabase đã tạo ở Page 1 (vì user sẽ upload lại)
+            const rid = window._hs_id_page1;
+            if (rid) {
+                db.from('ho_so_online').delete().eq('id', rid).then(() => {});
+                window._hs_id_page1 = null;
+                window._page1_ocr_data = null;
+            }
+            // Reset banner
+            const banner = document.getElementById('banner_vneid_ocr');
+            if (banner) banner.classList.add('hidden');
             document.getElementById('step2').classList.add('hidden');
             document.getElementById('step2').style.display = 'none';
             document.getElementById('step1').classList.remove('hidden');
@@ -640,7 +655,7 @@
         window.temp_hs_bosung = {};
 
         // ===== PAGE 1: Validate + chuyển sang Page 2 =====
-        function nopPage1() {
+        async function nopPage1() {
             const hang = document.getElementById('hang_dk').value;
             if(!hang) {
                 document.getElementById('hang_dk').classList.add('input-error');
@@ -672,7 +687,140 @@
                 return;
             }
 
-            // Chuyển sang Page 2 — set ghi chú nếu cần ép tick ô tô
+            const btn = document.getElementById('btnSubmit');
+            btn.innerText = "ĐANG UPLOAD...";
+            btn.disabled = true;
+            _sessionId = '';
+
+            try {
+                // 1. Upload VNeID lên Supabase Storage
+                chuyenManHinh('loading-overlay');
+                document.getElementById('loading-spinner-box').classList.remove('hidden');
+                document.querySelector('#loading-spinner-box div:nth-child(2)').innerText = 'AI đang phân tích VNeID & kiểm tra hồ sơ trùng...';
+                document.getElementById('timeout-box').classList.add('hidden');
+
+                const vneidMain = await uploadFiles('files_vneid_main', 'vneid_main');
+                const vneidSub  = await uploadFiles('files_vneid_sub',  'vneid_sub');
+
+                const anh = {
+                    files_vneid: [...vneidMain, ...vneidSub],
+                    files_gplx: [],
+                    files_vnetraffic: [],
+                    files_cccd: [],
+                    files_chan_dung: [],
+                };
+                const bosung = {
+                    nguoi_nop: "Dương Trần",
+                    so_cccd_goc: "",
+                    nguoi_gioi_thieu: document.getElementById('nguoi_gt_nop').value.trim(),
+                    sdt_nguoi_gioi_thieu: document.getElementById('sdt_gt_nop').value.trim(),
+                    nam_lai_xe: document.getElementById('nam_lai_xe_nop').value || "",
+                };
+
+                // 2. Insert row trạng thái CHO_OCR_VNEID → agent sẽ pick up + OCR
+                const { data, error } = await db.from('ho_so_online').insert({
+                    ho_ten: "Chưa xác định",
+                    sdt: "",
+                    hang_dk: hang,
+                    anh_data: anh,
+                    trang_thai: 'CHO_OCR_VNEID',
+                    thong_tin_bo_sung: bosung
+                }).select();
+                if (error) throw error;
+
+                const rowId = data[0].id;
+                window._hs_id_page1 = rowId;
+                document.getElementById('recordId').value = rowId;
+
+                // 3. Listen để chờ agent OCR xong
+                langNgheKetQuaPage1(rowId);
+
+            } catch(e) {
+                alert("Lỗi: " + e.message);
+                btn.innerText = "TIẾP TỤC → BƯỚC 2";
+                btn.disabled = false;
+                chuyenManHinh('step1');
+            }
+        }
+
+        // Listener riêng cho Page 1 — chờ VNEID_DA_OCR hoặc TRUNG_HO_SO
+        function langNgheKetQuaPage1(id) {
+            let resolved = false;
+            let channel = null;
+            let interval = null;
+            let timeout = null;
+            const cleanup = () => {
+                try { if (channel) db.removeChannel(channel); } catch(e) {}
+                if (interval) clearInterval(interval);
+                if (timeout) clearTimeout(timeout);
+                channel = null; interval = null; timeout = null;
+            };
+
+            const xuLy = (data) => {
+                if (resolved || !data) return;
+                const st = data.trang_thai;
+                if (st === 'VNEID_DA_OCR') {
+                    resolved = true; cleanup();
+                    chuyenSangPage2_TuOCR(data);
+                } else if (st === 'TRUNG_HO_SO') {
+                    resolved = true; cleanup();
+                    hienCanhBaoTrungHoSo(data);
+                } else if (st === 'LOI_OCR_VNEID') {
+                    resolved = true; cleanup();
+                    if (confirm("AI không đọc được VNeID. Bạn muốn tiếp tục dù không xác định được (sẽ điền thủ công ở Bước 3)?")) {
+                        chuyenSangPage2_TuOCR(data);
+                    } else {
+                        chuyenManHinh('step1');
+                        const btn = document.getElementById('btnSubmit');
+                        btn.innerText = "TIẾP TỤC → BƯỚC 2";
+                        btn.disabled = false;
+                    }
+                }
+            };
+
+            try {
+                channel = db.channel(`hs1_${id}`)
+                    .on('postgres_changes',
+                        { event: 'UPDATE', schema: 'public', table: 'ho_so_online', filter: `id=eq.${id}` },
+                        payload => xuLy(payload.new))
+                    .subscribe();
+            } catch(e) {}
+
+            interval = setInterval(async () => {
+                if (resolved) return;
+                try {
+                    const { data } = await db.from('ho_so_online').select('*').eq('id', id).single();
+                    xuLy(data);
+                } catch(e) {}
+            }, 3000);
+
+            timeout = setTimeout(() => {
+                if (resolved) return;
+                resolved = true; cleanup();
+                alert("Hệ thống xử lý lâu hơn dự kiến. Vui lòng kiểm tra kết nối backend hoặc thử lại.");
+                chuyenManHinh('step1');
+                const btn = document.getElementById('btnSubmit');
+                btn.innerText = "TIẾP TỤC → BƯỚC 2";
+                btn.disabled = false;
+            }, 120000);
+
+            // Initial fetch (đề phòng agent đã xử lý xong trước khi subscribe)
+            (async () => {
+                try {
+                    const { data } = await db.from('ho_so_online').select('*').eq('id', id).single();
+                    xuLy(data);
+                } catch(e) {}
+            })();
+        }
+
+        function chuyenSangPage2_TuOCR(row) {
+            const info = typeof row.thong_tin_bo_sung === 'string'
+                ? JSON.parse(row.thong_tin_bo_sung)
+                : (row.thong_tin_bo_sung || {});
+            window._page1_ocr_data = info;
+
+            // Set ghi chú + force tick ô tô nếu nâng hạng
+            const hang = row.hang_dk;
             const ghiChu = document.getElementById('ghi_chu_nang_hang');
             const cbOto = document.getElementById('cb_co_bang_oto');
             const lblOto = document.getElementById('lbl_co_bang_oto');
@@ -688,14 +836,64 @@
             }
             capNhatKhoiUpGplx();
 
+            // Hiển thị banner OCR data
+            const banner = document.getElementById('banner_vneid_ocr');
+            const bcon = document.getElementById('banner_vneid_ocr_content');
+            const parts = [];
+            if (info.ho_va_ten) parts.push(`<b>Họ tên:</b> ${info.ho_va_ten}`);
+            if (info.so_cccd) parts.push(`<b>CCCD:</b> ${info.so_cccd}`);
+            if (info.ngay_sinh) parts.push(`<b>Ngày sinh:</b> ${info.ngay_sinh}`);
+            if (info.sdt) parts.push(`<b>SĐT:</b> ${info.sdt}`);
+            bcon.innerHTML = parts.join(' &nbsp;•&nbsp; ') || '<i>Không trích xuất được dữ liệu</i>';
+            banner.classList.remove('hidden');
+
+            // Báo khách cũ (trùng khác hạng) — không chặn
+            const dsTrung = info._ho_so_trung || [];
+            if (dsTrung.length > 0) {
+                const txt = dsTrung.map(r => `• Hạng ${r.HangGPLX} (${r.TrangThai}) — ${r.NgayVaoHoSo}`).join('<br>');
+                bcon.innerHTML += `<div style="margin-top:8px;color:#ef6c00;"><b>⚠ Hồ sơ trước đây:</b><br>${txt}</div>`;
+            }
+
             document.getElementById('step1').classList.add('hidden');
             document.getElementById('step1').style.display = 'none';
             document.getElementById('step2').classList.remove('hidden');
             document.getElementById('step2').style.display = 'block';
+            document.getElementById('loading-overlay').classList.add('hidden');
+            document.getElementById('loading-overlay').style.display = 'none';
             window.scrollTo(0, 0);
+
+            const btn = document.getElementById('btnSubmit');
+            btn.innerText = "TIẾP TỤC → BƯỚC 2";
+            btn.disabled = false;
         }
 
-        // ===== PAGE 2: Validate + upload TẤT CẢ ảnh + tạo row CHO_XU_LY =====
+        function hienCanhBaoTrungHoSo(row) {
+            const info = typeof row.thong_tin_bo_sung === 'string'
+                ? JSON.parse(row.thong_tin_bo_sung)
+                : (row.thong_tin_bo_sung || {});
+            const ds = info._ho_so_trung || [];
+            const txt = ds.map(r => `• Hạng ${r.HangGPLX} — Trạng thái: ${r.TrangThai} — Ngày vào: ${r.NgayVaoHoSo}`).join('\n');
+
+            const msg = `⚠ PHÁT HIỆN HỒ SƠ TRÙNG\n\n` +
+                `Hệ thống ghi nhận bạn đã từng đăng ký hạng ${row.hang_dk}:\n\n${txt}\n\n` +
+                `Bạn có chắc muốn ĐĂNG KÝ THÊM hạng ${row.hang_dk} lần nữa?`;
+
+            if (confirm(msg)) {
+                // Cho qua → chuyển sang Page 2
+                chuyenSangPage2_TuOCR(row);
+            } else {
+                // Hủy → xóa row + về Page 1
+                db.from('ho_so_online').delete().eq('id', row.id).then(() => {});
+                chuyenManHinh('step1');
+                const btn = document.getElementById('btnSubmit');
+                btn.innerText = "TIẾP TỤC → BƯỚC 2";
+                btn.disabled = false;
+                document.getElementById('loading-overlay').classList.add('hidden');
+                document.getElementById('loading-overlay').style.display = 'none';
+            }
+        }
+
+        // ===== PAGE 2: Validate + upload GPLX/VNeTraffic + UPDATE row sang CHO_XU_LY =====
         async function nopPage2() {
             const hasMoto = document.getElementById('cb_co_bang_moto').checked;
             const hasOto = document.getElementById('cb_co_bang_oto').checked;
@@ -714,34 +912,40 @@
                     return;
                 }
             }
-            if (!hasMoto && !hasOto) {
-                if (document.getElementById('files_vnetraffic').files.length === 0) {
-                    alert("Bạn chưa tick có bằng nào — vui lòng tải ảnh trang chủ VNeTraffic để xác nhận!");
-                    return;
-                }
+            // VNeTraffic LUÔN BẮT BUỘC với mọi hạng
+            if (document.getElementById('files_vnetraffic').files.length === 0) {
+                alert("Ảnh trang chủ VNeTraffic là BẮT BUỘC với mọi hạng — vui lòng tải lên trước khi gửi!");
+                return;
             }
 
             const btn = document.getElementById('btnPage2');
             btn.innerText = "ĐANG ĐỒNG BỘ..."; btn.disabled = true;
 
-            // Reset session ID
-            _sessionId = '';
-
             try {
                 capNhatProgress(2);
                 chuyenManHinh('loading-overlay');
                 document.getElementById('loading-spinner-box').classList.remove('hidden');
+                document.querySelector('#loading-spinner-box div:nth-child(2)').innerText = 'Hệ thống đang trích xuất dữ liệu...';
                 document.getElementById('timeout-box').classList.add('hidden');
 
-                // Upload tất cả ảnh — gộp VNeID main+sub vào files_vneid; gộp moto+oto vào files_gplx
-                const vneidMain = await uploadFiles('files_vneid_main', 'vneid_main');
-                const vneidSub  = await uploadFiles('files_vneid_sub',  'vneid_sub');
+                const rowId = window._hs_id_page1;
+                if (!rowId) throw new Error("Mất phiên Page 1 — vui lòng làm lại từ đầu");
+
+                // Lấy row hiện tại để merge anh_data + thong_tin_bo_sung
+                const { data: cur, error: errCur } = await db.from('ho_so_online').select('*').eq('id', rowId).single();
+                if (errCur) throw errCur;
+                const curAnh = cur.anh_data || {};
+                const curInfo = typeof cur.thong_tin_bo_sung === 'string'
+                    ? JSON.parse(cur.thong_tin_bo_sung)
+                    : (cur.thong_tin_bo_sung || {});
+
+                // Upload các ảnh còn lại (GPLX + VNeTraffic) — VNeID đã upload ở Page 1
                 const gplxMoto  = hasMoto ? await uploadFiles('files_gplx_moto', 'gplx_moto') : [];
                 const gplxOto   = hasOto  ? await uploadFiles('files_gplx_oto',  'gplx_oto')  : [];
-                const vntraffic = (!hasMoto && !hasOto) ? await uploadFiles('files_vnetraffic', 'vt') : [];
+                const vntraffic = await uploadFiles('files_vnetraffic', 'vt');
 
                 const anh = {
-                    files_vneid: [...vneidMain, ...vneidSub],
+                    files_vneid: curAnh.files_vneid || [],
                     files_gplx:  [...gplxMoto, ...gplxOto],
                     files_vnetraffic: vntraffic,
                     files_cccd: [],
@@ -749,29 +953,26 @@
                 };
 
                 const bosung = {
-                    nguoi_nop: "Dương Trần",
-                    so_cccd_goc: "",
-                    nguoi_gioi_thieu: document.getElementById('nguoi_gt_nop').value.trim(),
-                    sdt_nguoi_gioi_thieu: document.getElementById('sdt_gt_nop').value.trim(),
-                    nam_lai_xe: document.getElementById('nam_lai_xe_nop').value || "",
+                    ...curInfo,
                     co_bang_moto: hasMoto,
                     co_bang_oto: hasOto,
                 };
+                // Bỏ field nội bộ — không cần truyền tiếp
+                delete bosung._ho_so_trung;
 
-                const { data, error } = await db.from('ho_so_online').insert({
-                    ho_ten: "Chưa xác định",
-                    sdt: "",
-                    hang_dk: hang,
+                // UPDATE row → trạng thái CHO_XU_LY → agent xử lý bước tổng hợp
+                const { error: errU } = await db.from('ho_so_online').update({
                     anh_data: anh,
+                    thong_tin_bo_sung: bosung,
                     trang_thai: 'CHO_XU_LY',
-                    thong_tin_bo_sung: bosung
-                }).select();
-                if(error) throw error;
+                }).eq('id', rowId);
+                if (errU) throw errU;
 
-                langNgheKetQua(data[0].id);
+                langNgheKetQua(rowId);
             } catch(e) {
                 alert("Lỗi: " + e.message);
                 btn.innerText = "GỬI YÊU CẦU XỬ LÝ →"; btn.disabled = false;
+                chuyenManHinh('step2');
             }
         }
 
