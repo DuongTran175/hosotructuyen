@@ -767,7 +767,10 @@
                     hienCanhBaoTrungHoSo(data);
                 } else if (st === 'LOI_OCR_VNEID') {
                     resolved = true; cleanup();
-                    if (confirm("AI không đọc được VNeID. Bạn muốn tiếp tục dù không xác định được (sẽ điền thủ công ở Bước 3)?")) {
+                    const loiCt = (data.thong_tin_bo_sung && data.thong_tin_bo_sung._loi_ocr_chi_tiet) || '';
+                    const msg = "AI không đọc được VNeID" + (loiCt ? `\n\nChi tiết lỗi: ${loiCt}` : '') +
+                                "\n\nBạn muốn tiếp tục dù không xác định được (sẽ điền thủ công ở Bước 3)?";
+                    if (confirm(msg)) {
                         chuyenSangPage2_TuOCR(data);
                     } else {
                         chuyenManHinh('step1');
