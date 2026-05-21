@@ -580,7 +580,7 @@
             // Xóa row Supabase đã tạo ở Page 1 (vì user sẽ upload lại)
             const rid = window._hs_id_page1;
             if (rid) {
-                db.from('ho_so_online').delete().eq('id', rid).then(() => {});
+                db.from('ho_so_inbox').delete().eq('id', rid).then(() => {});
                 window._hs_id_page1 = null;
                 window._page1_ocr_data = null;
             }
@@ -709,22 +709,15 @@
                     files_cccd: [],
                     files_chan_dung: [],
                 };
-                const bosung = {
-                    nguoi_nop: "Dương Trần",
-                    so_cccd_goc: "",
-                    nguoi_gioi_thieu: document.getElementById('nguoi_gt_nop').value.trim(),
-                    sdt_nguoi_gioi_thieu: document.getElementById('sdt_gt_nop').value.trim(),
-                    nam_lai_xe: document.getElementById('nam_lai_xe_nop').value || "",
-                };
-
                 // 2. Insert row trạng thái CHO_OCR_VNEID → agent sẽ pick up + OCR
-                const { data, error } = await db.from('ho_so_online').insert({
-                    ho_ten: "Chưa xác định",
-                    sdt: "",
+                //    Schema mới — ho_so_inbox với cột phẳng
+                const { data, error } = await db.from('ho_so_inbox').insert({
                     hang_dk: hang,
                     anh_data: anh,
                     trang_thai: 'CHO_OCR_VNEID',
-                    thong_tin_bo_sung: bosung
+                    nguoi_gioi_thieu:     document.getElementById('nguoi_gt_nop').value.trim() || null,
+                    sdt_nguoi_gioi_thieu: document.getElementById('sdt_gt_nop').value.trim()  || null,
+                    nam_lai_xe:           document.getElementById('nam_lai_xe_nop').value     || null,
                 }).select();
                 if (error) throw error;
 
@@ -767,7 +760,7 @@
                     hienCanhBaoTrungHoSo(data);
                 } else if (st === 'LOI_OCR_VNEID') {
                     resolved = true; cleanup();
-                    const loiCt = (data.thong_tin_bo_sung && data.thong_tin_bo_sung._loi_ocr_chi_tiet) || '';
+                    const loiCt = data.loi_chi_tiet || '';
                     const msg = "AI không đọc được VNeID" + (loiCt ? `\n\nChi tiết lỗi: ${loiCt}` : '') +
                                 "\n\nBạn muốn tiếp tục dù không xác định được (sẽ điền thủ công ở Bước 3)?";
                     if (confirm(msg)) {
@@ -784,7 +777,7 @@
             try {
                 channel = db.channel(`hs1_${id}`)
                     .on('postgres_changes',
-                        { event: 'UPDATE', schema: 'public', table: 'ho_so_online', filter: `id=eq.${id}` },
+                        { event: 'UPDATE', schema: 'public', table: 'ho_so_inbox', filter: `id=eq.${id}` },
                         payload => xuLy(payload.new))
                     .subscribe();
             } catch(e) {}
@@ -792,7 +785,7 @@
             interval = setInterval(async () => {
                 if (resolved) return;
                 try {
-                    const { data } = await db.from('ho_so_online').select('*').eq('id', id).single();
+                    const { data } = await db.from('ho_so_inbox').select('*').eq('id', id).single();
                     xuLy(data);
                 } catch(e) {}
             }, 3000);
@@ -810,17 +803,15 @@
             // Initial fetch (đề phòng agent đã xử lý xong trước khi subscribe)
             (async () => {
                 try {
-                    const { data } = await db.from('ho_so_online').select('*').eq('id', id).single();
+                    const { data } = await db.from('ho_so_inbox').select('*').eq('id', id).single();
                     xuLy(data);
                 } catch(e) {}
             })();
         }
 
         function chuyenSangPage2_TuOCR(row) {
-            const info = typeof row.thong_tin_bo_sung === 'string'
-                ? JSON.parse(row.thong_tin_bo_sung)
-                : (row.thong_tin_bo_sung || {});
-            window._page1_ocr_data = info;
+            // Schema mới — đọc trực tiếp từ cột phẳng của ho_so_inbox
+            window._page1_ocr_data = row;
 
             // Set ghi chú + force tick ô tô nếu nâng hạng
             const hang = row.hang_dk;
@@ -843,16 +834,16 @@
             const banner = document.getElementById('banner_vneid_ocr');
             const bcon = document.getElementById('banner_vneid_ocr_content');
             const parts = [];
-            if (info.ho_va_ten) parts.push(`<b>Họ tên:</b> ${info.ho_va_ten}`);
-            if (info.so_cccd) parts.push(`<b>CCCD:</b> ${info.so_cccd}`);
-            if (info.ngay_sinh) parts.push(`<b>Ngày sinh:</b> ${info.ngay_sinh}`);
-            if (info.sdt) parts.push(`<b>SĐT:</b> ${info.sdt}`);
+            if (row.ho_va_ten) parts.push(`<b>Họ tên:</b> ${row.ho_va_ten}`);
+            if (row.so_cccd)   parts.push(`<b>CCCD:</b> ${row.so_cccd}`);
+            if (row.ngay_sinh) parts.push(`<b>Ngày sinh:</b> ${row.ngay_sinh}`);
+            if (row.sdt)       parts.push(`<b>SĐT:</b> ${row.sdt}`);
             bcon.innerHTML = parts.join(' &nbsp;•&nbsp; ') || '<i>Không trích xuất được dữ liệu</i>';
             banner.classList.remove('hidden');
 
-            // Báo khách cũ (trùng khác hạng) — không chặn
-            const dsTrung = info._ho_so_trung || [];
-            if (dsTrung.length > 0) {
+            // Báo khách cũ (trùng khác hạng) — đọc từ cột ho_so_trung JSONB
+            const dsTrung = row.ho_so_trung || [];
+            if (Array.isArray(dsTrung) && dsTrung.length > 0) {
                 const txt = dsTrung.map(r => `• Hạng ${r.HangGPLX} (${r.TrangThai}) — ${r.NgayVaoHoSo}`).join('<br>');
                 bcon.innerHTML += `<div style="margin-top:8px;color:#ef6c00;"><b>⚠ Hồ sơ trước đây:</b><br>${txt}</div>`;
             }
@@ -871,10 +862,7 @@
         }
 
         function hienCanhBaoTrungHoSo(row) {
-            const info = typeof row.thong_tin_bo_sung === 'string'
-                ? JSON.parse(row.thong_tin_bo_sung)
-                : (row.thong_tin_bo_sung || {});
-            const ds = info._ho_so_trung || [];
+            const ds = row.ho_so_trung || [];
             const txt = ds.map(r => `• Hạng ${r.HangGPLX} — Trạng thái: ${r.TrangThai} — Ngày vào: ${r.NgayVaoHoSo}`).join('\n');
 
             const msg = `⚠ PHÁT HIỆN HỒ SƠ TRÙNG\n\n` +
@@ -886,7 +874,7 @@
                 chuyenSangPage2_TuOCR(row);
             } else {
                 // Hủy → xóa row + về Page 1
-                db.from('ho_so_online').delete().eq('id', row.id).then(() => {});
+                db.from('ho_so_inbox').delete().eq('id', row.id).then(() => {});
                 chuyenManHinh('step1');
                 const btn = document.getElementById('btnSubmit');
                 btn.innerText = "TIẾP TỤC → BƯỚC 2";
@@ -934,13 +922,10 @@
                 const rowId = window._hs_id_page1;
                 if (!rowId) throw new Error("Mất phiên Page 1 — vui lòng làm lại từ đầu");
 
-                // Lấy row hiện tại để merge anh_data + thong_tin_bo_sung
-                const { data: cur, error: errCur } = await db.from('ho_so_online').select('*').eq('id', rowId).single();
+                // Lấy row hiện tại để merge anh_data
+                const { data: cur, error: errCur } = await db.from('ho_so_inbox').select('anh_data').eq('id', rowId).single();
                 if (errCur) throw errCur;
                 const curAnh = cur.anh_data || {};
-                const curInfo = typeof cur.thong_tin_bo_sung === 'string'
-                    ? JSON.parse(cur.thong_tin_bo_sung)
-                    : (cur.thong_tin_bo_sung || {});
 
                 // Upload các ảnh còn lại (GPLX + VNeTraffic) — VNeID đã upload ở Page 1
                 const gplxMoto  = hasMoto ? await uploadFiles('files_gplx_moto', 'gplx_moto') : [];
@@ -955,18 +940,12 @@
                     files_chan_dung: [],
                 };
 
-                const bosung = {
-                    ...curInfo,
+                // UPDATE row → trạng thái CHO_XU_LY → agent xử lý bước tổng hợp
+                const { error: errU } = await db.from('ho_so_inbox').update({
+                    anh_data: anh,
                     co_bang_moto: hasMoto,
                     co_bang_oto: hasOto,
-                };
-                // Bỏ field nội bộ — không cần truyền tiếp
-                delete bosung._ho_so_trung;
-
-                // UPDATE row → trạng thái CHO_XU_LY → agent xử lý bước tổng hợp
-                const { error: errU } = await db.from('ho_so_online').update({
-                    anh_data: anh,
-                    thong_tin_bo_sung: bosung,
+                    ho_so_trung: null,
                     trang_thai: 'CHO_XU_LY',
                 }).eq('id', rowId);
                 if (errU) throw errU;
@@ -1004,10 +983,8 @@
                 if (data.trang_thai === 'LOI_XU_LY') {
                     resolved = true;
                     cleanup();
-                    const info = typeof data.thong_tin_bo_sung === 'string'
-                        ? JSON.parse(data.thong_tin_bo_sung)
-                        : (data.thong_tin_bo_sung || {});
-                    if (info && Object.keys(info).length > 2) {
+                    // Có dữ liệu cá nhân đã được agent tổng hợp → hiện form xác nhận
+                    if (data.ho_va_ten || data.so_cccd) {
                         hienThiFormXacNhan(data);
                     } else {
                         document.getElementById('loading-spinner-box').classList.add('hidden');
@@ -1022,7 +999,7 @@
             try {
                 channel = db.channel(`hs_${id}`)
                     .on('postgres_changes',
-                        { event: 'UPDATE', schema: 'public', table: 'ho_so_online', filter: `id=eq.${id}` },
+                        { event: 'UPDATE', schema: 'public', table: 'ho_so_inbox', filter: `id=eq.${id}` },
                         payload => handleData(payload.new))
                     .subscribe();
             } catch(e) { console.warn('Realtime subscribe lỗi, dùng polling:', e); }
@@ -1031,7 +1008,7 @@
             interval = setInterval(async () => {
                 if (resolved) return;
                 try {
-                    const { data } = await db.from('ho_so_online').select('*').eq('id', id).single();
+                    const { data } = await db.from('ho_so_inbox').select('*').eq('id', id).single();
                     handleData(data);
                 } catch(e) { console.error('Polling error:', e); }
             }, 3000);
@@ -1048,7 +1025,7 @@
             // 4. Initial fetch: nếu AI đã xong trước khi subscribe → bắt ngay
             (async () => {
                 try {
-                    const { data } = await db.from('ho_so_online').select('*').eq('id', id).single();
+                    const { data } = await db.from('ho_so_inbox').select('*').eq('id', id).single();
                     handleData(data);
                 } catch(e) {}
             })();
@@ -1056,7 +1033,7 @@
 
         async function kiemTraLaiNgay() {
             const id = document.getElementById('recordId').value;
-            const { data } = await db.from('ho_so_online').select('*').eq('id', id).single();
+            const { data } = await db.from('ho_so_inbox').select('*').eq('id', id).single();
             if (!data) return alert("Không tìm thấy hồ sơ!");
 
             if (['CHO_KHACH_XEM', 'KHACH_DA_SUA', 'HOAN_TAT'].includes(data.trang_thai)) {
@@ -1072,9 +1049,8 @@
 
         function hienThiFormXacNhan(hs) {
             capNhatProgress(3);
-            const i = typeof hs.thong_tin_bo_sung === 'string'
-                ? JSON.parse(hs.thong_tin_bo_sung)
-                : (hs.thong_tin_bo_sung || {});
+            // Sau migration v2: dùng trực tiếp các cột phẳng của ho_so_inbox
+            const i = hs;
 
             window.temp_hs_bosung = i;
             window._hs_id_xacnhan = hs.id;
@@ -1140,7 +1116,7 @@
                     btnSync.disabled = true;
                     btnSync.innerText = '⏳ Đang đồng bộ...';
                     try {
-                        await db.from('ho_so_online').update({
+                        await db.from('ho_so_inbox').update({
                             trang_thai: 'YEU_CAU_DONG_BO_LAI',
                             cap_nhat_luc: new Date().toISOString()
                         }).eq('id', hs.id);
@@ -1157,11 +1133,11 @@
                 };
             }
 
-            // 3e. Hiện lỗi đồng bộ nếu có
-            if (i._loi_dong_bo) {
+            // 3e. Hiện lỗi đồng bộ nếu có (cột loi_chi_tiet)
+            if (i.loi_chi_tiet) {
                 const errBox = document.createElement('div');
                 errBox.style.cssText = 'background:#ffebee;border:1px solid #c62828;border-radius:8px;padding:10px 14px;margin-bottom:16px;color:#b71c1c;font-size:13px;';
-                errBox.innerHTML = '⚠️ <b>Lỗi đồng bộ:</b> ' + i._loi_dong_bo;
+                errBox.innerHTML = '⚠️ <b>Lỗi đồng bộ:</b> ' + i.loi_chi_tiet;
                 formDiv.insertBefore(errBox, formDiv.firstChild);
             }
 
@@ -1338,8 +1314,9 @@
             // Giữ lại thâm niên từ dữ liệu đã nộp ban đầu
             const namLaiXe = (window.temp_hs_bosung || {}).nam_lai_xe || '';
 
+            // Sau migration v2: ghi trực tiếp vào các cột phẳng của ho_so_inbox
             const updateData = {
-                ...(window.temp_hs_bosung || {}),
+                ho_va_ten: hoten.toUpperCase(),
                 ngay_sinh: getVal('ngay_sinh_chk'),
                 gioi_tinh: getVal('gio_tinh_chk'),
                 so_cccd: getVal('so_cccd_chk'),
@@ -1355,10 +1332,12 @@
                 nguoi_lien_he_sdt: lh_sdt,
                 nguoi_lien_he_dia_chi: getVal('nguoi_lh_dia_chi_chk'),
                 nam_lai_xe: namLaiXe,
+                trang_thai: 'KHACH_DA_SUA',
+                cap_nhat_luc: new Date().toISOString(),
             };
 
             const hs_id = (formDiv.querySelector ? formDiv.querySelector('#recordId') : document.getElementById('recordId'))?.value || document.getElementById('recordId').value;
-            const { error } = await db.from('ho_so_online').update({ ho_ten: hoten.toUpperCase(), sdt: sdt, thong_tin_bo_sung: updateData, trang_thai: 'KHACH_DA_SUA' }).eq('id', hs_id);
+            const { error } = await db.from('ho_so_inbox').update(updateData).eq('id', hs_id);
             if(!error) {
                 capNhatProgress(4);
                 document.getElementById('loading-overlay').style.display = 'none';
@@ -1376,54 +1355,27 @@
             document.getElementById('btn-tracuu').disabled = true;
 
             try {
-                const { data, error } = await db.from('ho_so_online')
+                // Sau migration v2: so_cccd là cột phẳng → query trực tiếp
+                // Thử inbox trước; nếu không có → gửi truy_van_request lên SQL Server qua proxy
+                const { data, error } = await db.from('ho_so_inbox')
                     .select('*')
                     .eq('hang_dk', hang)
+                    .eq('so_cccd', cccd)
                     .in('trang_thai', ['HOAN_TAT', 'CHO_KHACH_XEM', 'KHACH_DA_SUA', 'LOI_XU_LY', 'DANG_XU_LY'])
                     .order('cap_nhat_luc', { ascending: false, nullsFirst: false })
-                    .order('created_at', { ascending: false });
+                    .order('ngay_tao', { ascending: false });
 
                 if(error) throw error;
 
-                // Lọc tất cả row khớp CCCD
-                const _parseTtbs = (item) => {
-                    try {
-                        return typeof item.thong_tin_bo_sung === 'string'
-                            ? JSON.parse(item.thong_tin_bo_sung)
-                            : (item.thong_tin_bo_sung || {});
-                    } catch(e) { return {}; }
-                };
-                const matches = data.filter(item => {
-                    const i = _parseTtbs(item);
-                    return (i.so_cccd || '').replace(/\s/g,'') === cccd ||
-                           (i.so_cccd_goc || '').replace(/\s/g,'') === cccd;
-                });
-
-                // Sort: ưu tiên row có nhiều field thong_tin_bo_sung có giá trị nhất
-                // (tránh chọn phải row do desktop push tạo nhưng thiếu dữ liệu AI scan)
-                matches.sort((a, b) => {
-                    const ia = _parseTtbs(a);
-                    const ib = _parseTtbs(b);
-                    const ca = Object.values(ia).filter(v => v !== null && v !== undefined && String(v).trim() !== '').length;
-                    const cb = Object.values(ib).filter(v => v !== null && v !== undefined && String(v).trim() !== '').length;
-                    if (cb !== ca) return cb - ca;
-                    // Tie-break: row có anh_data đầy đủ hơn
-                    const aa = a.anh_data ? Object.keys(typeof a.anh_data === 'string' ? JSON.parse(a.anh_data || '{}') : (a.anh_data || {})).length : 0;
-                    const ab = b.anh_data ? Object.keys(typeof b.anh_data === 'string' ? JSON.parse(b.anh_data || '{}') : (b.anh_data || {})).length : 0;
-                    return ab - aa;
-                });
-
-                const hs = matches[0];
+                const hs = (data || [])[0];
 
                 if(!hs) {
-                    alert("Không tìm thấy hồ sơ!\nCCCD: " + cccd + "\nHạng: " + hang);
+                    alert("Không tìm thấy hồ sơ trong inbox!\nCCCD: " + cccd + "\nHạng: " + hang + "\n(Nếu hồ sơ đã hoàn tất quá 30 ngày sẽ không còn trong inbox — vui lòng liên hệ trung tâm.)");
                     return;
                 }
 
-                // Hiện kết quả ngay trong trang — không cần chuyển màn hình
-                const i = typeof hs.thong_tin_bo_sung === 'string'
-                    ? JSON.parse(hs.thong_tin_bo_sung)
-                    : (hs.thong_tin_bo_sung || {});
+                // Hiện kết quả ngay trong trang — i = hs (dùng cột phẳng)
+                const i = hs;
                 window._hs_hien_tai = hs;
                 window._i_hien_tai = i;
 
@@ -1646,16 +1598,15 @@
             }
         }
         function hienThiManHinhXem(hs) {
-            const i = typeof hs.thong_tin_bo_sung === 'string'
-                ? JSON.parse(hs.thong_tin_bo_sung)
-                : (hs.thong_tin_bo_sung || {});
+            // Sau migration v2: cột phẳng → dùng trực tiếp hs
+            const i = hs;
 
             // Điền thông tin vào các ô read-only
-            document.getElementById('v_ho_va_ten').innerText   = (i.ho_va_ten || hs.ho_ten || "").toUpperCase() || "—";
-            document.getElementById('v_so_cccd').innerText     = i.so_cccd || i.so_cccd_goc || "—";
+            document.getElementById('v_ho_va_ten').innerText   = (i.ho_va_ten || "").toUpperCase() || "—";
+            document.getElementById('v_so_cccd').innerText     = i.so_cccd || "—";
             document.getElementById('v_ngay_sinh').innerText   = i.ngay_sinh || "—";
             document.getElementById('v_gioi_tinh').innerText   = i.gioi_tinh || "—";
-            document.getElementById('v_sdt').innerText         = i.sdt || hs.sdt || "—";
+            document.getElementById('v_sdt').innerText         = i.sdt || "—";
             document.getElementById('v_dan_toc').innerText     = i.dan_toc || "—";
             document.getElementById('v_que_quan').innerText    = i.que_quan || "—";
             document.getElementById('v_thuong_tru').innerText  = i.noi_thuong_tru || "—";
@@ -1709,11 +1660,11 @@
 
         async function luuBoSung() {
             const hs_id = window._hs_hien_tai.id;
-            const cu = window._i_hien_tai;
+            const cu = window._i_hien_tai;  // hs (cột phẳng)
             const lay = (id, fallback) => document.getElementById(id).value.trim() || fallback || '';
 
+            // Sau migration v2: chỉ build các cột phẳng đã thay đổi (không spread full hs)
             const moi = {
-                ...cu,
                 sdt:                 lay('bs_sdt',     cu.sdt),
                 nghe_nghiep:         (document.getElementById('bs_nghe').value === 'Khác' ? lay('bs_nghe_khac', cu.nghe_nghiep) : lay('bs_nghe', cu.nghe_nghiep)),
                 noi_lam_viec:        lay('bs_noilam',  cu.noi_lam_viec),
@@ -1765,8 +1716,9 @@
                     document.getElementById('btn-luu-bosung').innerText = 'ĐANG UPLOAD ẢNH...';
                 }
 
+                // Sau migration v2: spread cột phẳng đã thay đổi trực tiếp vào payload
                 const updatePayload = {
-                    thong_tin_bo_sung: moi,
+                    ...moi,
                     sdt: moi.sdt || window._hs_hien_tai.sdt || '',
                     trang_thai: co_anh_moi ? 'CHO_XU_LY' : 'KHACH_DA_SUA',
                     cap_nhat_luc: new Date().toISOString()
@@ -1775,7 +1727,7 @@
                     updatePayload.anh_data = anh_data_moi;
                 }
 
-                const { error } = await db.from('ho_so_online')
+                const { error } = await db.from('ho_so_inbox')
                     .update(updatePayload)
                     .eq('id', hs_id);
 
