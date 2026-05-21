@@ -91,6 +91,31 @@
         .field-hint.error { color:#d32f2f; font-weight:bold; }
         .form-control.input-error { border-color:#d32f2f !important; background:#fff5f5 !important; }
         .form-control.input-ok { border-color:#2e7d32 !important; }
+
+        /* ===== TRUNG HỒ SƠ MODAL ===== */
+        #trung-hoso-modal { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); z-index:99999; justify-content:center; align-items:center; }
+        #trung-hoso-modal.show { display:flex; }
+        .trung-modal-box { background:#fff; max-width:520px; width:94%; border:3px solid #000; font-family:var(--font-mono); }
+        .trung-modal-header { background:#ef6c00; color:#fff; padding:18px 22px; }
+        .trung-modal-header h3 { margin:0; font-size:18px; letter-spacing:0.5px; }
+        .trung-modal-header p { margin:6px 0 0; font-size:12px; opacity:0.9; }
+        .trung-modal-body { padding:20px 22px; }
+        .trung-modal-record { background:#fff8e1; border:1px solid #ef6c00; border-left:4px solid #ef6c00; padding:10px 14px; margin-bottom:14px; font-size:13px; line-height:1.7; }
+        .trung-modal-question { font-size:14px; font-weight:bold; margin:0 0 16px; }
+        .trung-modal-btns { display:flex; gap:12px; }
+        .trung-btn-update { flex:2; padding:14px; background:#2e7d32; color:#fff; border:2px solid #2e7d32; font-family:var(--font-mono); font-size:14px; font-weight:bold; cursor:pointer; transition:0.2s; }
+        .trung-btn-update:hover { background:#1b5e20; border-color:#1b5e20; }
+        .trung-btn-cancel { flex:1; padding:14px; background:#fff; color:#000; border:2px solid #000; font-family:var(--font-mono); font-size:13px; cursor:pointer; transition:0.2s; }
+        .trung-btn-cancel:hover { background:#f5f5f5; }
+
+        /* ===== LỖI XỬ LÝ: Retry box ===== */
+        #loi-xuly-box { display:none; text-align:center; border:1px solid var(--border-color); padding:30px 40px; background:var(--bg-color); }
+        #loi-xuly-box h2 { margin-top:0; font-family:var(--font-mono); color:#c62828; }
+        #loi-xuly-box .loi-detail { background:#fff5f5; border:1px solid #ef9a9a; border-left:4px solid #c62828; padding:10px 14px; font-size:13px; text-align:left; margin:12px 0 20px; line-height:1.6; }
+        .btn-retry { display:inline-block; padding:12px 24px; background:#000; color:#ff00ff; border:2px solid #000; font-family:var(--font-mono); font-size:15px; font-weight:bold; cursor:pointer; transition:0.2s; margin:6px; }
+        .btn-retry:hover { background:#ff00ff; color:#000; }
+        .btn-manual { display:inline-block; padding:12px 24px; background:#fff; color:#000; border:2px solid #000; font-family:var(--font-mono); font-size:14px; cursor:pointer; transition:0.2s; margin:6px; }
+        .btn-manual:hover { background:#f5f5f5; }
     </style>
 </head>
 <body>
@@ -352,6 +377,31 @@
                 <h2 style="margin-top: 0; font-family: var(--font-mono);">[ SYSTEM QUEUE ]</h2>
                 <p>Hồ sơ đã vào hàng đợi AI xử lý.</p>
                 <button onclick="kiemTraLaiNgay()" class="btn-main" style="width: auto;">KIỂM TRA TRẠNG THÁI</button>
+            </div>
+            <div id="loi-xuly-box">
+                <h2>[ LỖI XỬ LÝ ]</h2>
+                <div class="loi-detail" id="loi-xuly-detail">Hệ thống gặp sự cố trong quá trình xử lý hồ sơ.</div>
+                <button class="btn-retry" onclick="thuLaiXuLy()">🔄 THỬ LẠI XỬ LÝ</button>
+                <button class="btn-manual" id="btn-dien-tay" onclick="dienThuCong()" style="display:none;">📝 ĐIỀN THỦ CÔNG</button>
+                <div style="margin-top:16px;font-size:12px;color:#999;">Nếu tiếp tục lỗi, liên hệ nhân viên hỗ trợ.</div>
+            </div>
+        </div>
+
+        <!-- MODAL: Phát hiện hồ sơ trùng cùng hạng -->
+        <div id="trung-hoso-modal">
+            <div class="trung-modal-box">
+                <div class="trung-modal-header">
+                    <h3>⚠ PHÁT HIỆN HỒ SƠ TRÙNG</h3>
+                    <p>Hệ thống tìm thấy hồ sơ đã tồn tại với cùng hạng đăng ký</p>
+                </div>
+                <div class="trung-modal-body">
+                    <div class="trung-modal-record" id="trung-modal-info"></div>
+                    <p class="trung-modal-question">Bạn muốn làm gì với hồ sơ này?</p>
+                    <div class="trung-modal-btns">
+                        <button class="trung-btn-update" id="trung-btn-capnhat">📷 CẬP NHẬT ẢNH VÀO HỒ SƠ CŨ</button>
+                        <button class="trung-btn-cancel" id="trung-btn-huy">❌ HỦY BỎ</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -635,9 +685,16 @@
                 const sid = getSessionId();
                 let c = 0;
                 for(let file of input.files) {
-                    c++; const fileName = `${sid}_${Date.now()}_${c}_${folderPrefix}_${file.name.replace(/[^a-zA-Z0-9.]/g, '')}`;
-                    const { data } = await db.storage.from('kho-anh-hoc-vien').upload(fileName, file);
-                    if(data) urls.push(db.storage.from('kho-anh-hoc-vien').getPublicUrl(fileName).data.publicUrl);
+                    c++;
+                    // Đảm bảo tên file luôn có phần tên hợp lệ (tránh tên tiếng Việt gây lỗi upload)
+                    const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, '') || 'img.jpg';
+                    const fileName = `${sid}_${Date.now()}_${c}_${folderPrefix}_${cleanName}`;
+                    const { data, error } = await db.storage.from('kho-anh-hoc-vien').upload(fileName, file);
+                    if(data) {
+                        urls.push(db.storage.from('kho-anh-hoc-vien').getPublicUrl(fileName).data.publicUrl);
+                    } else if(error) {
+                        console.error(`Upload lỗi [${folderPrefix}]:`, error.message);
+                    }
                 }
             } return urls;
         }
@@ -864,25 +921,43 @@
 
         function hienCanhBaoTrungHoSo(row) {
             const ds = row.ho_so_trung || [];
-            const txt = ds.map(r => `• Hạng ${r.HangGPLX} — Trạng thái: ${r.TrangThai} — Ngày vào: ${r.NgayVaoHoSo}`).join('\n');
+            // Lấy hồ sơ trùng cùng hạng (nếu có) để điền local_hoc_vien_id
+            const trungCungHang = ds.find(r => r.HangGPLX === row.hang_dk) || ds[0] || {};
+            const existingId = trungCungHang.Id || null;
 
-            const msg = `⚠ PHÁT HIỆN HỒ SƠ TRÙNG\n\n` +
-                `Hệ thống ghi nhận bạn đã từng đăng ký hạng ${row.hang_dk}:\n\n${txt}\n\n` +
-                `Bạn có chắc muốn ĐĂNG KÝ THÊM hạng ${row.hang_dk} lần nữa?`;
+            // Điền thông tin vào modal
+            const infoHtml = ds.map(r =>
+                `<div>📋 Hạng <b>${r.HangGPLX}</b> &nbsp;|&nbsp; Trạng thái: <b>${r.TrangThai}</b> &nbsp;|&nbsp; Ngày vào: ${r.NgayVaoHoSo}</div>`
+            ).join('');
+            document.getElementById('trung-modal-info').innerHTML =
+                `<div style="margin-bottom:8px;font-size:12px;color:#777;">Hạng đang đăng ký: <b>${row.hang_dk}</b></div>` + infoHtml;
 
-            if (confirm(msg)) {
-                // Cho qua → chuyển sang Page 2
+            // Ẩn loading, hiện modal
+            document.getElementById('loading-overlay').classList.add('hidden');
+            document.getElementById('loading-overlay').style.display = 'none';
+            const modal = document.getElementById('trung-hoso-modal');
+            modal.classList.add('show');
+
+            // Nút CẬP NHẬT ẢNH → merge ảnh vào hồ sơ cũ
+            document.getElementById('trung-btn-capnhat').onclick = async () => {
+                modal.classList.remove('show');
+                // Ghi local_hoc_vien_id vào row → agent biết cần update record cũ
+                if (existingId) {
+                    await db.from('ho_so_inbox').update({ local_hoc_vien_id: existingId }).eq('id', row.id);
+                    row.local_hoc_vien_id = existingId;
+                }
                 chuyenSangPage2_TuOCR(row);
-            } else {
-                // Hủy → xóa row + về Page 1
+            };
+
+            // Nút HỦY BỎ → xóa row, về Page 1
+            document.getElementById('trung-btn-huy').onclick = () => {
+                modal.classList.remove('show');
                 db.from('ho_so_inbox').delete().eq('id', row.id).then(() => {});
                 chuyenManHinh('step1');
                 const btn = document.getElementById('btnSubmit');
                 btn.innerText = "TIẾP TỤC → BƯỚC 2";
                 btn.disabled = false;
-                document.getElementById('loading-overlay').classList.add('hidden');
-                document.getElementById('loading-overlay').style.display = 'none';
-            }
+            };
         }
 
         // ===== PAGE 2: Validate + upload GPLX/VNeTraffic + UPDATE row sang CHO_XU_LY =====
@@ -986,15 +1061,7 @@
                 if (data.trang_thai === 'LOI_XU_LY') {
                     resolved = true;
                     cleanup();
-                    // Có dữ liệu cá nhân đã được agent tổng hợp → hiện form xác nhận
-                    if (data.ho_va_ten || data.so_cccd) {
-                        hienThiFormXacNhan(data);
-                    } else {
-                        document.getElementById('loading-spinner-box').classList.add('hidden');
-                        document.getElementById('timeout-box').classList.remove('hidden');
-                        document.querySelector('#timeout-box p').innerHTML =
-                            'Hệ thống gặp sự cố khi xử lý.<br>Bạn có thể <b>kiểm tra lại</b> hoặc tra cứu bằng CCCD ở mục <b>Tra Cứu Dữ Liệu</b>.';
-                    }
+                    hienLoiVoiThuLai(data);
                 }
             };
 
@@ -1042,12 +1109,57 @@
             if (['CHO_KHACH_XEM', 'KHACH_DA_SUA', 'HOAN_TAT'].includes(data.trang_thai)) {
                 hienThiFormXacNhan(data);
             } else if (data.trang_thai === 'LOI_XU_LY') {
-                if (confirm("Hệ thống gặp lỗi khi xử lý. Bạn có muốn điền thông tin thủ công?")) {
-                    hienThiFormXacNhan(data);
-                }
+                hienLoiVoiThuLai(data);
             } else {
                 alert("Hệ thống vẫn đang xử lý (" + data.trang_thai + "). Vui lòng thử lại sau!");
             }
+        }
+
+        // Hiển thị hộp lỗi với nút thử lại + điền thủ công
+        function hienLoiVoiThuLai(data) {
+            window._loi_xuly_data = data;
+            document.getElementById('loading-spinner-box').classList.add('hidden');
+            document.getElementById('timeout-box').classList.add('hidden');
+
+            const loiCt = data.loi_chi_tiet || 'Không có chi tiết lỗi.';
+            document.getElementById('loi-xuly-detail').innerHTML =
+                `<b>Chi tiết lỗi:</b> ${loiCt}`;
+
+            // Hiện nút "Điền thủ công" nếu đã có một số dữ liệu
+            const btnManual = document.getElementById('btn-dien-tay');
+            if (data.ho_va_ten || data.so_cccd) {
+                btnManual.style.display = 'inline-block';
+            } else {
+                btnManual.style.display = 'none';
+            }
+
+            document.getElementById('loi-xuly-box').style.display = 'block';
+        }
+
+        async function thuLaiXuLy() {
+            const data = window._loi_xuly_data;
+            if (!data) return;
+            const id = data.id || document.getElementById('recordId').value;
+            if (!id) return alert("Không tìm thấy ID hồ sơ để thử lại.");
+
+            document.getElementById('loi-xuly-box').style.display = 'none';
+            document.getElementById('loading-spinner-box').classList.remove('hidden');
+            document.querySelector('#loading-spinner-box div:nth-child(2)').innerText = 'Đang đưa hồ sơ vào hàng đợi thử lại...';
+
+            const { error } = await db.from('ho_so_inbox').update({ trang_thai: 'CHO_XU_LY', loi_chi_tiet: null }).eq('id', id);
+            if (error) {
+                alert("Lỗi khi thử lại: " + error.message);
+                document.getElementById('loi-xuly-box').style.display = 'block';
+                document.getElementById('loading-spinner-box').classList.add('hidden');
+                return;
+            }
+            document.querySelector('#loading-spinner-box div:nth-child(2)').innerText = 'Hệ thống đang xử lý lại hồ sơ...';
+            langNgheKetQua(id);
+        }
+
+        function dienThuCong() {
+            const data = window._loi_xuly_data;
+            if (data) hienThiFormXacNhan(data);
         }
 
         function hienThiFormXacNhan(hs) {
@@ -1061,9 +1173,10 @@
             // Đánh dấu form đang ở chế độ KHÔI PHỤC (hồ sơ cũ) thay vì lần nộp mới
             window._is_recovery_mode = !!(hs.trang_thai === 'CHO_KHACH_XEM' || hs.trang_thai === 'KHACH_DA_SUA' || hs.trang_thai === 'HOAN_TAT');
 
-            // 1. Ẩn spinner và timeout box
+            // 1. Ẩn spinner, timeout box và lỗi box
             document.getElementById('loading-spinner-box').classList.add('hidden');
             document.getElementById('timeout-box').classList.add('hidden');
+            document.getElementById('loi-xuly-box').style.display = 'none';
 
             // 2. Tạo formDiv trong overlay (chỉ tạo 1 lần)
             let formDiv = document.getElementById('inline-xacnhan');
