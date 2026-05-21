@@ -1127,9 +1127,60 @@
                 formDiv.insertBefore(warn, formDiv.firstChild);
             }
 
+            // 3d. Nút "Tải lại từ CSDL" — đồng bộ lại data trực tiếp từ SQL Server
+            //     (dùng khi Supabase row bị thiếu data do agent lỗi giữa chừng)
+            if (hs.local_hoc_vien_id) {
+                const syncBar = document.createElement('div');
+                syncBar.style.cssText = 'display:flex;align-items:center;justify-content:space-between;background:#e8f4ff;border:1px solid #2196f3;border-radius:8px;padding:10px 14px;margin-bottom:16px;color:#0d47a1;font-size:13px;';
+                syncBar.innerHTML = '<span>💡 Nếu thông tin còn trống, bấm để tải lại từ CSDL trung tâm:</span>'
+                    + '<button type="button" id="btn_sync_from_sql" style="background:#1976d2;color:#fff;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;">🔄 Tải lại từ CSDL</button>';
+                formDiv.insertBefore(syncBar, formDiv.firstChild);
+                const btnSync = syncBar.querySelector('#btn_sync_from_sql');
+                btnSync.onclick = async () => {
+                    btnSync.disabled = true;
+                    btnSync.innerText = '⏳ Đang đồng bộ...';
+                    try {
+                        await db.from('ho_so_online').update({
+                            trang_thai: 'YEU_CAU_DONG_BO_LAI',
+                            cap_nhat_luc: new Date().toISOString()
+                        }).eq('id', hs.id);
+                        // Realtime sẽ tự bắt khi agent xong → reload form
+                        langNgheKetQua(hs.id);
+                        // Hiện loading overlay lại
+                        document.getElementById('inline-xacnhan')?.remove();
+                        document.getElementById('loading-spinner-box').classList.remove('hidden');
+                    } catch(e) {
+                        alert('Lỗi yêu cầu đồng bộ: ' + e.message);
+                        btnSync.disabled = false;
+                        btnSync.innerText = '🔄 Tải lại từ CSDL';
+                    }
+                };
+            }
+
+            // 3e. Hiện lỗi đồng bộ nếu có
+            if (i._loi_dong_bo) {
+                const errBox = document.createElement('div');
+                errBox.style.cssText = 'background:#ffebee;border:1px solid #c62828;border-radius:8px;padding:10px 14px;margin-bottom:16px;color:#b71c1c;font-size:13px;';
+                errBox.innerHTML = '⚠️ <b>Lỗi đồng bộ:</b> ' + i._loi_dong_bo;
+                formDiv.insertBefore(errBox, formDiv.firstChild);
+            }
+
             // 4. Helper: lấy element trong formDiv
             const q = (sel) => formDiv.querySelector(sel);
             const set = (id, val) => { const el = q('#' + id); if (el) el.value = val || ''; };
+
+            // 4b. AUTO-TRIGGER đồng bộ lại nếu thiếu data quan trọng (CCCD + Ngày sinh)
+            //     Chạy 1 lần duy nhất mỗi phiên để tránh lặp vô hạn nếu SQL cũng trống
+            const thieuDataQuanTrong = !((i.so_cccd || i.so_cccd_goc) && i.ngay_sinh);
+            if (thieuDataQuanTrong && hs.local_hoc_vien_id && !window._da_auto_sync_lai) {
+                window._da_auto_sync_lai = true;
+                console.log('[AutoSync] Thiếu CCCD/NgaySinh — đang tự động đồng bộ lại từ CSDL...');
+                setTimeout(() => {
+                    const btn = q('#btn_sync_from_sql');
+                    if (btn) btn.click();
+                }, 300);
+                return;  // Dừng populate vì sẽ reload sau khi sync xong
+            }
 
             // 5. Điền dữ liệu cá nhân
             let tenFinal = (i.ho_va_ten || hs.ho_ten || '').toUpperCase();
