@@ -1390,14 +1390,18 @@
                     const t = (st.textContent || '').trim();
                     if (t.startsWith('II. Thời Gian Biểu') || t.startsWith('III. Liên Hệ')) {
                         // Ẩn section title và tất cả siblings đến section-title kế tiếp
+                        // HOẶC đến khi gặp nút #btnFinal (để không ẩn nút Lưu)
                         st.style.display = 'none';
                         let next = st.nextElementSibling;
-                        while (next && !next.classList.contains('section-title')) {
+                        while (next && !next.classList.contains('section-title') && next.id !== 'btnFinal') {
                             next.style.display = 'none';
                             next = next.nextElementSibling;
                         }
                     }
                 });
+                // Đảm bảo nút Lưu vẫn hiển thị (vì nó đứng sau section III, không có section-title nào sau nó)
+                const btnFinalShow = q('#btnFinal');
+                if (btnFinalShow) btnFinalShow.style.display = '';
                 // Xóa required khỏi các ô liên hệ khẩn cấp (vì đã ẩn)
                 ['nguoi_lh_ten_chk','nguoi_lh_sdt_chk','nguoi_lh_dia_chi_chk'].forEach(id => {
                     const el = q('#' + id);
