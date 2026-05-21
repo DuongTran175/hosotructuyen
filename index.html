@@ -95,18 +95,20 @@
         /* ===== TRUNG HỒ SƠ MODAL ===== */
         #trung-hoso-modal { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); z-index:99999; justify-content:center; align-items:center; }
         #trung-hoso-modal.show { display:flex; }
-        .trung-modal-box { background:#fff; max-width:520px; width:94%; border:3px solid #000; font-family:var(--font-mono); }
+        .trung-modal-box { background:#fff; max-width:560px; width:94%; border:3px solid #000; font-family:var(--font-mono); }
         .trung-modal-header { background:#ef6c00; color:#fff; padding:18px 22px; }
         .trung-modal-header h3 { margin:0; font-size:18px; letter-spacing:0.5px; }
         .trung-modal-header p { margin:6px 0 0; font-size:12px; opacity:0.9; }
         .trung-modal-body { padding:20px 22px; }
         .trung-modal-record { background:#fff8e1; border:1px solid #ef6c00; border-left:4px solid #ef6c00; padding:10px 14px; margin-bottom:14px; font-size:13px; line-height:1.7; }
         .trung-modal-question { font-size:14px; font-weight:bold; margin:0 0 16px; }
-        .trung-modal-btns { display:flex; gap:12px; }
-        .trung-btn-update { flex:2; padding:14px; background:#2e7d32; color:#fff; border:2px solid #2e7d32; font-family:var(--font-mono); font-size:14px; font-weight:bold; cursor:pointer; transition:0.2s; }
+        .trung-modal-btns { display:flex; flex-direction:column; gap:10px; }
+        .trung-btn-update { padding:14px; background:#2e7d32; color:#fff; border:2px solid #2e7d32; font-family:var(--font-mono); font-size:14px; font-weight:bold; cursor:pointer; transition:0.2s; text-align:left; }
         .trung-btn-update:hover { background:#1b5e20; border-color:#1b5e20; }
-        .trung-btn-cancel { flex:1; padding:14px; background:#fff; color:#000; border:2px solid #000; font-family:var(--font-mono); font-size:13px; cursor:pointer; transition:0.2s; }
-        .trung-btn-cancel:hover { background:#f5f5f5; }
+        .trung-btn-view { padding:14px; background:#1565c0; color:#fff; border:2px solid #1565c0; font-family:var(--font-mono); font-size:14px; font-weight:bold; cursor:pointer; transition:0.2s; text-align:left; }
+        .trung-btn-view:hover { background:#0d47a1; border-color:#0d47a1; }
+        .trung-btn-cancel { padding:10px; background:#fff; color:#888; border:1px solid #ccc; font-family:var(--font-mono); font-size:12px; cursor:pointer; transition:0.2s; }
+        .trung-btn-cancel:hover { background:#f5f5f5; color:#000; }
 
         /* ===== LỖI XỬ LÝ: Retry box ===== */
         #loi-xuly-box { display:none; text-align:center; border:1px solid var(--border-color); padding:30px 40px; background:var(--bg-color); }
@@ -398,8 +400,9 @@
                     <div class="trung-modal-record" id="trung-modal-info"></div>
                     <p class="trung-modal-question">Bạn muốn làm gì với hồ sơ này?</p>
                     <div class="trung-modal-btns">
-                        <button class="trung-btn-update" id="trung-btn-capnhat">📷 CẬP NHẬT ẢNH VÀO HỒ SƠ CŨ</button>
-                        <button class="trung-btn-cancel" id="trung-btn-huy">❌ HỦY BỎ</button>
+                        <button class="trung-btn-view" id="trung-btn-xem">📋 XEM & BỔ SUNG HỒ SƠ ĐÃ CÓ</button>
+                        <button class="trung-btn-update" id="trung-btn-capnhat">📷 CHỈ CẬP NHẬT ẢNH MỚI</button>
+                        <button class="trung-btn-cancel" id="trung-btn-huy">↩ Hủy và quay lại trang chủ</button>
                     </div>
                 </div>
             </div>
@@ -938,10 +941,36 @@
             const modal = document.getElementById('trung-hoso-modal');
             modal.classList.add('show');
 
-            // Nút CẬP NHẬT ẢNH → merge ảnh vào hồ sơ cũ
+            // Nút XEM & BỔ SUNG → đồng bộ data từ hồ sơ CŨ → hiện form xác nhận
+            document.getElementById('trung-btn-xem').onclick = async () => {
+                if (!existingId) {
+                    alert("Không tìm thấy ID hồ sơ cũ để tải lên!");
+                    return;
+                }
+                modal.classList.remove('show');
+
+                // Hiện loading overlay với thông báo phù hợp
+                chuyenManHinh('loading-overlay');
+                document.getElementById('loading-spinner-box').classList.remove('hidden');
+                document.getElementById('timeout-box').classList.add('hidden');
+                document.getElementById('loi-xuly-box').style.display = 'none';
+                document.querySelector('#loading-spinner-box div:nth-child(2)').innerText =
+                    'Đang tải hồ sơ đã có để xem & bổ sung...';
+
+                // Ghi local_hoc_vien_id + đổi trạng thái → agent đồng bộ data từ SQL CŨ → ho_so_inbox
+                await db.from('ho_so_inbox').update({
+                    local_hoc_vien_id: existingId,
+                    trang_thai: 'YEU_CAU_DONG_BO_LAI',
+                    ho_so_trung: null,
+                }).eq('id', row.id);
+
+                // Listen tới CHO_KHACH_XEM → hiện form chỉnh sửa
+                langNgheKetQua(row.id);
+            };
+
+            // Nút CHỈ CẬP NHẬT ẢNH → chuyển sang Page 2 (upload GPLX + VNeTraffic) rồi merge ảnh
             document.getElementById('trung-btn-capnhat').onclick = async () => {
                 modal.classList.remove('show');
-                // Ghi local_hoc_vien_id vào row → agent biết cần update record cũ
                 if (existingId) {
                     await db.from('ho_so_inbox').update({ local_hoc_vien_id: existingId }).eq('id', row.id);
                     row.local_hoc_vien_id = existingId;
@@ -949,7 +978,7 @@
                 chuyenSangPage2_TuOCR(row);
             };
 
-            // Nút HỦY BỎ → xóa row, về Page 1
+            // Nút HỦY → xóa row, về Page 1
             document.getElementById('trung-btn-huy').onclick = () => {
                 modal.classList.remove('show');
                 db.from('ho_so_inbox').delete().eq('id', row.id).then(() => {});
