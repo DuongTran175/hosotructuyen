@@ -118,6 +118,38 @@
         .btn-retry:hover { background:#ff00ff; color:#000; }
         .btn-manual { display:inline-block; padding:12px 24px; background:#fff; color:#000; border:2px solid #000; font-family:var(--font-mono); font-size:14px; cursor:pointer; transition:0.2s; margin:6px; }
         .btn-manual:hover { background:#f5f5f5; }
+
+        /* ===== ĐỊA CHỈ 2 CẤP PICKER ===== */
+        #dc-picker-modal { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); z-index:999990; justify-content:center; align-items:center; padding:16px; box-sizing:border-box; }
+        #dc-picker-modal.show { display:flex; }
+        .dc-modal-box { background:#fff; max-width:480px; width:100%; border:3px solid #000; font-family:var(--font-mono); max-height:90vh; overflow-y:auto; }
+        .dc-modal-header { background:#000; color:#ff00ff; padding:14px 18px; }
+        .dc-modal-header h3 { margin:0; font-size:15px; letter-spacing:1px; text-transform:uppercase; }
+        .dc-modal-header p { margin:4px 0 0; font-size:11px; color:#aaa; }
+        .dc-modal-body { padding:18px; }
+        .dc-field-group { margin-bottom:14px; }
+        .dc-field-group label { display:block; font-size:11px; font-weight:bold; margin-bottom:5px; text-transform:uppercase; letter-spacing:1px; color:#666; }
+        .dc-select { width:100%; padding:10px; border:1px solid #000; font-family:var(--font-mono); font-size:14px; background:#fff; -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; background-size:14px; padding-right:32px; cursor:pointer; box-sizing:border-box; }
+        .dc-select:focus { outline:none; background-color:#f5f5f5; }
+        .dc-select:disabled { background-color:#f0f0f0; color:#999; cursor:not-allowed; }
+        .dc-street-input { width:100%; padding:10px; border:1px solid #000; font-family:var(--font-mono); font-size:14px; box-sizing:border-box; }
+        .dc-street-input:focus { outline:none; background:#f5f5f5; }
+        .dc-preview-box { background:#f5f5f5; border:1px solid #ccc; border-left:3px solid #ff00ff; padding:10px 12px; font-size:13px; min-height:36px; line-height:1.5; word-break:break-word; }
+        .dc-preview-box.empty { color:#999; font-style:italic; }
+        .dc-loading { font-size:11px; color:#999; margin-top:4px; font-style:italic; display:none; }
+        .dc-modal-footer { padding:14px 18px; border-top:2px solid #000; display:flex; gap:10px; }
+        .dc-btn-confirm { flex:1; padding:12px; background:#000; color:#ff00ff; border:2px solid #000; font-family:var(--font-mono); font-size:13px; font-weight:bold; cursor:pointer; text-transform:uppercase; letter-spacing:1px; transition:0.2s; }
+        .dc-btn-confirm:hover:not(:disabled) { background:#ff00ff; color:#000; }
+        .dc-btn-confirm:disabled { background:#666; color:#ccc; border-color:#666; cursor:not-allowed; }
+        .dc-btn-cancel { padding:12px 18px; background:#fff; color:#000; border:2px solid #000; font-family:var(--font-mono); font-size:13px; cursor:pointer; transition:0.2s; }
+        .dc-btn-cancel:hover { background:#f5f5f5; }
+        /* Wrapper cho field địa chỉ */
+        .dc-input-wrapper { display:flex; gap:0; align-items:stretch; }
+        .dc-input-wrapper input[readonly] { flex:1; cursor:pointer; background:#fff; border-right:none; }
+        .dc-input-wrapper input[readonly]:focus { outline:none; background:#f5f5f5; }
+        .dc-btn-pick { padding:10px 14px; background:#000; color:#ff00ff; border:2px solid #000; border-left:none; font-family:var(--font-mono); font-size:14px; cursor:pointer; flex-shrink:0; transition:0.2s; white-space:nowrap; -webkit-appearance:none; }
+        .dc-btn-pick:hover { background:#ff00ff; color:#000; }
+        .dc-clear-btn { position:absolute; right:50px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:16px; cursor:pointer; color:#999; padding:4px; line-height:1; display:none; }
     </style>
 </head>
 <body>
@@ -478,7 +510,16 @@
             <div class="section-title">III. Liên Hệ Khẩn Cấp (Bắt Buộc)</div>
             <div class="form-group"><label>Họ tên người thân:</label><input type="text" id="nguoi_lh_ten_chk" class="form-control" required></div>
             <div class="form-group"><label>SĐT người thân:</label><input type="tel" id="nguoi_lh_sdt_chk" class="form-control" required></div>
-            <div class="form-group"><label>Địa chỉ người thân:</label><input type="text" id="nguoi_lh_dia_chi_chk" class="form-control" required></div>
+            <div class="form-group">
+                <label>Địa chỉ người thân:</label>
+                <div class="dc-input-wrapper">
+                    <input type="text" id="nguoi_lh_dia_chi_chk" class="form-control" readonly required
+                           placeholder="📍 Bấm để chọn địa chỉ..." onclick="dcOpenPicker('nguoi_lh_dia_chi_chk')"
+                           style="flex:1;cursor:pointer;">
+                    <button type="button" class="dc-btn-pick" onclick="dcOpenPicker('nguoi_lh_dia_chi_chk')">📍 Chọn</button>
+                </div>
+                <div class="field-hint" id="hint_nguoi_lh_dia_chi_chk"></div>
+            </div>
 
             <button onclick="hoanTatHoSo()" id="btnFinal" class="btn-main">LƯU TRỮ VÀO HỆ THỐNG</button>
         </div>
@@ -1677,7 +1718,14 @@
                             </div>
                             <div style="margin-top:12px;">
                                 <label style="font-size:12px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">Địa chỉ người thân:</label>
-                                <input id="bs_lh_dc" class="form-control" style="margin-top:5px;" placeholder="${i.nguoi_lien_he_dia_chi||'Chưa có'}">
+                                <div class="dc-input-wrapper" style="margin-top:5px;">
+                                    <input type="text" id="bs_lh_dc" class="form-control" readonly
+                                           value="${i.nguoi_lien_he_dia_chi||''}"
+                                           placeholder="📍 Bấm để chọn địa chỉ..."
+                                           onclick="dcOpenPicker('bs_lh_dc')"
+                                           style="flex:1;cursor:pointer;">
+                                    <button type="button" class="dc-btn-pick" onclick="dcOpenPicker('bs_lh_dc')">📍</button>
+                                </div>
                             </div>
                             <div style="margin-top:15px;">
                                 <label style="font-size:12px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">Lịch học thực hành:</label>
@@ -1923,6 +1971,226 @@
                 e.target.classList.remove('input-error');
             }
         });
+
+        // ===== ĐỊA CHỈ 2 CẤP PICKER =====
+        // Dữ liệu từ provinces.open-api.vn (có cache localStorage theo tỉnh)
+        // Hỗ trợ cả hệ cũ 3 cấp (tỉnh→huyện→xã) và hệ mới 2 cấp (tỉnh→xã) sau sáp nhập 2025.
+        (function() {
+            const API_BASE  = 'https://provinces.open-api.vn/api';
+            const CACHE_TTL = 7 * 24 * 3600 * 1000;  // 7 ngày
+            let _dcTarget   = null;
+            let _dcLoading  = false;
+
+            function dcCacheGet(key) {
+                try {
+                    const raw = localStorage.getItem(key);
+                    if (!raw) return null;
+                    const obj = JSON.parse(raw);
+                    if (Date.now() - obj.ts > CACHE_TTL) { localStorage.removeItem(key); return null; }
+                    return obj.data;
+                } catch { return null; }
+            }
+            function dcCacheSet(key, data) {
+                try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data })); } catch {}
+            }
+
+            async function dcLoadProvinces() {
+                let provinces = dcCacheGet('dc_provinces');
+                if (!provinces) {
+                    const r = await fetch(`${API_BASE}/?depth=1`);
+                    if (!r.ok) throw new Error('Không tải được danh sách tỉnh/thành');
+                    provinces = await r.json();
+                    dcCacheSet('dc_provinces', provinces);
+                }
+                return provinces;
+            }
+
+            async function dcLoadWards(provinceCode) {
+                const cacheKey = `dc_wards_${provinceCode}`;
+                let wards = dcCacheGet(cacheKey);
+                if (wards) return wards;
+
+                // Thử depth=2 trước (hệ 2 cấp sau sáp nhập)
+                const r2 = await fetch(`${API_BASE}/p/${provinceCode}?depth=2`);
+                if (!r2.ok) throw new Error('Không tải được danh sách xã/phường');
+                const data2 = await r2.json();
+
+                if (data2.wards && data2.wards.length > 0) {
+                    // API đã cập nhật sang 2 cấp (sau sáp nhập 2025)
+                    wards = data2.wards;
+                } else {
+                    // API cũ 3 cấp — lấy thêm depth=3 để có xã
+                    const r3 = await fetch(`${API_BASE}/p/${provinceCode}?depth=3`);
+                    const data3 = await r3.json();
+                    wards = [];
+                    for (const d of (data3.districts || [])) {
+                        for (const w of (d.wards || [])) wards.push(w);
+                    }
+                }
+                dcCacheSet(cacheKey, wards);
+                return wards;
+            }
+
+            function dcUpdatePreview() {
+                const selTinh = document.getElementById('dc-sel-tinh');
+                const selXa   = document.getElementById('dc-sel-xa');
+                const street  = (document.getElementById('dc-street')?.value || '').trim();
+                const preview = document.getElementById('dc-preview');
+                const btnOk   = document.getElementById('dc-btn-ok');
+
+                const tenTinh = selTinh.selectedIndex > 0 ? selTinh.options[selTinh.selectedIndex].text : '';
+                const tenXa   = selXa.value || '';
+
+                if (!tenTinh || !tenXa) {
+                    preview.textContent = 'Cần chọn Tỉnh/TP và Xã/Phường';
+                    preview.className = 'dc-preview-box empty';
+                    btnOk.disabled = true;
+                    return;
+                }
+                const parts = [];
+                if (street) parts.push(street);
+                parts.push(tenXa, tenTinh);
+                preview.textContent = parts.join(', ');
+                preview.className = 'dc-preview-box';
+                btnOk.disabled = false;
+            }
+
+            async function dcOnTinhChange() {
+                const code = document.getElementById('dc-sel-tinh').value;
+                const selXa = document.getElementById('dc-sel-xa');
+                const loading = document.getElementById('dc-xa-loading');
+
+                selXa.innerHTML = '<option value="">-- Đang tải... --</option>';
+                selXa.disabled = true;
+                loading.style.display = 'block';
+                dcUpdatePreview();
+
+                if (!code) {
+                    selXa.innerHTML = '<option value="">-- Chọn Tỉnh/TP trước --</option>';
+                    loading.style.display = 'none';
+                    return;
+                }
+
+                try {
+                    const wards = await dcLoadWards(code);
+                    selXa.innerHTML = '<option value="">-- Chọn Xã/Phường/Thị trấn --</option>';
+                    for (const w of wards) {
+                        const opt = document.createElement('option');
+                        opt.value = w.name;
+                        opt.textContent = w.name;
+                        selXa.appendChild(opt);
+                    }
+                    selXa.disabled = false;
+                } catch (e) {
+                    selXa.innerHTML = '<option value="">⚠ Lỗi — thử lại hoặc nhập tay</option>';
+                    selXa.disabled = false;
+                }
+                loading.style.display = 'none';
+                dcUpdatePreview();
+            }
+
+            window.dcOpenPicker = async function(targetId) {
+                _dcTarget = targetId;
+
+                // Reset modal state
+                const selTinh = document.getElementById('dc-sel-tinh');
+                const selXa   = document.getElementById('dc-sel-xa');
+                const street  = document.getElementById('dc-street');
+                selXa.innerHTML = '<option value="">-- Chọn Tỉnh/TP trước --</option>';
+                selXa.disabled = true;
+                street.value = '';
+                dcUpdatePreview();
+
+                // Load tỉnh nếu chưa có
+                if (selTinh.options.length <= 1) {
+                    selTinh.innerHTML = '<option value="">Đang tải...</option>';
+                    selTinh.disabled = true;
+                    try {
+                        const provinces = await dcLoadProvinces();
+                        selTinh.innerHTML = '<option value="">-- Chọn Tỉnh/Thành phố --</option>';
+                        for (const p of provinces) {
+                            const opt = document.createElement('option');
+                            opt.value = p.code;
+                            opt.textContent = p.name;
+                            selTinh.appendChild(opt);
+                        }
+                    } catch (e) {
+                        selTinh.innerHTML = '<option value="">⚠ Không tải được — kiểm tra mạng</option>';
+                    }
+                    selTinh.disabled = false;
+                } else {
+                    selTinh.value = '';
+                }
+
+                // Hiện modal
+                document.getElementById('dc-picker-modal').classList.add('show');
+                // Focus chọn tỉnh
+                setTimeout(() => selTinh.focus(), 100);
+            };
+
+            window.dcClosePicker = function() {
+                document.getElementById('dc-picker-modal').classList.remove('show');
+            };
+
+            window.dcOnTinhChange = dcOnTinhChange;
+            window.dcUpdatePreview = dcUpdatePreview;
+
+            window.dcConfirm = function() {
+                const result = document.getElementById('dc-preview').textContent;
+                if (!result || document.getElementById('dc-btn-ok').disabled) return;
+                const el = document.getElementById(_dcTarget);
+                if (el) {
+                    el.value = result;
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                    el.classList.remove('input-error');
+                }
+                dcClosePicker();
+            };
+
+            window.dcClearAddress = function(targetId) {
+                const el = document.getElementById(targetId);
+                if (el) { el.value = ''; el.dispatchEvent(new Event('input', { bubbles: true })); }
+            };
+        })();
     </script>
+
+    <!-- ===== ĐỊA CHỈ 2 CẤP PICKER MODAL ===== -->
+    <div id="dc-picker-modal" onclick="if(event.target===this)dcClosePicker()">
+        <div class="dc-modal-box">
+            <div class="dc-modal-header">
+                <h3>📍 Chọn địa chỉ (2 cấp)</h3>
+                <p>Tỉnh/Thành phố → Xã/Phường/Thị trấn (hệ thống sau sáp nhập 2025)</p>
+            </div>
+            <div class="dc-modal-body">
+                <div class="dc-field-group">
+                    <label>1. Tỉnh / Thành phố</label>
+                    <select id="dc-sel-tinh" class="dc-select" onchange="dcOnTinhChange()">
+                        <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                    </select>
+                </div>
+                <div class="dc-field-group">
+                    <label>2. Xã / Phường / Thị trấn</label>
+                    <select id="dc-sel-xa" class="dc-select" disabled onchange="dcUpdatePreview()">
+                        <option value="">-- Chọn Tỉnh/TP trước --</option>
+                    </select>
+                    <div class="dc-loading" id="dc-xa-loading">Đang tải danh sách...</div>
+                </div>
+                <div class="dc-field-group">
+                    <label>3. Số nhà, tên đường <span style="font-weight:normal;color:#aaa;">(tùy chọn)</span></label>
+                    <input type="text" id="dc-street" class="dc-street-input"
+                           placeholder="VD: 45 Lê Lợi, Khu 3"
+                           oninput="dcUpdatePreview()">
+                </div>
+                <div class="dc-field-group">
+                    <label>Địa chỉ đầy đủ</label>
+                    <div class="dc-preview-box empty" id="dc-preview">Cần chọn Tỉnh/TP và Xã/Phường</div>
+                </div>
+            </div>
+            <div class="dc-modal-footer">
+                <button class="dc-btn-confirm" id="dc-btn-ok" disabled onclick="dcConfirm()">✓ Xác nhận</button>
+                <button class="dc-btn-cancel" onclick="dcClosePicker()">Hủy</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
