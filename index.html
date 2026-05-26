@@ -575,6 +575,10 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhenZ6aW91aHdrZHRoZWtwYWp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMDMzODIsImV4cCI6MjA4Nzc3OTM4Mn0.SRA9ukFbbj69oqofug3erF-Y0G7JH7Ik5e6iMP8nbyU';
         const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        // ===== AGENT: Đọc ?agent= từ URL để gắn Người nhận =====
+        // Mỗi người nhận có link riêng: .../?agent=username
+        const _agentUsername = new URLSearchParams(window.location.search).get('agent') || '';
+
         // ===== ONBOARDING: Welcome Modal =====
         function kiemTraWelcome() {
             const daXem = localStorage.getItem('dt_welcome_done');
@@ -820,6 +824,7 @@
                     nguoi_gioi_thieu:     document.getElementById('nguoi_gt_nop').value.trim() || null,
                     sdt_nguoi_gioi_thieu: document.getElementById('sdt_gt_nop').value.trim()  || null,
                     nam_lai_xe:           document.getElementById('nam_lai_xe_nop').value     || null,
+                    agent_username:       _agentUsername || null,
                 }).select();
                 if (error) throw error;
 
