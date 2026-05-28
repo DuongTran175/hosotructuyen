@@ -1773,37 +1773,78 @@
                                 <input id="bs_gio_hoc_khac" class="form-control" placeholder="Ghi chú thêm về lịch học..." style="margin-top:8px;">
                             </div>
                             <div style="margin-top:20px;border-top:2px dashed #000;padding-top:15px;">
-                                <div style="font-family:var(--font-mono);font-size:11px;color:#999;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">
+                                <div style="font-family:var(--font-mono);font-size:11px;color:#999;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;">
                                     IV. Upload lại ảnh giấy tờ (nếu thiếu)
                                 </div>
+                                <div style="font-size:11px;color:#888;margin-bottom:12px;">Chỉ chọn ô nào cần bổ sung — ô bỏ trống sẽ giữ nguyên ảnh cũ.</div>
+
+                                <!-- VNeID — 2 ảnh tách riêng -->
+                                <div style="font-family:var(--font-mono);font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">VNeID (Căn cước điện tử)</div>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+                                    <div class="upload-card" id="bs_card_vneid_main" style="padding:14px;border:1px dashed #888;position:relative;cursor:pointer;">
+                                        <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] VNeID — Ảnh chính</div>
+                                        <div style="font-size:11px;color:#888;">Trang có CCCD ảo (số, họ tên, ảnh)</div>
+                                        <input type="file" id="bs_files_vneid_main" accept="image/*" multiple style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;"
+                                            onchange="bsMarkCard(this,'bs_card_vneid_main')">
+                                        <div class="bs-status" style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
+                                    </div>
+                                    <div class="upload-card" id="bs_card_vneid_sub" style="padding:14px;border:1px dashed #888;position:relative;cursor:pointer;">
+                                        <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] VNeID — Ảnh phụ</div>
+                                        <div style="font-size:11px;color:#888;">Cuộn xuống: ngày cấp, SĐT, CMT cũ</div>
+                                        <input type="file" id="bs_files_vneid_sub" accept="image/*" multiple style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;"
+                                            onchange="bsMarkCard(this,'bs_card_vneid_sub')">
+                                        <div class="bs-status" style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- VNeTraffic -->
+                                <div style="font-family:var(--font-mono);font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">VNeTraffic</div>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+                                    <div class="upload-card" id="bs_card_vnetraffic" style="padding:14px;border:1px dashed #888;position:relative;cursor:pointer;">
+                                        <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] VNeTraffic — Trang chủ</div>
+                                        <div style="font-size:11px;color:#888;">Ảnh trang chủ app VNeTraffic (bắt buộc)</div>
+                                        <input type="file" id="bs_files_vnetraffic" accept="image/*" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;"
+                                            onchange="bsMarkCard(this,'bs_card_vnetraffic')">
+                                        <div class="bs-status" style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
+                                    </div>
+                                    <div></div>
+                                </div>
+
+                                <!-- GPLX cũ — mô tô / ô tô tách riêng -->
+                                <div style="font-family:var(--font-mono);font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">GPLX đã có (nếu có)</div>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+                                    <div class="upload-card" id="bs_card_gplx_moto" style="padding:14px;border:1px dashed #888;position:relative;cursor:pointer;">
+                                        <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] GPLX Mô tô</div>
+                                        <div style="font-size:11px;color:#888;">Bằng mô tô đã có (A1, A...)</div>
+                                        <input type="file" id="bs_files_gplx_moto" accept="image/*" multiple style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;"
+                                            onchange="bsMarkCard(this,'bs_card_gplx_moto')">
+                                        <div class="bs-status" style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
+                                    </div>
+                                    <div class="upload-card" id="bs_card_gplx_oto" style="padding:14px;border:1px dashed #888;position:relative;cursor:pointer;">
+                                        <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] GPLX Ô tô</div>
+                                        <div style="font-size:11px;color:#888;">Bằng ô tô đã có (B, C...)</div>
+                                        <input type="file" id="bs_files_gplx_oto" accept="image/*" multiple style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;"
+                                            onchange="bsMarkCard(this,'bs_card_gplx_oto')">
+                                        <div class="bs-status" style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- CCCD + Chân dung -->
+                                <div style="font-family:var(--font-mono);font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Giấy tờ khác</div>
                                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                                    <div class="upload-card" id="bs_card_vneid" style="padding:14px;border:1px dashed #888;position:relative;cursor:pointer;">
-                                        <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] VNeID</div>
-                                        <div style="font-size:11px;color:#888;">Ảnh Căn cước điện tử</div>
-                                        <input type="file" id="bs_files_vneid" accept="image/*" multiple style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;"
-                                            onchange="this.parentElement.style.borderColor='#000';this.parentElement.style.borderStyle='solid';this.nextElementSibling.innerText='Đã chọn '+this.files.length+' ảnh'">
-                                        <div style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
-                                    </div>
                                     <div class="upload-card" id="bs_card_cccd" style="padding:14px;border:1px dashed #888;position:relative;cursor:pointer;">
-                                        <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] CCCD</div>
-                                        <div style="font-size:11px;color:#888;">Mặt trước + sau</div>
+                                        <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] CCCD vật lý</div>
+                                        <div style="font-size:11px;color:#888;">Chụp thẻ — mặt trước + sau</div>
                                         <input type="file" id="bs_files_cccd" accept="image/*" multiple style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;"
-                                            onchange="this.parentElement.style.borderColor='#000';this.parentElement.style.borderStyle='solid';this.nextElementSibling.innerText='Đã chọn '+this.files.length+' ảnh'">
-                                        <div style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
-                                    </div>
-                                    <div class="upload-card" id="bs_card_gplx" style="padding:14px;border:1px dashed #888;position:relative;cursor:pointer;">
-                                        <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] GPLX cũ</div>
-                                        <div style="font-size:11px;color:#888;">Bằng lái đã có</div>
-                                        <input type="file" id="bs_files_gplx" accept="image/*" multiple style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;"
-                                            onchange="this.parentElement.style.borderColor='#000';this.parentElement.style.borderStyle='solid';this.nextElementSibling.innerText='Đã chọn '+this.files.length+' ảnh'">
-                                        <div style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
+                                            onchange="bsMarkCard(this,'bs_card_cccd')">
+                                        <div class="bs-status" style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
                                     </div>
                                     <div class="upload-card" id="bs_card_chan_dung" style="padding:14px;border:1px dashed #888;position:relative;cursor:pointer;">
                                         <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] Chân dung</div>
-                                        <div style="font-size:11px;color:#888;">Ảnh 3x4</div>
+                                        <div style="font-size:11px;color:#888;">Ảnh 3×4 nền trắng/xanh</div>
                                         <input type="file" id="bs_files_chan_dung" accept="image/*" multiple style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;"
-                                            onchange="this.parentElement.style.borderColor='#000';this.parentElement.style.borderStyle='solid';this.nextElementSibling.innerText='Đã chọn '+this.files.length+' ảnh'">
-                                        <div style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
+                                            onchange="bsMarkCard(this,'bs_card_chan_dung')">
+                                        <div class="bs-status" style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
                                     </div>
                                 </div>
                             </div>
@@ -1886,6 +1927,21 @@
             return urls;
         }
 
+        function bsMarkCard(input, cardId) {
+            const card = document.getElementById(cardId);
+            if (!card) return;
+            const statusEl = card.querySelector('.bs-status');
+            if (input.files && input.files.length > 0) {
+                card.style.borderColor = '#009faa';
+                card.style.background = 'rgba(0,159,170,0.06)';
+                if (statusEl) statusEl.innerText = `✓ ${input.files.length} ảnh đã chọn`;
+            } else {
+                card.style.borderColor = '#888';
+                card.style.background = '';
+                if (statusEl) statusEl.innerText = '';
+            }
+        }
+
         async function luuBoSung() {
             const hs_id = window._hs_hien_tai.id;
             const cu = window._i_hien_tai;  // hs (cột phẳng)
@@ -1920,12 +1976,16 @@
             try {
                 // Upload ảnh bổ sung nếu có
                 _sessionId = '';  // Reset session ID cho upload mới
-                const anh_vneid = await uploadBoSungFiles('bs_files_vneid', 'vneid');
-                const anh_cccd = await uploadBoSungFiles('bs_files_cccd', 'cccd');
-                const anh_gplx = await uploadBoSungFiles('bs_files_gplx', 'gplx');
-                const anh_cd = await uploadBoSungFiles('bs_files_chan_dung', 'cd');
+                const anh_vneid_main  = await uploadBoSungFiles('bs_files_vneid_main',  'vneid_main');
+                const anh_vneid_sub   = await uploadBoSungFiles('bs_files_vneid_sub',   'vneid_sub');
+                const anh_vnetraffic  = await uploadBoSungFiles('bs_files_vnetraffic',  'vnetraffic');
+                const anh_gplx_moto   = await uploadBoSungFiles('bs_files_gplx_moto',   'gplx_moto');
+                const anh_gplx_oto    = await uploadBoSungFiles('bs_files_gplx_oto',    'gplx_oto');
+                const anh_cccd        = await uploadBoSungFiles('bs_files_cccd',         'cccd');
+                const anh_cd          = await uploadBoSungFiles('bs_files_chan_dung',    'cd');
 
-                const co_anh_moi = anh_vneid.length + anh_cccd.length + anh_gplx.length + anh_cd.length > 0;
+                const co_anh_moi = anh_vneid_main.length + anh_vneid_sub.length + anh_vnetraffic.length +
+                                   anh_gplx_moto.length + anh_gplx_oto.length + anh_cccd.length + anh_cd.length > 0;
 
                 // Gộp ảnh mới vào anh_data cũ
                 let anh_data_cu = window._hs_hien_tai.anh_data || {};
@@ -1933,11 +1993,16 @@
                     try { anh_data_cu = JSON.parse(anh_data_cu); } catch(e) { anh_data_cu = {}; }
                 }
                 const anh_data_moi = {
-                    files_vneid: [...(anh_data_cu.files_vneid || []), ...anh_vneid],
-                    files_cccd: [...(anh_data_cu.files_cccd || []), ...anh_cccd],
-                    files_gplx: [...(anh_data_cu.files_gplx || []), ...anh_gplx],
-                    files_chan_dung: [...(anh_data_cu.files_chan_dung || []), ...anh_cd],
-                    files_vnetraffic: anh_data_cu.files_vnetraffic || [],
+                    // Giữ nguyên tất cả key cũ để không mất ảnh đã upload trước
+                    ...anh_data_cu,
+                    // Gộp từng nhóm ảnh mới vào nhóm cũ
+                    files_vneid_main:  [...(anh_data_cu.files_vneid_main  || anh_data_cu.files_vneid || []), ...anh_vneid_main],
+                    files_vneid_sub:   [...(anh_data_cu.files_vneid_sub   || []), ...anh_vneid_sub],
+                    files_vnetraffic:  [...(anh_data_cu.files_vnetraffic  || []), ...anh_vnetraffic],
+                    files_gplx_moto:   [...(anh_data_cu.files_gplx_moto   || anh_data_cu.files_gplx || []), ...anh_gplx_moto],
+                    files_gplx_oto:    [...(anh_data_cu.files_gplx_oto    || []), ...anh_gplx_oto],
+                    files_cccd:        [...(anh_data_cu.files_cccd        || []), ...anh_cccd],
+                    files_chan_dung:   [...(anh_data_cu.files_chan_dung   || []), ...anh_cd],
                 };
 
                 if (co_anh_moi) {
