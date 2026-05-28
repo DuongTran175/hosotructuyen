@@ -1574,14 +1574,29 @@
                 window._hs_hien_tai = hs;
                 window._i_hien_tai = i;
 
-                // Auto-trigger đồng bộ từ SQL nếu khoa_dk trống nhưng đã có local_hoc_vien_id
-                // Khi staff cập nhật Khóa dự kiến trên desktop, agent sẽ ghi vào Supabase
+                // Auto-sync: nếu khoa_dk trống và đã có local_hoc_vien_id
+                // → trigger agent đồng bộ từ SQL, rồi tự polling cập nhật ô hiển thị (không cần reload)
                 if (!hs.khoa_dk && hs.local_hoc_vien_id && !window._khoa_dk_sync_triggered) {
                     window._khoa_dk_sync_triggered = true;
-                    db.from('ho_so_inbox').update({
-                        trang_thai: 'YEU_CAU_DONG_BO_LAI'
-                    }).eq('id', hs.id).then(({ error: e }) => {
-                        if (!e) console.log('[AutoSync] Triggered khoa_dk sync from SQL — reload in ~10s to see update');
+                    db.from('ho_so_inbox').update({ trang_thai: 'YEU_CAU_DONG_BO_LAI' }).eq('id', hs.id).then(() => {
+                        // Poll Supabase mỗi 2s (tối đa 15s) cho đến khi khoa_dk xuất hiện
+                        let _tries = 0;
+                        const _poll = setInterval(async () => {
+                            _tries++;
+                            if (_tries > 7) {
+                                clearInterval(_poll);
+                                const el = document.getElementById('v_khoa_dk_inline');
+                                if (el && el.textContent.includes('⏳')) el.textContent = '—';
+                                return;
+                            }
+                            const { data: fresh } = await db.from('ho_so_inbox')
+                                .select('khoa_dk').eq('id', hs.id).single();
+                            if (fresh?.khoa_dk) {
+                                clearInterval(_poll);
+                                const el = document.getElementById('v_khoa_dk_inline');
+                                if (el) el.textContent = fresh.khoa_dk;
+                            }
+                        }, 2000);
                     });
                 }
 
@@ -1647,7 +1662,7 @@
                                 ].map(([k,v],idx)=>`
                                     <div style="padding:10px 14px;border-bottom:1px solid #eee;${idx%2===0?'border-right:1px solid #eee;':''}">
                                         <div style="font-size:11px;color:#999;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">${k}</div>
-                                        <div style="font-size:14px;font-family:var(--font-mono);margin-top:3px;${k==='Hạng đào tạo'?'font-weight:bold;color:#ff00ff;':''}">${v}</div>
+                                        <div id="${k==='Khóa dự kiến'?'v_khoa_dk_inline':''}" style="font-size:14px;font-family:var(--font-mono);margin-top:3px;${k==='Hạng đào tạo'?'font-weight:bold;color:#ff00ff;':''}">${v}</div>
                                     </div>
                                 `).join('')}
                             </div>
