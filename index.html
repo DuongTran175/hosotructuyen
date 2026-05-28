@@ -1556,7 +1556,7 @@
                     .select('*')
                     .eq('hang_dk', hang)
                     .eq('so_cccd', cccd)
-                    .in('trang_thai', ['HOAN_TAT', 'CHO_KHACH_XEM', 'KHACH_DA_SUA', 'LOI_XU_LY', 'DANG_XU_LY'])
+                    .in('trang_thai', ['HOAN_TAT', 'CHO_KHACH_XEM', 'KHACH_DA_SUA', 'LOI_XU_LY', 'DANG_XU_LY', 'YEU_CAU_DONG_BO_LAI'])
                     .order('cap_nhat_luc', { ascending: false, nullsFirst: false })
                     .order('ngay_tao', { ascending: false });
 
@@ -1573,6 +1573,17 @@
                 const i = hs;
                 window._hs_hien_tai = hs;
                 window._i_hien_tai = i;
+
+                // Auto-trigger đồng bộ từ SQL nếu khoa_dk trống nhưng đã có local_hoc_vien_id
+                // Khi staff cập nhật Khóa dự kiến trên desktop, agent sẽ ghi vào Supabase
+                if (!hs.khoa_dk && hs.local_hoc_vien_id && !window._khoa_dk_sync_triggered) {
+                    window._khoa_dk_sync_triggered = true;
+                    db.from('ho_so_inbox').update({
+                        trang_thai: 'YEU_CAU_DONG_BO_LAI'
+                    }).eq('id', hs.id).then(({ error: e }) => {
+                        if (!e) console.log('[AutoSync] Triggered khoa_dk sync from SQL — reload in ~10s to see update');
+                    });
+                }
 
                 document.getElementById('ket-qua-tracuu').innerHTML = `
                     <div style="border:2px solid #000;margin-top:24px;">
@@ -1628,7 +1639,7 @@
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #000;">
                                 ${[
                                     ['Hạng đào tạo', hs.hang_dk||'—'],
-                                    ['Khóa dự kiến', i.khoa_dk||'—'],
+                                    ['Khóa dự kiến', i.khoa_dk || (!hs.khoa_dk && hs.local_hoc_vien_id ? '⏳ Đang cập nhật...' : '—')],
                                     ['Bằng lái đã có', i.hang_gplx_da_co||'—'],
                                     ['Trình độ', i.hoc_luc||'—'],
                                     ['Nghề nghiệp', i.nghe_nghiep||'—'],
@@ -1815,7 +1826,7 @@
             document.getElementById('v_noi_o').innerText       = i.noi_o_hien_tai || "—";
             document.getElementById('v_hang_dk').innerText     = hs.hang_dk || "—";
             document.getElementById('v_trang_thai').innerText  = i.trang_thai_ho_so || "Đã hoàn tất";
-            document.getElementById('v_khoa').innerText        = i.khoa_dk || "—";
+            document.getElementById('v_khoa').innerText        = i.khoa_dk || (hs.local_hoc_vien_id ? "⏳ Đang cập nhật..." : "—");
             document.getElementById('v_gplx').innerText        = i.hang_gplx_da_co || "—";
             document.getElementById('v_lich_hoc').innerText    = i.gio_hoc_thuc_hanh || "—";
             document.getElementById('v_lh_ten').innerText      = i.nguoi_lien_he_ten || "—";
