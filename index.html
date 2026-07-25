@@ -215,8 +215,9 @@
     <div class="main-wrapper">
         <div id="box-tracuu" class="container-main hidden">
             <h2 class="title-main">Tra Cứu Hồ Sơ</h2>
-            <div class="note">Nhập chính xác số CCCD và Hạng bằng lái để truy xuất dữ liệu đã nộp.</div>
+            <div class="note">Nhập chính xác số CCCD, <b>ngày sinh</b> và Hạng bằng lái để truy xuất dữ liệu đã nộp. (Bắt buộc đúng ngày sinh để bảo vệ thông tin của bạn.)</div>
             <div class="form-group"><label>Số CCCD / Mã Định Danh:</label><input type="text" id="cccd_tracuu_input" class="form-control" placeholder="Ví dụ: 031092..."></div>
+            <div class="form-group"><label>Ngày sinh (dd/mm/yyyy):</label><input type="text" id="ngaysinh_tracuu_input" class="form-control" placeholder="Ví dụ: 15/03/1990"></div>
             <div class="form-group"><label>Hạng Đào Tạo:</label>
                 <select id="hang_tracuu_input" class="form-control">
                     <option value="">-- Lựa chọn --</option><option value="A1m">A1m</option><option value="Am">Am</option><option value="B.01">B.01</option><option value="B">B</option><option value="C1">C1</option><option value="Cm">Cm</option><option value="D1">D1</option><option value="D2">D2</option><option value="Dm">Dm</option><option value="CE">CE</option>
@@ -573,7 +574,49 @@
     <script>
         const SUPABASE_URL = 'https://wazvziouhwkdthekpajv.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhenZ6aW91aHdrZHRoZWtwYWp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMDMzODIsImV4cCI6MjA4Nzc3OTM4Mn0.SRA9ukFbbj69oqofug3erF-Y0G7JH7Ik5e6iMP8nbyU';
-        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // ===== BẢO MẬT: client theo "phiên nộp" (token bí mật) =====
+        // Sau khi siết RLS, anon chỉ đọc/sửa được ĐÚNG hàng của mình nhờ
+        // header x-hs-token khớp cột client_token. `db` được tạo lại kèm header
+        // token khi bắt đầu một phiên nộp / khi khôi phục phiên (mở lại trang).
+        const STORAGE_BUCKET = 'kho-anh-hoc-vien';
+        const EDGE_BASE = SUPABASE_URL + '/functions/v1';
+
+        function _makeClient(token) {
+            const opts = token ? { global: { headers: { 'x-hs-token': token } } } : undefined;
+            return supabase.createClient(SUPABASE_URL, SUPABASE_KEY, opts);
+        }
+
+        // client mặc định (không token) — hầu như không đọc được gì (đúng ý đồ)
+        let db = _makeClient(null);
+        let _clientToken = '';
+
+        // Lấy/khởi tạo token cho phiên nộp hiện tại (giữ trong localStorage để
+        // F5 giữa chừng vẫn xem lại được hồ sơ vừa nộp).
+        function getClientToken() {
+            if (_clientToken) return _clientToken;
+            let t = localStorage.getItem('hs_client_token');
+            if (!t) {
+                t = (crypto.randomUUID ? crypto.randomUUID()
+                    : ('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+                        const r = Math.random() * 16 | 0;
+                        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+                    })));
+                localStorage.setItem('hs_client_token', t);
+            }
+            _clientToken = t;
+            return t;
+        }
+
+        // Kích hoạt client gắn token cho phiên nộp (gọi trước khi INSERT/đọc lại)
+        function useScopedDb() {
+            db = _makeClient(getClientToken());
+            return db;
+        }
+
+        // Khôi phục token nếu đã có phiên nộp trước đó (mở lại trang)
+        if (localStorage.getItem('hs_client_token')) {
+            useScopedDb();
+        }
 
         // ===== AGENT: Đọc ?agent= từ URL để gắn Người nhận =====
         // Mỗi người nhận có link riêng: .../?agent=username
@@ -737,9 +780,11 @@
                     // Đảm bảo tên file luôn có phần tên hợp lệ (tránh tên tiếng Việt gây lỗi upload)
                     const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, '') || 'img.jpg';
                     const fileName = `${sid}_${Date.now()}_${c}_${folderPrefix}_${cleanName}`;
-                    const { data, error } = await db.storage.from('kho-anh-hoc-vien').upload(fileName, file);
+                    const { data, error } = await db.storage.from(STORAGE_BUCKET).upload(fileName, file);
                     if(data) {
-                        urls.push(db.storage.from('kho-anh-hoc-vien').getPublicUrl(fileName).data.publicUrl);
+                        // Bucket PRIVATE → lưu STORAGE PATH (không dùng public URL).
+                        // Agent (service_role) tải bằng path này.
+                        urls.push(fileName);
                     } else if(error) {
                         console.error(`Upload lỗi [${folderPrefix}]:`, error.message);
                     }
@@ -796,6 +841,7 @@
             btn.innerText = "ĐANG UPLOAD...";
             btn.disabled = true;
             _sessionId = '';
+            useScopedDb();   // BẢO MẬT: gắn token cho phiên nộp trước khi ghi/đọc
 
             try {
                 // 1. Upload VNeID lên Supabase Storage
@@ -820,6 +866,7 @@
                 const { data, error } = await db.from('ho_so_inbox').insert({
                     hang_dk: hang,
                     anh_data: anh,
+                    client_token: getClientToken(),   // BẢO MẬT: khoá quyền đọc/sửa theo phiên
                     trang_thai: 'CHO_OCR_VNEID',
                     nguoi_gioi_thieu:     document.getElementById('nguoi_gt_nop').value.trim() || null,
                     sdt_nguoi_gioi_thieu: document.getElementById('sdt_gt_nop').value.trim()  || null,
@@ -1543,29 +1590,30 @@
 
         async function traCuuThuCong() {
             const cccd = document.getElementById('cccd_tracuu_input').value.replace(/\s/g,'').trim();
+            const dob  = document.getElementById('ngaysinh_tracuu_input').value.replace(/\s/g,'').trim();
             const hang = document.getElementById('hang_tracuu_input').value;
             if(!cccd || !hang) return alert("Vui lòng nhập CCCD và chọn hạng!");
+            if(!dob) return alert("Vui lòng nhập ngày sinh (dd/mm/yyyy) để xác minh chủ hồ sơ!");
 
             document.getElementById('btn-tracuu').innerText = "ĐANG TÌM...";
             document.getElementById('btn-tracuu').disabled = true;
 
             try {
-                // Sau migration v2: so_cccd là cột phẳng → query trực tiếp
-                // Thử inbox trước; nếu không có → gửi truy_van_request lên SQL Server qua proxy
-                const { data, error } = await db.from('ho_so_inbox')
-                    .select('*')
-                    .eq('hang_dk', hang)
-                    .eq('so_cccd', cccd)
-                    .in('trang_thai', ['HOAN_TAT', 'CHO_KHACH_XEM', 'KHACH_DA_SUA', 'LOI_XU_LY', 'DANG_XU_LY', 'YEU_CAU_DONG_BO_LAI'])
-                    .order('cap_nhat_luc', { ascending: false, nullsFirst: false })
-                    .order('ngay_tao', { ascending: false });
+                // BẢO MẬT: không query trực tiếp bảng từ trình duyệt nữa.
+                // Gọi Edge Function xác minh CCCD + NGÀY SINH phía server.
+                const resp = await fetch(`${EDGE_BASE}/tra-cuu-ho-so`, {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json', 'apikey': SUPABASE_KEY },
+                    body: JSON.stringify({ cccd, ngay_sinh: dob, hang }),
+                });
+                const kq = await resp.json().catch(() => ({}));
 
-                if(error) throw error;
+                if (!resp.ok) throw new Error(kq.message || kq.error || ('Lỗi máy chủ ' + resp.status));
 
-                const hs = (data || [])[0];
+                const hs = kq.found ? kq.ho_so : null;
 
                 if(!hs) {
-                    alert("Không tìm thấy hồ sơ trong inbox!\nCCCD: " + cccd + "\nHạng: " + hang + "\n(Nếu hồ sơ đã hoàn tất quá 30 ngày sẽ không còn trong inbox — vui lòng liên hệ trung tâm.)");
+                    alert("Không tìm thấy hồ sơ khớp CCCD và ngày sinh!\nCCCD: " + cccd + "\nHạng: " + hang + "\n(Nếu hồ sơ đã hoàn tất quá 30 ngày sẽ không còn trong inbox — vui lòng liên hệ trung tâm.)");
                     return;
                 }
 
@@ -1574,30 +1622,34 @@
                 window._hs_hien_tai = hs;
                 window._i_hien_tai = i;
 
-                // Auto-sync: nếu khoa_dk trống và đã có local_hoc_vien_id
-                // → trigger agent đồng bộ từ SQL, rồi tự polling cập nhật ô hiển thị (không cần reload)
-                if (!hs.khoa_dk && hs.local_hoc_vien_id && !window._khoa_dk_sync_triggered) {
+                // Auto-sync khoa_dk: Edge Function đã tự trigger đồng bộ phía server.
+                // Ở đây chỉ POLL LẠI Edge Function (không đọc thẳng bảng) để cập nhật ô hiển thị.
+                if (!hs.khoa_dk && !window._khoa_dk_sync_triggered) {
                     window._khoa_dk_sync_triggered = true;
-                    db.from('ho_so_inbox').update({ trang_thai: 'YEU_CAU_DONG_BO_LAI' }).eq('id', hs.id).then(() => {
-                        // Poll Supabase mỗi 2s (tối đa 15s) cho đến khi khoa_dk xuất hiện
-                        let _tries = 0;
-                        const _poll = setInterval(async () => {
-                            _tries++;
-                            if (_tries > 7) {
-                                clearInterval(_poll);
-                                const el = document.getElementById('v_khoa_dk_inline');
-                                if (el && el.textContent.includes('⏳')) el.textContent = '—';
-                                return;
-                            }
-                            const { data: fresh } = await db.from('ho_so_inbox')
-                                .select('khoa_dk').eq('id', hs.id).single();
+                    let _tries = 0;
+                    const _poll = setInterval(async () => {
+                        _tries++;
+                        if (_tries > 7) {
+                            clearInterval(_poll);
+                            const el = document.getElementById('v_khoa_dk_inline');
+                            if (el && el.textContent.includes('⏳')) el.textContent = '—';
+                            return;
+                        }
+                        try {
+                            const r2 = await fetch(`${EDGE_BASE}/tra-cuu-ho-so`, {
+                                method: 'POST',
+                                headers: { 'content-type': 'application/json', 'apikey': SUPABASE_KEY },
+                                body: JSON.stringify({ cccd, ngay_sinh: dob, hang }),
+                            });
+                            const k2 = await r2.json().catch(() => ({}));
+                            const fresh = k2.found ? k2.ho_so : null;
                             if (fresh?.khoa_dk) {
                                 clearInterval(_poll);
                                 const el = document.getElementById('v_khoa_dk_inline');
                                 if (el) el.textContent = fresh.khoa_dk;
                             }
-                        }, 2000);
-                    });
+                        } catch(e) {}
+                    }, 2000);
                 }
 
                 document.getElementById('ket-qua-tracuu').innerHTML = `
@@ -1921,8 +1973,8 @@
             for (let file of input.files) {
                 c++;
                 const fileName = `${sid}_bs_${Date.now()}_${c}_${folderPrefix}_${file.name.replace(/[^a-zA-Z0-9.]/g, '')}`;
-                const { data } = await db.storage.from('kho-anh-hoc-vien').upload(fileName, file);
-                if (data) urls.push(db.storage.from('kho-anh-hoc-vien').getPublicUrl(fileName).data.publicUrl);
+                const { data } = await db.storage.from(STORAGE_BUCKET).upload(fileName, file);
+                if (data) urls.push(fileName);   // PRIVATE bucket → lưu storage path
             }
             return urls;
         }
