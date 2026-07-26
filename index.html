@@ -1622,6 +1622,15 @@
                 window._hs_hien_tai = hs;
                 window._i_hien_tai = i;
 
+                // "Nhận chìa khoá" hồ sơ để có thể SỬA/BỔ SUNG từ thiết bị này
+                // (đã xác minh CCCD + ngày sinh). Nhờ vậy các thao tác db.from().update()
+                // sau đó hoạt động lại bình thường.
+                if (kq._token) {
+                    _clientToken = kq._token;
+                    localStorage.setItem('hs_client_token', _clientToken);
+                    useScopedDb();
+                }
+
                 // Auto-sync khoa_dk: Edge Function đã tự trigger đồng bộ phía server.
                 // Ở đây chỉ POLL LẠI Edge Function (không đọc thẳng bảng) để cập nhật ô hiển thị.
                 if (!hs.khoa_dk && !window._khoa_dk_sync_triggered) {
