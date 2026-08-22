@@ -2,8 +2,9 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Sinh Thái Dương Trần | Documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#ffffff">
+    <title>Hệ Sinh Thái Dương Trần | Nộp hồ sơ trực tuyến</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         /* ============================================================
@@ -27,7 +28,13 @@
             --font-mono: ui-monospace, 'Cascadia Mono', Consolas, 'JetBrains Mono', 'SFMono-Regular', Menlo, 'Courier New', monospace;
         }
         * { -webkit-tap-highlight-color: transparent; }
+        /* CHẶN "TỰ PHÓNG TO CHỮ" của Chrome/Safari trên điện thoại.
+           Không có 2 dòng này, trình duyệt tự nống cỡ chữ trong các khối
+           văn bản dài → trang trông như đang bị zoom + ngay khi vừa mở. */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        html, body { overflow-x: hidden; max-width: 100%; }
         body { margin: 0; padding: 0; font-family: var(--font-mono); background-color: var(--bg-color); color: var(--text-color); display: flex; min-height: 100vh; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        img, svg, table { max-width: 100%; }
 
         /* ===== SIDEBAR (đảo từ nền đen sang nền trắng cho sáng) ===== */
         .sidebar { width: 264px; background-color: var(--sidebar-bg); color: var(--sidebar-text); position: fixed; height: 100vh; overflow-y: auto; padding-top: 24px; border-right: 1px solid var(--border-color); z-index: 100; box-sizing: border-box; }
@@ -114,17 +121,116 @@
         .spinner { width: 50px; height: 50px; border: 3px solid var(--line); border-top: 3px solid var(--accent-color); border-radius: 50%; animation: spin 0.9s linear infinite; margin: 0 auto 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        /* ============================================================
+           HOẠT ẢNH HƯỚNG DẪN CHỤP ẢNH
+           Mô phỏng màn hình điện thoại, chạy lặp 3 cảnh × 3 giây.
+           Thuần CSS — không tải video, chạy được cả khi mất mạng.
+           ============================================================ */
+        .dp { display:flex; gap:16px; align-items:flex-start; margin-top:12px; flex-wrap:wrap; }
+        .dp-phone { position:relative; width:148px; height:268px; border:2px solid var(--text-color); border-radius:16px; background:#fff; flex-shrink:0; overflow:hidden; }
+        .dp-notch { position:absolute; top:0; left:50%; margin-left:-26px; width:52px; height:11px; background:var(--text-color); border-radius:0 0 7px 7px; z-index:6; }
+        .dp-screen { position:absolute; top:0; right:0; bottom:0; left:0; overflow:hidden; background:#fbfbf9; }
+        .dp-scene { position:absolute; top:0; right:0; bottom:0; left:0; opacity:0; animation:dp-cycle 9s infinite; }
+        .dp-s1 { animation-delay:0s; } .dp-s2 { animation-delay:3s; } .dp-s3 { animation-delay:6s; }
+        @keyframes dp-cycle { 0%{opacity:0} 3%{opacity:1} 30%{opacity:1} 33%{opacity:0} 100%{opacity:0} }
+
+        .dp-appbar { background:var(--accent-color); color:#fff; font-size:8px; letter-spacing:1.5px; font-weight:bold; text-align:center; padding:17px 6px 6px; }
+        .dp-appbar.dark { background:var(--text-color); }
+        .dp-body { padding:9px; }
+        .dp-line { height:5px; background:#e4e4de; border-radius:2px; margin-bottom:6px; }
+        .dp-btn { position:relative; border:1px solid var(--accent-color); color:var(--accent-hover); background:var(--accent-soft); font-size:8.5px; font-weight:bold; text-align:center; padding:7px 4px; margin-top:8px; }
+        .dp-btn.mo { opacity:0.4; }
+        .dp-card { border:1px solid var(--text-color); background:#fff; padding:6px; display:flex; gap:6px; align-items:flex-start; }
+        .dp-face { width:26px; height:33px; background:#d9dfe2; border:1px solid #bcc5ca; flex-shrink:0; }
+        .dp-txt { font-size:8px; line-height:1.6; color:#3c4248; word-break:break-word; }
+        .dp-tag { display:inline-block; font-size:7px; letter-spacing:0.5px; font-weight:bold; background:var(--accent-color); color:#fff; padding:2px 5px; margin-bottom:6px; }
+        .dp-tag.warn { background:var(--warn); }
+        .dp-hl { border:1px solid var(--warn); background:#fff8e1; padding:4px 5px; margin-top:6px; font-size:8px; line-height:1.5; }
+        .dp-ok { font-size:9px; color:var(--ok); font-weight:bold; text-align:center; margin-top:12px; line-height:1.5; }
+        .dp-shot { border:1px solid var(--ok); background:#f1f8f2; height:52px; margin-top:8px; display:flex; align-items:center; justify-content:center; font-size:8px; color:var(--ok); font-weight:bold; }
+        .dp-shots { display:flex; gap:6px; margin-top:8px; }
+        .dp-shots > div { flex:1; }
+        /* Khung ngắm khi chụp giấy tờ */
+        .dp-view { position:absolute; top:34px; right:9px; bottom:9px; left:9px; border:1px dashed var(--accent-color); display:flex; align-items:center; justify-content:center; }
+        .dp-gplx { width:100px; border:1px solid var(--text-color); background:#fff; padding:5px; }
+
+        /* Ngón tay chạm / vuốt */
+        .dp-finger { position:absolute; right:5px; top:50%; margin-top:-11px; width:22px; height:22px; border-radius:50%; background:rgba(7,129,167,0.22); border:2px solid var(--accent-color); animation:dp-tap 9s infinite; }
+        @keyframes dp-tap { 0%,5%{transform:scale(0.5);opacity:0} 11%{transform:scale(1);opacity:1} 19%{transform:scale(0.72);opacity:1} 28%{opacity:1} 32%,100%{transform:scale(0.72);opacity:0} }
+        .dp-swipe { position:absolute; left:50%; bottom:26px; margin-left:-11px; width:22px; height:22px; border-radius:50%; background:rgba(7,129,167,0.22); border:2px solid var(--accent-color); animation:dp-swipe 9s infinite; }
+        .dp-s2 .dp-swipe, .dp-s2 .dp-finger { animation-delay:3s; }
+        .dp-s3 .dp-swipe, .dp-s3 .dp-finger { animation-delay:6s; }
+        @keyframes dp-swipe { 0%,4%{opacity:0;transform:translateY(0)} 9%{opacity:1;transform:translateY(0)} 24%{opacity:1;transform:translateY(-58px)} 30%,100%{opacity:0;transform:translateY(-58px)} }
+        .dp-flash { position:absolute; top:0; right:0; bottom:0; left:0; background:#fff; opacity:0; z-index:5; pointer-events:none; animation:dp-flash 9s infinite; }
+        @keyframes dp-flash { 0%,66%{opacity:0} 68%{opacity:0.92} 75%{opacity:0} 100%{opacity:0} }
+
+        /* Danh sách bước — bước đang diễn ra sẽ sáng lên theo hoạt ảnh */
+        .dp-steps { list-style:none; margin:0; padding:0; flex:1; min-width:170px; font-size:11.5px; line-height:1.55; }
+        .dp-steps li { position:relative; padding-left:23px; margin-bottom:9px; color:#9aa0a6; animation:dp-hl 9s infinite; }
+        .dp-steps li b { position:absolute; left:0; top:1px; width:15px; height:15px; border:1px solid currentColor; font-size:9px; display:flex; align-items:center; justify-content:center; font-weight:bold; }
+        .dp-steps li:nth-child(1) { animation-delay:0s; }
+        .dp-steps li:nth-child(2) { animation-delay:3s; }
+        .dp-steps li:nth-child(3) { animation-delay:6s; }
+        @keyframes dp-hl { 0%,3%{color:#9aa0a6} 6%,29%{color:var(--accent-hover)} 33%,100%{color:#9aa0a6} }
+        .dp-note { flex-basis:100%; font-size:11px; color:var(--text-soft); border-top:1px dashed #cfcfc7; padding-top:8px; margin-top:2px; line-height:1.55; }
+
+        /* Máy đặt chế độ "giảm chuyển động" → dừng hoạt ảnh, giữ 1 cảnh tĩnh */
+        @media (prefers-reduced-motion: reduce) {
+            .dp-scene, .dp-finger, .dp-swipe, .dp-flash, .dp-steps li { animation: none !important; }
+            .dp-scene { opacity:0; } .dp-s2 { opacity:1; }
+            .dp-steps li { color: var(--text-soft); }
+        }
+
+        /* ===== THANH TRÊN + MENU TRƯỢT (điện thoại) ===== */
+        .mobile-bar { display: none; }
+        .nav-backdrop { display: none; }
+        .nav-close { display: none; }
+
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; position: static; padding-top: 16px; padding-bottom: 8px; border-right: none; border-bottom: 1px solid var(--border-color); }
-            .sidebar-logo { padding-bottom: 14px; margin-bottom: 10px; }
-            .main-wrapper { margin-left: 0; width: 100%; padding: 18px 14px 40px; }
-            .container-main { padding: 20px 16px 26px; }
+
+            /* Thanh cố định trên cùng */
+            .mobile-bar { display: flex; align-items: center; gap: 8px; position: fixed; top: 0; left: 0; right: 0; height: 54px; padding: 0 10px; background: var(--surface); border-bottom: 1px solid var(--border-color); z-index: 900; box-sizing: border-box; }
+            .mb-burger { width: 40px; height: 40px; border: 1px solid var(--border-color); background: var(--surface); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; cursor: pointer; padding: 0; flex-shrink: 0; }
+            .mb-burger span { display: block; width: 18px; height: 2px; background: var(--text-color); transition: 0.2s; }
+            .mb-burger:active { background: var(--light-gray); }
+            .mb-title { flex: 1; font-family: var(--font-mono); font-weight: 800; font-size: 15px; letter-spacing: -0.3px; }
+            .mb-act { width: 40px; height: 40px; border: 1px solid var(--line); background: var(--surface); font-family: var(--font-mono); font-size: 16px; cursor: pointer; flex-shrink: 0; color: var(--text-color); }
+            .mb-act:active { background: var(--accent-soft); border-color: var(--accent-color); }
+
+            /* Nền mờ sau menu */
+            .nav-backdrop { display: block; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(20,23,26,0.45); opacity: 0; pointer-events: none; transition: opacity 0.25s; z-index: 950; }
+            .nav-backdrop.show { opacity: 1; pointer-events: auto; }
+
+            /* Menu trượt từ trái */
+            .sidebar { position: fixed; top: 0; left: 0; height: 100%; width: 80%; max-width: 300px; padding-top: 18px; border-right: 1px solid var(--border-color); border-bottom: none; transform: translateX(-101%); transition: transform 0.25s ease; z-index: 960; box-shadow: 4px 0 24px rgba(20,23,26,0.14); }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-logo { padding-right: 52px; padding-bottom: 16px; margin-bottom: 12px; }
+            .nav-close { display: flex; align-items: center; justify-content: center; position: absolute; top: 12px; right: 12px; width: 34px; height: 34px; border: 1px solid var(--line); background: var(--surface); font-family: var(--font-mono); font-size: 15px; cursor: pointer; color: var(--text-color); }
+            .nav-item { padding: 12px 20px; font-size: 14px; }
+
+            /* Nội dung — chừa chỗ cho thanh trên */
+            .main-wrapper { margin-left: 0; width: 100%; padding: 68px 12px 40px; }
+            .container-main { padding: 20px 15px 26px; }
             .upload-grid { grid-template-columns: 1fr; }
-            .hero-title { font-size: 24px; }
-            .hero-badge { width: 60px; height: 60px; font-size: 26px; }
+            .hero-title { font-size: 23px; letter-spacing: -0.6px; }
+            .hero-badge { width: 56px; height: 56px; font-size: 24px; }
+            .hero-main { gap: 14px; }
+            .hero-text { min-width: 160px; }
             .hero-strip { flex-wrap: wrap; }
             .hero-cta { width: 100%; text-align: center; }
+            .hero-tools { width: 100%; }
+            .hero-tool { flex: 1; }
+            h2.title-main { font-size: 21px; }
+
+            /* Ô nhập PHẢI ≥16px: nhỏ hơn là iOS tự phóng to trang khi bấm vào ô,
+               và sau đó không tự thu lại — người dùng phải tay zoom ra. */
+            .form-control, .dc-select, .dc-street-input,
+            input, select, textarea { font-size: 16px; }
+
+            /* Form 2 cột -> 1 cột cho dễ đọc trên màn hẹp */
+            .container-main [style*="grid-template-columns: 1fr 1fr"],
+            .container-main [style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
         }
 
         /* ===== ONBOARDING: Welcome Modal ===== */
@@ -283,13 +389,26 @@
         </div>
     </div>
 
-    <div class="sidebar">
+    <!-- ===== THANH TRÊN CÙNG (chỉ hiện trên điện thoại) ===== -->
+    <div class="mobile-bar">
+        <button class="mb-burger" type="button" onclick="moMenu()" aria-label="Mở menu" aria-controls="sidebar" aria-expanded="false" id="btn-burger">
+            <span></span><span></span><span></span>
+        </button>
+        <span class="mb-title">Dương Trần</span>
+        <button class="mb-act" type="button" onclick="moWelcome()" aria-label="Hướng dẫn">?</button>
+        <button class="mb-act" type="button" onclick="chuyenManHinh('box-tracuu')" aria-label="Tra cứu hồ sơ">⌕</button>
+    </div>
+    <div class="nav-backdrop" id="nav-backdrop" onclick="dongMenu()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <button class="nav-close" type="button" onclick="dongMenu()" aria-label="Đóng menu">✕</button>
         <div class="sidebar-logo"><img src="IMG_2356.JPG" alt="Logo" onerror="this.outerHTML='<span style=\'font-size: 28px;\'>◯</span>'">Dương Trần</div>
         <div class="nav-group-title">Hồ Sơ Học Viên</div>
         <div class="nav-item active" id="nav-step1" onclick="chuyenManHinh('step1')">Khởi Tạo Hồ Sơ</div>
         <div class="nav-item" id="nav-tracuu" onclick="chuyenManHinh('box-tracuu')">Tra Cứu Dữ Liệu</div>
-        <div style="margin-top: 40px;" class="nav-group-title">Hỗ Trợ</div>
-        <div class="nav-item" onclick="alert('Hotline hỗ trợ kỹ thuật: 0902.077.049')">Liên Hệ Giáo Viên</div>
+        <div class="nav-group-title" style="margin-top: 26px;">Hỗ Trợ</div>
+        <div class="nav-item" onclick="moWelcome()">Hướng Dẫn 4 Bước</div>
+        <div class="nav-item" onclick="location.href='tel:0902077049'">Gọi Giáo Viên — 0902.077.049</div>
     </div>
 
     <div class="main-wrapper">
@@ -400,6 +519,7 @@
                             <li>Vào <b>"Căn cước điện tử"</b> hoặc <b>"Thông tin công dân"</b></li>
                             <li>Chụp màn hình trang <b>có hiển thị thẻ CCCD ảo</b> (số CCCD, họ tên, ảnh)</li>
                         </ol>
+                        <div class="dp" data-demo="vneid_main"></div>
                     </div>
                 </div>
                 <div class="upload-card" id="card_vneid_sub">
@@ -415,6 +535,7 @@
                             <li>Chụp phần có <b>ngày cấp CCCD</b>, <b>số điện thoại</b>, <b>số CMT cũ</b></li>
                         </ol>
                         <div class="tip">💡 Thông tin SĐT và ngày cấp thường nằm ở trang phụ.</div>
+                        <div class="dp" data-demo="vneid_sub"></div>
                     </div>
                 </div>
             </div>
@@ -460,10 +581,15 @@
                 <div class="note">Có thể tải <b>1 ảnh</b> (bằng ảo có cả 2 mặt) hoặc <b>2 ảnh</b> (mặt trước + mặt sau chụp riêng).</div>
                 <div class="upload-grid">
                     <div class="upload-card" id="card_gplx_moto">
+                        <button class="upload-help-btn" onclick="event.stopPropagation();toggleHelp('help_gplx_moto')" title="Xem hướng dẫn chụp">?</button>
                         <div class="title">[+] GPLX Mô Tô</div>
                         <div class="subtitle">1 hoặc 2 ảnh</div>
                         <input type="file" id="files_gplx_moto" accept="image/*" multiple>
                         <div id="status_files_gplx_moto" class="file-status"></div>
+                        <div class="upload-instruction" id="help_gplx_moto">
+                            <b>🏍 Cách chụp bằng mô tô:</b>
+                            <div class="dp" data-demo="gplx"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -474,10 +600,15 @@
                 <div class="note">Chỉ chụp <b>hạng cao nhất</b> bạn đang có. Có thể 1 ảnh (bằng ảo) hoặc 2 ảnh (trước + sau).</div>
                 <div class="upload-grid">
                     <div class="upload-card" id="card_gplx_oto">
+                        <button class="upload-help-btn" onclick="event.stopPropagation();toggleHelp('help_gplx_oto')" title="Xem hướng dẫn chụp">?</button>
                         <div class="title">[+] GPLX Ô Tô</div>
                         <div class="subtitle">1 hoặc 2 ảnh</div>
                         <input type="file" id="files_gplx_oto" accept="image/*" multiple>
                         <div id="status_files_gplx_oto" class="file-status"></div>
+                        <div class="upload-instruction" id="help_gplx_oto">
+                            <b>🚗 Cách chụp bằng ô tô (hạng cao nhất):</b>
+                            <div class="dp" data-demo="gplx"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -490,10 +621,15 @@
                 </div>
                 <div class="upload-grid">
                     <div class="upload-card" id="card_vnetraffic">
+                        <button class="upload-help-btn" onclick="event.stopPropagation();toggleHelp('help_vnetraffic')" title="Xem hướng dẫn chụp">?</button>
                         <div class="title">[+] VNeTraffic Trang Chủ</div>
                         <div class="subtitle">Ảnh trang chủ app VNeTraffic</div>
                         <input type="file" id="files_vnetraffic" accept="image/*">
                         <div id="status_files_vnetraffic" class="file-status"></div>
+                        <div class="upload-instruction" id="help_vnetraffic">
+                            <b>🚦 Cách lấy ảnh trang chủ VNeTraffic:</b>
+                            <div class="dp" data-demo="vnetraffic"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -732,8 +868,27 @@
                 modal.style.display = 'flex';
             }
         }
+        // ===== MENU TRƯỢT (điện thoại) =====
+        function moMenu() {
+            document.getElementById('sidebar').classList.add('open');
+            document.getElementById('nav-backdrop').classList.add('show');
+            document.getElementById('btn-burger')?.setAttribute('aria-expanded', 'true');
+            // khóa cuộn nền khi menu mở — đặt cả 2 vì mỗi trình duyệt cuộn ở một phần tử khác nhau
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
+        }
+        function dongMenu() {
+            document.getElementById('sidebar')?.classList.remove('open');
+            document.getElementById('nav-backdrop')?.classList.remove('show');
+            document.getElementById('btn-burger')?.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') dongMenu(); });
+
         // Mở lại hướng dẫn từ nút "?" trên đầu trang
         function moWelcome() {
+            dongMenu();
             const modal = document.getElementById('welcome-modal');
             if (modal) modal.style.display = 'flex';
         }
@@ -744,10 +899,118 @@
             } else {
                 localStorage.setItem('dt_welcome_done', 'read');
                 // Tự động mở hướng dẫn VNeID cho người mới
-                setTimeout(() => toggleHelp('help_vneid', true), 300);
+                // (trước đây gọi id 'help_vneid' — không tồn tại nên chẳng mở gì)
+                setTimeout(() => toggleHelp('help_vneid_main', true), 300);
             }
         }
         window.addEventListener('DOMContentLoaded', kiemTraWelcome);
+
+        // ============================================================
+        // HOẠT ẢNH HƯỚNG DẪN CHỤP ẢNH
+        // Mô phỏng màn hình điện thoại bằng CSS — không tải video,
+        // chỉ dựng khi học viên bấm "?" (đỡ tốn pin khi chưa xem).
+        // ============================================================
+        const _L = (w) => `<div class="dp-line" style="width:${w}"></div>`;
+
+        const DEMO_HD = {
+            vneid_main: {
+                buoc: ['Mở app VNeID rồi đăng nhập',
+                       'Bấm "Căn cước điện tử" — thẻ CCCD hiện ra',
+                       'Chụp màn hình: giữ nút Nguồn + Giảm âm lượng'],
+                luuy: 'Ảnh phải đọc rõ: số CCCD, họ và tên, ngày sinh và ảnh chân dung.',
+                canh: [
+                    `<div class="dp-appbar">VNeID</div><div class="dp-body">
+                        ${_L('72%')}${_L('48%')}
+                        <div class="dp-btn">Căn cước điện tử<span class="dp-finger"></span></div>
+                        <div class="dp-btn mo">Ví giấy tờ</div>
+                        <div class="dp-btn mo">Thông báo lưu trú</div></div>`,
+                    `<div class="dp-appbar">CĂN CƯỚC ĐIỆN TỬ</div><div class="dp-body">
+                        <span class="dp-tag">CHỤP TRANG NÀY</span>
+                        <div class="dp-card"><div class="dp-face"></div>
+                            <div class="dp-txt"><b>NGUYỄN VĂN A</b><br>031 234 567 890<br>01/01/1990</div></div>
+                        <div style="margin-top:8px">${_L('88%')}${_L('64%')}</div></div>`,
+                    `<div class="dp-appbar">CĂN CƯỚC ĐIỆN TỬ</div><div class="dp-body">
+                        <div class="dp-shot">ẢNH ĐÃ LƯU</div>
+                        <div class="dp-ok">✓ Ảnh chính<br>đủ thông tin</div></div>`
+                ]
+            },
+            vneid_sub: {
+                buoc: ['Vẫn ở trang Căn cước điện tử',
+                       'Vuốt xuống tới phần Ngày cấp / Số thuê bao',
+                       'Chụp màn hình phần này'],
+                luuy: 'Đây là trang có ngày cấp CCCD, số điện thoại và số CMND cũ — khác với ảnh chính.',
+                canh: [
+                    `<div class="dp-appbar">CĂN CƯỚC ĐIỆN TỬ</div><div class="dp-body">
+                        <div class="dp-card"><div class="dp-face"></div>
+                            <div class="dp-txt"><b>NGUYỄN VĂN A</b><br>031 234 567 890</div></div>
+                        <div style="margin-top:8px">${_L('88%')}${_L('70%')}</div>
+                        <div class="dp-swipe"></div></div>`,
+                    `<div class="dp-appbar">CĂN CƯỚC ĐIỆN TỬ</div><div class="dp-body">
+                        <span class="dp-tag warn">CHỤP PHẦN NÀY</span>
+                        <div class="dp-hl">Ngày cấp: <b>01/01/2022</b></div>
+                        <div class="dp-hl">Số thuê bao di động:<br><b>09xx xxx xxx</b></div>
+                        <div class="dp-hl">Số CMND cũ: <b>031234567</b></div></div>`,
+                    `<div class="dp-appbar">CĂN CƯỚC ĐIỆN TỬ</div><div class="dp-body">
+                        <div class="dp-shot">ẢNH ĐÃ LƯU</div>
+                        <div class="dp-ok">✓ Ảnh phụ<br>đủ ngày cấp + SĐT</div></div>`
+                ]
+            },
+            gplx: {
+                buoc: ['Đặt bằng lái trên mặt phẳng, đủ sáng',
+                       'Chụp mặt trước, rồi lật chụp mặt sau',
+                       'Tải lên 2 ảnh (bằng ảo có sẵn 2 mặt thì 1 ảnh)'],
+                luuy: 'Chụp thẳng từ trên xuống, không chéo, không loá đèn, thấy đủ 4 góc thẻ.',
+                canh: [
+                    `<div class="dp-appbar dark">MÁY ẢNH</div>
+                     <div class="dp-view"><div class="dp-gplx">
+                        <div style="display:flex;gap:5px"><div class="dp-face" style="width:20px;height:25px"></div>
+                        <div style="flex:1">${_L('100%')}${_L('80%')}${_L('60%')}</div></div>
+                        <div style="font-size:7px;text-align:center;margin-top:4px;letter-spacing:1px">MẶT TRƯỚC</div>
+                     </div></div>`,
+                    `<div class="dp-appbar dark">MÁY ẢNH</div>
+                     <div class="dp-view"><div class="dp-gplx">
+                        ${_L('100%')}${_L('90%')}${_L('70%')}
+                        <div style="font-size:7px;text-align:center;margin-top:4px;letter-spacing:1px">MẶT SAU — HẠNG / NGÀY</div>
+                     </div></div>`,
+                    `<div class="dp-appbar dark">MÁY ẢNH</div><div class="dp-body">
+                        <div class="dp-shots">
+                            <div class="dp-shot" style="height:44px">TRƯỚC</div>
+                            <div class="dp-shot" style="height:44px">SAU</div></div>
+                        <div class="dp-ok">✓ Đủ 2 mặt</div></div>`
+                ]
+            },
+            vnetraffic: {
+                buoc: ['Mở app VNeTraffic và đăng nhập',
+                       'Ở lại trang chủ — nơi hiện thông tin GPLX',
+                       'Chụp màn hình trang chủ'],
+                luuy: 'Bắt buộc với mọi hạng, kể cả khi bạn chưa có bằng lái nào.',
+                canh: [
+                    `<div class="dp-appbar">VNeTraffic</div><div class="dp-body">
+                        ${_L('60%')}${_L('40%')}
+                        <div class="dp-btn">Đăng nhập<span class="dp-finger"></span></div></div>`,
+                    `<div class="dp-appbar">VNeTraffic</div><div class="dp-body">
+                        <span class="dp-tag">CHỤP TRANG NÀY</span>
+                        <div class="dp-card"><div class="dp-txt"><b>GIẤY PHÉP LÁI XE</b><br>Hạng: <b>B</b><br>Số: 031234567890<br>Trạng thái: Còn hạn</div></div>
+                        <div style="margin-top:8px">${_L('80%')}</div></div>`,
+                    `<div class="dp-appbar">VNeTraffic</div><div class="dp-body">
+                        <div class="dp-shot">ẢNH ĐÃ LƯU</div>
+                        <div class="dp-ok">✓ Trang chủ VNeTraffic</div></div>`
+                ]
+            }
+        };
+
+        function dungDemo(box) {
+            if (!box || box.dataset.dung === '1') return;      // mỗi ô chỉ dựng 1 lần
+            const d = DEMO_HD[box.dataset.demo];
+            if (!d) return;
+            box.innerHTML =
+                `<div class="dp-phone"><div class="dp-notch"></div><div class="dp-screen">`
+                + d.canh.map((c, i) => `<div class="dp-scene dp-s${i + 1}">${c}</div>`).join('')
+                + `<div class="dp-flash"></div></div></div>`
+                + `<ol class="dp-steps">` + d.buoc.map((b, i) => `<li><b>${i + 1}</b>${b}</li>`).join('') + `</ol>`
+                + (d.luuy ? `<div class="dp-note">💡 ${d.luuy}</div>` : '');
+            box.dataset.dung = '1';
+        }
 
         // ===== ONBOARDING: Toggle Upload Help =====
         function toggleHelp(id, forceShow) {
@@ -759,6 +1022,7 @@
             } else {
                 el.classList.toggle('show');
             }
+            if (el.classList.contains('show')) el.querySelectorAll('.dp[data-demo]').forEach(dungDemo);
         }
 
         // ===== ONBOARDING: Progress Bar =====
@@ -869,6 +1133,9 @@
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             if (id === 'step1' || id === 'step2' || id === 'step3') document.getElementById('nav-step1').classList.add('active');
             else if (id === 'box-tracuu') document.getElementById('nav-tracuu').classList.add('active');
+
+            dongMenu();                       // chọn xong thì đóng menu trượt
+            window.scrollTo({ top: 0 });      // lên đầu trang cho khỏi lạc
         }
         
         // Tạo session ID riêng biệt cho mỗi lần nộp — tránh 2 người nộp cùng lúc bị trùng file
