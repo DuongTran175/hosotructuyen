@@ -233,6 +233,8 @@
         .mb-grow { flex: 1; }
         .mb-act { width: 40px; height: 40px; border: 1px solid var(--line); background: var(--surface); color: var(--text-color); cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0; text-decoration: none; transition: 0.15s; }
         .mb-act:hover { background: var(--accent-color); border-color: var(--accent-color); color: #fff; }
+        .mb-act.them { background: var(--accent-soft); border-color: var(--accent-color); color: var(--accent-hover); }  /* thêm hồ sơ mới */
+        .mb-act.them:hover { background: var(--accent-color); color: #fff; }
         .mb-act.dt { color: #c8102e; border-color: #f0c2ca; }          /* nút gọi — đỏ */
         .mb-act.dt:hover { background: #c8102e; border-color: #c8102e; color: #fff; }
         .nav-backdrop { display: none; }
@@ -246,7 +248,7 @@
             .mb-burger { display: flex; width: 40px; height: 40px; border: 1px solid var(--border-color); background: var(--surface); flex-direction: column; justify-content: center; align-items: center; gap: 4px; cursor: pointer; padding: 0; flex-shrink: 0; }
             .mb-burger span { display: block; width: 18px; height: 2px; background: var(--text-color); transition: 0.2s; }
             .mb-burger:active { background: var(--light-gray); }
-            .mb-title { display: block; font-family: var(--font-mono); font-weight: 800; font-size: 15px; letter-spacing: -0.3px; }
+            .mb-title { display: block; font-family: var(--font-mono); font-weight: 800; font-size: 14px; letter-spacing: 0.5px; }
             .mb-act:active { background: var(--accent-soft); border-color: var(--accent-color); }
 
             /* Nền mờ sau menu */
@@ -307,8 +309,9 @@
 
         /* ===== ONBOARDING: Upload Card Instructions ===== */
         .upload-card { position:relative; }
-        .upload-help-btn { position:absolute; top:6px; right:6px; width:22px; height:22px; background:var(--surface); color:var(--text-soft); border:1px solid var(--line); font-family:var(--font-mono); font-size:12px; font-weight:bold; cursor:pointer; z-index:2; display:flex; align-items:center; justify-content:center; transition:0.15s; }
-        .upload-help-btn:hover { background:var(--accent-color); color:#fff; border-color:var(--accent-color); }
+        /* Nút hỏi: để to và nền xanh nhạt cho người lớn tuổi dễ thấy, dễ bấm trúng */
+        .upload-help-btn { position:absolute; top:7px; right:7px; width:34px; height:34px; background:#dff0f7; color:var(--accent-hover); border:1px solid var(--accent-color); font-family:var(--font-mono); font-size:19px; font-weight:bold; line-height:1; cursor:pointer; z-index:2; display:flex; align-items:center; justify-content:center; transition:0.15s; padding:0; }
+        .upload-help-btn:hover, .upload-help-btn:active { background:var(--accent-color); color:#fff; }
         /* Cửa sổ hướng dẫn — chiếm cả màn hình, đóng lại là về ngay chỗ tải ảnh */
         .hd-modal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(20,23,26,0.55); backdrop-filter:blur(4px); z-index:999995; justify-content:center; align-items:center; padding:14px; box-sizing:border-box; }
         .hd-modal.show { display:flex; }
@@ -445,8 +448,9 @@
         <button class="mb-burger" type="button" onclick="moMenu()" aria-label="Mở menu" aria-controls="sidebar" aria-expanded="false" id="btn-burger">
             <span></span><span></span><span></span>
         </button>
-        <span class="mb-title">Dương Trần</span>
+        <span class="mb-title">DƯƠNG TRẦN</span>
         <span class="mb-grow"></span>
+        <button class="mb-act them" type="button" onclick="chuyenManHinh('step1')" aria-label="Thêm hồ sơ mới" title="Thêm hồ sơ mới"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><line x1="12" y1="5.2" x2="12" y2="18.8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="5.2" y1="12" x2="18.8" y2="12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
         <button class="mb-act" type="button" onclick="moWelcome()" aria-label="Hướng dẫn nộp hồ sơ" title="Hướng dẫn nộp hồ sơ"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="7.7" r="1.25" fill="currentColor"/><line x1="12" y1="11" x2="12" y2="17.2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>
         <button class="mb-act" type="button" onclick="chuyenManHinh('box-tracuu')" aria-label="Tra cứu hồ sơ đã nộp" title="Tra cứu hồ sơ đã nộp"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" focusable="false"><rect x="3.4" y="3" width="11" height="15" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="6.3" y1="7.4" x2="11.5" y2="7.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="6.3" y1="10.4" x2="11.5" y2="10.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="15.6" cy="14.6" r="4.3" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="18.7" y1="17.7" x2="21.2" y2="20.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
         <a class="mb-act dt" href="tel:0902077049" aria-label="Gọi giáo viên 0902 077 049" title="Gọi giáo viên — 0902 077 049"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" focusable="false"><rect x="6.2" y="2.4" width="11.6" height="19.2" rx="2.6" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="10.2" y1="5.6" x2="13.8" y2="5.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="18.4" r="1.15" fill="currentColor"/></svg></a>
