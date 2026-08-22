@@ -51,12 +51,12 @@
 
         /* ===== HERO / THANH ĐẦU TRANG (kiểu getcroc) ===== */
         .page-hero { max-width: 880px; margin: 0 auto 18px; }
-        .hero-strip { display: flex; align-items: center; gap: 14px; border: 1px solid var(--border-color); background: var(--surface); padding: 11px 14px; font-size: 13px; }
-        .hero-strip .hero-ico { width: 26px; height: 26px; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; }
-        .hero-strip .hero-txt { flex: 1; min-width: 0; line-height: 1.5; }
-        .hero-strip b { font-weight: bold; }
-        .hero-cta { background: var(--text-color); color: #fff; border: 1px solid var(--border-color); padding: 9px 15px; font-family: var(--font-mono); font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; text-decoration: none; transition: 0.15s; }
-        .hero-cta:hover { background: var(--accent-color); border-color: var(--accent-color); }
+        .hero-strip { border: 1px solid var(--border-color); background: var(--surface); }
+        /* Ảnh bìa: cắt bớt phần trời phía trên, giữ khu vực có logo ở dưới.
+           Đổi max-height nếu muốn ảnh cao/thấp hơn. Thiếu file ảnh thì tự ẩn. */
+        .hero-bia { display: block; width: 100%; height: auto; max-height: 170px; object-fit: cover; object-position: center bottom; }
+        .hero-cta { display: block; width: 100%; box-sizing: border-box; background: var(--accent-color); color: #fff; border: none; border-top: 1px solid var(--border-color); padding: 13px 15px; font-family: var(--font-mono); font-size: 15px; font-weight: bold; letter-spacing: 1px; text-align: center; text-decoration: none; cursor: pointer; transition: 0.15s; }
+        .hero-cta:hover { background: var(--accent-hover); }
 
         /* ===== TIÊU ĐỀ ===== */
         h2.title-main { font-family: var(--font-mono); font-size: 26px; font-weight: 800; margin: 0 0 22px; border-bottom: 1px solid var(--line); padding-bottom: 14px; letter-spacing: -0.8px; line-height: 1.2; }
@@ -71,6 +71,17 @@
         .form-control::placeholder { color: #a3a8ad; }
         select.form-control { -webkit-appearance: none; appearance: none; cursor: pointer; padding-right: 34px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%236b7280' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 13px; }
         textarea.form-control { resize: vertical; min-height: 76px; }
+
+        /* ===== MÔ TẢ HẠNG GPLX (hiện sau khi chọn hạng) ===== */
+        .hang-info { display: none; border: 1px solid var(--line); border-left: 3px solid var(--accent-color); background: #fbfbf9; padding: 12px 14px; margin: -6px 0 18px; font-size: 13px; line-height: 1.6; }
+        .hang-info.show { display: block; }
+        .hang-info .hi-top { display: flex; align-items: center; gap: 9px; margin-bottom: 7px; flex-wrap: wrap; }
+        .hang-info .hi-badge { background: var(--accent-color); color: #fff; font-weight: bold; font-size: 13px; letter-spacing: 1px; padding: 3px 10px; }
+        .hang-info .hi-ten { font-weight: bold; font-size: 12px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 1px; }
+        .hang-info ul { margin: 0; padding-left: 18px; }
+        .hang-info li { margin-bottom: 4px; }
+        .hang-info .hi-luat { font-size: 11px; color: var(--text-soft); font-style: italic; margin-top: 8px; border-top: 1px dashed #d8d8d0; padding-top: 7px; }
+        .hang-info .hi-canh { color: var(--warn); font-weight: bold; }
 
         /* ===== BẢNG LỊCH HỌC ===== */
         .table-responsive { overflow-x: auto; margin-bottom: 10px; border: 1px solid var(--line); background: var(--surface); }
@@ -248,8 +259,8 @@
             .main-wrapper { margin-left: 0; width: 100%; padding: 68px 12px 40px; }
             .container-main { padding: 20px 15px 26px; }
             .upload-grid { grid-template-columns: 1fr; }
-            .hero-strip { flex-wrap: wrap; }
-            .hero-cta { width: 100%; text-align: center; }
+            .hero-bia { max-height: 120px; }
+            .hero-cta { font-size: 14px; padding: 12px; }
             h2.title-main { font-size: 21px; }
 
             /* Ô nhập PHẢI ≥16px: nhỏ hơn là iOS tự phóng to trang khi bấm vào ô,
@@ -459,7 +470,7 @@
         <div class="nav-item" id="nav-tracuu" onclick="chuyenManHinh('box-tracuu')">Tra Cứu Dữ Liệu</div>
         <div class="nav-group-title" style="margin-top: 26px;">Hỗ Trợ</div>
         <div class="nav-item" onclick="moWelcome()">Hướng Dẫn 4 Bước</div>
-        <div class="nav-item" onclick="location.href='tel:0902077049'">Gọi Giáo Viên — 0902.077.049</div>
+        <div class="nav-item" onclick="location.href='tel:0902077049'">Gọi Giáo Viên — 0902 077 049</div>
     </div>
 
     <div class="main-wrapper">
@@ -467,9 +478,9 @@
         <!-- ===== HERO / THANH ĐẦU TRANG ===== -->
         <div class="page-hero">
             <div class="hero-strip">
-                <span class="hero-ico">✓</span>
-                <span class="hero-txt"><b>Nộp hồ sơ trực tuyến — không cần đến trung tâm.</b> Chỉ cần ảnh chụp VNeID, hệ thống tự đọc thông tin giúp bạn.</span>
-                <a class="hero-cta" href="tel:0902077049">Hotline 0902.077.049</a>
+                <img class="hero-bia" src="anh_bia.jpg" alt="Trung tâm Giáo dục nghề nghiệp lái xe Nam Triệu"
+                     onerror="this.style.display='none'">
+                <a class="hero-cta" href="tel:0902077049">Hotline 0902 077 049</a>
             </div>
         </div>
 
@@ -512,7 +523,6 @@
             </div>
 
             <h2 class="title-main">Bước 1 — Thông Tin Cá Nhân</h2>
-            <div class="note">Receiver: <b>Dương Trần</b><br>Chọn hạng đào tạo và tải lên <b>2 ảnh VNeID</b>. AI sẽ tự động đọc thông tin cá nhân của bạn.</div>
 
             <div class="section-title">I. Thông Tin Bắt Buộc</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
@@ -524,6 +534,9 @@
                 </div>
             </div>
 
+            <!-- Mô tả hạng vừa chọn — điền bằng JS, xem MO_TA_HANG -->
+            <div class="hang-info" id="mo_ta_hang"></div>
+
             <!-- Ô thâm niên — chỉ hiện khi chọn hạng nâng hạng -->
             <div id="box_tham_nien" style="display:none;" class="form-group">
                 <label>⭐ Số năm lái xe an toàn (*):</label>
@@ -533,10 +546,7 @@
             </div>
 
             <div class="section-title">II. Nguồn Giới Thiệu (Tùy chọn)</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div class="form-group"><label>Họ Tên Người GT:</label><input type="text" id="nguoi_gt_nop" class="form-control" placeholder="Để trống nếu không có"></div>
-                <div class="form-group"><label>SĐT (Zalo) Người GT:</label><input type="tel" id="sdt_gt_nop" class="form-control" placeholder="Để trống nếu không có"></div>
-            </div>
+            <div class="form-group"><label>Họ tên người giới thiệu:</label><input type="text" id="nguoi_gt_nop" class="form-control" placeholder="Để trống nếu không có"></div>
 
             <div class="section-title">III. Tải Ảnh VNeID (Bắt Buộc)</div>
             <div class="note">
@@ -1156,11 +1166,80 @@
         // Hạng yêu cầu PHẢI có bằng ô tô (lực ép tick "Có bằng ô tô")
         const HANG_BUOC_CO_OTO = ["Cm", "D1", "D2", "Dm", "CE"];
 
+        // ===== MÔ TẢ HẠNG GPLX =====
+        // Nội dung theo Điều 57 Luật Trật tự, an toàn giao thông đường bộ 2024
+        // (hiệu lực 01/01/2025) — chính là phần ghi ở mặt sau giấy phép lái xe.
+        // Khoá là MÃ NỘI BỘ của trung tâm; 'ten' là tên hạng theo luật.
+        const MO_TA_HANG = {
+            'A1m': { ten: 'Hạng A1', y: [
+                'Xe mô tô hai bánh có dung tích xi-lanh đến <b>125 cm³</b>',
+                'Hoặc xe mô tô hai bánh dùng động cơ điện công suất đến <b>11 kW</b>'] },
+            'Am': { ten: 'Hạng A', y: [
+                'Xe mô tô hai bánh có dung tích xi-lanh <b>trên 125 cm³</b> hoặc động cơ điện công suất <b>trên 11 kW</b>',
+                'Và các loại xe của hạng A1'] },
+            'B.01': { ten: 'Hạng B — xe số tự động', y: [
+                'Ô tô <b>số tự động</b> chở người đến <b>8 chỗ</b> (không kể chỗ người lái)',
+                'Ô tô tải, ô tô chuyên dùng <b>số tự động</b> khối lượng đến <b>3.500 kg</b>',
+                'Các loại xe trên kéo rơ moóc có khối lượng đến 750 kg'],
+                canh: 'Bằng này KHÔNG được lái xe số sàn (số cơ khí).' },
+            'B': { ten: 'Hạng B', y: [
+                'Ô tô chở người đến <b>8 chỗ</b> (không kể chỗ người lái)',
+                'Ô tô tải, ô tô chuyên dùng khối lượng đến <b>3.500 kg</b>',
+                'Các loại xe trên kéo rơ moóc có khối lượng đến 750 kg',
+                'Lái được <b>cả số sàn và số tự động</b>'] },
+            'C1': { ten: 'Hạng C1', y: [
+                'Ô tô tải, ô tô chuyên dùng khối lượng <b>trên 3.500 kg đến 7.500 kg</b>',
+                'Các loại xe của hạng B',
+                'Các loại xe trên kéo rơ moóc có khối lượng đến 750 kg'] },
+            'Cm': { ten: 'Hạng C', y: [
+                'Ô tô tải, ô tô chuyên dùng khối lượng <b>trên 7.500 kg</b>',
+                'Các loại xe của hạng B và C1',
+                'Các loại xe trên kéo rơ moóc có khối lượng đến 750 kg'] },
+            'D1': { ten: 'Hạng D1', y: [
+                'Ô tô chở người <b>trên 8 chỗ đến 16 chỗ</b> (không kể chỗ người lái)',
+                'Các loại xe của hạng B, C1 và C',
+                'Các loại xe trên kéo rơ moóc có khối lượng đến 750 kg'] },
+            'D2': { ten: 'Hạng D2', y: [
+                'Ô tô chở người <b>trên 16 chỗ đến 29 chỗ</b> (không kể chỗ người lái)',
+                'Các loại xe của hạng B, C1, C và D1',
+                'Các loại xe trên kéo rơ moóc có khối lượng đến 750 kg'] },
+            'Dm': { ten: 'Hạng D', y: [
+                'Ô tô chở người <b>trên 29 chỗ</b> (không kể chỗ người lái)',
+                'Ô tô chở người <b>giường nằm</b>',
+                'Các loại xe của hạng B, C1, C, D1 và D2',
+                'Các loại xe trên kéo rơ moóc có khối lượng đến 750 kg'] },
+            'CE': { ten: 'Hạng CE', y: [
+                'Các loại xe của hạng C kéo rơ moóc có khối lượng <b>trên 750 kg</b>',
+                'Ô tô đầu kéo kéo sơ mi rơ moóc'] }
+        };
+
+        function hienMoTaHang(hang) {
+            const box = document.getElementById('mo_ta_hang');
+            if (!box) return;
+            const m = MO_TA_HANG[hang];
+            if (!m) { box.classList.remove('show'); box.innerHTML = ''; return; }
+            box.innerHTML =
+                '<div class="hi-top"><span class="hi-badge">' + hang + '</span>'
+                + '<span class="hi-ten">' + m.ten + ' — được điều khiển</span></div>'
+                + '<ul>' + m.y.map(x => '<li>' + x + '</li>').join('') + '</ul>'
+                + (m.canh ? '<div class="hi-luat hi-canh">⚠ ' + m.canh + '</div>' : '')
+                + '<div class="hi-luat">Theo Điều 57 Luật Trật tự, an toàn giao thông đường bộ 2024 '
+                + '(hiệu lực 01/01/2025) — cũng là nội dung ghi ở mặt sau giấy phép lái xe.</div>';
+            box.classList.add('show');
+        }
+
         document.getElementById('hang_dk').addEventListener('change', function() {
             const hang = this.value;
             const box = document.getElementById('box_tham_nien');
             box.style.display = HANG_NANG_HANG.includes(hang) ? 'block' : 'none';
             document.getElementById('nam_lai_xe_nop').required = HANG_NANG_HANG.includes(hang);
+            hienMoTaHang(hang);
+        });
+        // Tải lại trang, trình duyệt hay giữ nguyên lựa chọn cũ trong ô chọn
+        // → hiện luôn mô tả cho khớp, đừng để ô mô tả trống trong khi đã chọn hạng.
+        window.addEventListener('DOMContentLoaded', function() {
+            const el = document.getElementById('hang_dk');
+            if (el && el.value) hienMoTaHang(el.value);
         });
 
         // ===== PAGE 2: GPLX checkbox + upload toggling =====
@@ -1331,7 +1410,9 @@
                     client_token: getClientToken(),   // BẢO MẬT: khoá quyền đọc/sửa theo phiên
                     trang_thai: 'CHO_OCR_VNEID',
                     nguoi_gioi_thieu:     document.getElementById('nguoi_gt_nop').value.trim() || null,
-                    sdt_nguoi_gioi_thieu: document.getElementById('sdt_gt_nop').value.trim()  || null,
+                    // Đã bỏ ô "SĐT (Zalo) người giới thiệu" khỏi form cho gọn màn hình.
+                    // Cột trong CSDL vẫn còn để không phá dữ liệu cũ — nay luôn để trống.
+                    sdt_nguoi_gioi_thieu: null,
                     nam_lai_xe:           document.getElementById('nam_lai_xe_nop').value     || null,
                     agent_username:       _agentUsername || null,
                 }).select();
