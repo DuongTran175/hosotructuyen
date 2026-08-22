@@ -122,62 +122,102 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* ============================================================
-           HOẠT ẢNH HƯỚNG DẪN CHỤP ẢNH
-           Mô phỏng màn hình điện thoại, chạy lặp 3 cảnh × 3 giây.
-           Thuần CSS — không tải video, chạy được cả khi mất mạng.
+           HOAT ANH HUONG DAN CHUP ANH
+           Mo phong dung cac buoc trong app VNeID (dung theo video that).
+           Thuan CSS - khong tai video, chay duoc ca khi mat mang.
+           So canh thay doi theo tung huong dan: 3, 4 hoac 5 canh,
+           moi canh 3 giay (JS gan animation vao tung canh).
            ============================================================ */
         .dp { display:flex; gap:16px; align-items:flex-start; margin-top:12px; flex-wrap:wrap; }
-        .dp-phone { position:relative; width:148px; height:268px; border:2px solid var(--text-color); border-radius:16px; background:#fff; flex-shrink:0; overflow:hidden; }
+        .dp-phone { position:relative; width:150px; height:290px; border:2px solid var(--text-color); border-radius:16px; background:#fff; flex-shrink:0; overflow:hidden; }
         .dp-notch { position:absolute; top:0; left:50%; margin-left:-26px; width:52px; height:11px; background:var(--text-color); border-radius:0 0 7px 7px; z-index:6; }
         .dp-screen { position:absolute; top:0; right:0; bottom:0; left:0; overflow:hidden; background:#fbfbf9; }
-        .dp-scene { position:absolute; top:0; right:0; bottom:0; left:0; opacity:0; animation:dp-cycle 9s infinite; }
-        .dp-s1 { animation-delay:0s; } .dp-s2 { animation-delay:3s; } .dp-s3 { animation-delay:6s; }
-        @keyframes dp-cycle { 0%{opacity:0} 3%{opacity:1} 30%{opacity:1} 33%{opacity:0} 100%{opacity:0} }
+        .dp-scene { position:absolute; top:0; right:0; bottom:0; left:0; opacity:0; }
+        @keyframes dp-c3 { 0%{opacity:0} 1%{opacity:1} 31%{opacity:1} 33.4%{opacity:0} 100%{opacity:0} }
+        @keyframes dp-c4 { 0%{opacity:0} 0.8%{opacity:1} 23%{opacity:1} 25%{opacity:0} 100%{opacity:0} }
+        @keyframes dp-c5 { 0%{opacity:0} 0.6%{opacity:1} 18.4%{opacity:1} 20%{opacity:0} 100%{opacity:0} }
 
-        .dp-appbar { background:var(--accent-color); color:#fff; font-size:8px; letter-spacing:1.5px; font-weight:bold; text-align:center; padding:17px 6px 6px; }
+        /* Thanh tieu de trong man hinh gia lap */
+        .dp-appbar { font-size:8px; letter-spacing:1px; font-weight:bold; text-align:center; padding:17px 6px 6px; background:var(--accent-color); color:#fff; }
+        .dp-appbar.do { background:#c8102e; }
+        .dp-appbar.trang { background:#fff; color:var(--text-color); border-bottom:1px solid var(--line); text-align:left; padding-left:8px; letter-spacing:0; font-size:7.5px; }
         .dp-appbar.dark { background:var(--text-color); }
-        .dp-body { padding:9px; }
-        .dp-line { height:5px; background:#e4e4de; border-radius:2px; margin-bottom:6px; }
+        .dp-body { padding:8px; }
+
+        /* Trang chu VNeID */
+        .dp-vn-user { display:flex; align-items:center; gap:5px; padding:0 8px 7px; background:#c8102e; }
+        .dp-vn-ava { width:17px; height:17px; border-radius:50%; background:#f0d9c8; flex-shrink:0; }
+        .dp-vn-name { font-size:7.5px; color:#fff; font-weight:bold; }
+        .dp-qr { display:flex; gap:5px; padding:0 8px 8px; background:#c8102e; }
+        .dp-qr > div { flex:1; background:#f7efe2; border:1px solid #e8d9bd; font-size:6.5px; color:#8a2b1f; padding:4px 3px; text-align:center; line-height:1.3; }
+        .dp-grid4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:4px; margin-top:6px; }
+        .dp-grid4 > div { height:22px; background:#f2eee6; border:1px solid #e6e0d3; }
+
+        /* The can cuoc gia lap */
+        .dp-idcard { border:1px solid #dfcda6; background:#f8f1e4; padding:5px; display:flex; gap:5px; align-items:flex-start; }
+        .dp-idcard .dp-face { width:23px; height:29px; background:#cfd7dc; border:1px solid #b7c1c7; flex-shrink:0; }
+        .dp-idtitle { font-size:6.5px; color:#c8102e; font-weight:bold; letter-spacing:0.5px; margin-bottom:2px; }
+        .dp-idtxt { font-size:7px; line-height:1.55; color:#3c4248; }
+        .dp-idcard.mo .dp-idtxt { color:#9aa0a6; }
+
+        /* Nut / dong thong tin / lien ket do */
         .dp-btn { position:relative; border:1px solid var(--accent-color); color:var(--accent-hover); background:var(--accent-soft); font-size:8.5px; font-weight:bold; text-align:center; padding:7px 4px; margin-top:8px; }
+        .dp-btn.vien { border:1px solid #cfcfc7; background:#fff; color:#3c4248; font-weight:normal; }
         .dp-btn.mo { opacity:0.4; }
-        .dp-card { border:1px solid var(--text-color); background:#fff; padding:6px; display:flex; gap:6px; align-items:flex-start; }
-        .dp-face { width:26px; height:33px; background:#d9dfe2; border:1px solid #bcc5ca; flex-shrink:0; }
-        .dp-txt { font-size:8px; line-height:1.6; color:#3c4248; word-break:break-word; }
+        .dp-row { position:relative; display:flex; justify-content:space-between; gap:6px; font-size:7px; line-height:1.5; color:#3c4248; padding:4px 0; border-bottom:1px solid #eceae2; }
+        .dp-row b { color:#14171a; }
+        .dp-link { position:relative; font-size:7.5px; color:#c8102e; padding:6px 0 6px 10px; border-bottom:1px solid #eceae2; }
+        .dp-link::before { content:'\003E'; position:absolute; left:0; font-weight:bold; }
+        .dp-line { height:5px; background:#e4e4de; border-radius:2px; margin-bottom:6px; }
+        .dp-hl { border:1px solid var(--warn); background:#fff8e1; padding:4px 5px; margin-top:5px; font-size:7px; line-height:1.5; }
         .dp-tag { display:inline-block; font-size:7px; letter-spacing:0.5px; font-weight:bold; background:var(--accent-color); color:#fff; padding:2px 5px; margin-bottom:6px; }
         .dp-tag.warn { background:var(--warn); }
-        .dp-hl { border:1px solid var(--warn); background:#fff8e1; padding:4px 5px; margin-top:6px; font-size:8px; line-height:1.5; }
         .dp-ok { font-size:9px; color:var(--ok); font-weight:bold; text-align:center; margin-top:12px; line-height:1.5; }
         .dp-shot { border:1px solid var(--ok); background:#f1f8f2; height:52px; margin-top:8px; display:flex; align-items:center; justify-content:center; font-size:8px; color:var(--ok); font-weight:bold; }
         .dp-shots { display:flex; gap:6px; margin-top:8px; }
         .dp-shots > div { flex:1; }
-        /* Khung ngắm khi chụp giấy tờ */
+
+        /* Man nhap passcode */
+        .dp-pass { position:absolute; left:0; right:0; bottom:0; background:#fff; border-top:1px solid var(--line); padding:8px; }
+        .dp-pass-t { font-size:7.5px; font-weight:bold; margin-bottom:6px; }
+        .dp-dots { display:flex; gap:6px; justify-content:center; margin-bottom:8px; }
+        .dp-dots i { width:9px; height:9px; border-radius:50%; background:#e4e4de; display:block; }
+        .dp-dots i.on { background:#f0b429; }
+        .dp-keys { display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; }
+        .dp-keys > span { background:#f2f2ee; border:1px solid #e4e4de; height:15px; }
+
+        /* Thanh tab duoi day */
+        .dp-tabbar { position:absolute; left:0; right:0; bottom:0; height:22px; background:#fff; border-top:1px solid var(--line); display:flex; align-items:center; }
+        .dp-tabbar > span { flex:1; text-align:center; font-size:5.5px; color:#a3a8ad; }
+        .dp-tabbar > span.on { color:#c8102e; font-weight:bold; }
+
+        /* Khung ngam khi chup giay to */
         .dp-view { position:absolute; top:34px; right:9px; bottom:9px; left:9px; border:1px dashed var(--accent-color); display:flex; align-items:center; justify-content:center; }
         .dp-gplx { width:100px; border:1px solid var(--text-color); background:#fff; padding:5px; }
+        .dp-cap { font-size:7px; text-align:center; margin-top:4px; letter-spacing:1px; color:#3c4248; }
 
-        /* Ngón tay chạm / vuốt */
-        .dp-finger { position:absolute; right:5px; top:50%; margin-top:-11px; width:22px; height:22px; border-radius:50%; background:rgba(7,129,167,0.22); border:2px solid var(--accent-color); animation:dp-tap 9s infinite; }
-        @keyframes dp-tap { 0%,5%{transform:scale(0.5);opacity:0} 11%{transform:scale(1);opacity:1} 19%{transform:scale(0.72);opacity:1} 28%{opacity:1} 32%,100%{transform:scale(0.72);opacity:0} }
-        .dp-swipe { position:absolute; left:50%; bottom:26px; margin-left:-11px; width:22px; height:22px; border-radius:50%; background:rgba(7,129,167,0.22); border:2px solid var(--accent-color); animation:dp-swipe 9s infinite; }
-        .dp-s2 .dp-swipe, .dp-s2 .dp-finger { animation-delay:3s; }
-        .dp-s3 .dp-swipe, .dp-s3 .dp-finger { animation-delay:6s; }
-        @keyframes dp-swipe { 0%,4%{opacity:0;transform:translateY(0)} 9%{opacity:1;transform:translateY(0)} 24%{opacity:1;transform:translateY(-58px)} 30%,100%{opacity:0;transform:translateY(-58px)} }
-        .dp-flash { position:absolute; top:0; right:0; bottom:0; left:0; background:#fff; opacity:0; z-index:5; pointer-events:none; animation:dp-flash 9s infinite; }
-        @keyframes dp-flash { 0%,66%{opacity:0} 68%{opacity:0.92} 75%{opacity:0} 100%{opacity:0} }
+        /* Ngon tay cham / vuot - lap moi 3 giay, khop nhip doi canh */
+        .dp-finger { position:absolute; right:5px; top:50%; margin-top:-11px; width:22px; height:22px; border-radius:50%; background:rgba(7,129,167,0.22); border:2px solid var(--accent-color); animation:dp-tap 3s infinite; }
+        .dp-finger.giua { left:50%; right:auto; margin-left:-11px; }
+        @keyframes dp-tap { 0%{transform:scale(0.5);opacity:0} 12%{transform:scale(1);opacity:1} 30%{transform:scale(0.78);opacity:1} 92%{opacity:1} 100%{transform:scale(0.78);opacity:0} }
+        .dp-swipe { position:absolute; left:50%; bottom:26px; margin-left:-11px; width:22px; height:22px; border-radius:50%; background:rgba(7,129,167,0.22); border:2px solid var(--accent-color); animation:dp-swipe 3s infinite; }
+        @keyframes dp-swipe { 0%{opacity:0;transform:translateY(0)} 10%{opacity:1;transform:translateY(0)} 55%{opacity:1;transform:translateY(-58px)} 72%,100%{opacity:0;transform:translateY(-58px)} }
+        .dp-flash { position:absolute; top:0; right:0; bottom:0; left:0; background:#fff; opacity:0; z-index:5; pointer-events:none; animation:dp-flash 3s infinite; }
+        @keyframes dp-flash { 0%{opacity:0} 5%{opacity:0.9} 18%{opacity:0} 100%{opacity:0} }
 
-        /* Danh sách bước — bước đang diễn ra sẽ sáng lên theo hoạt ảnh */
-        .dp-steps { list-style:none; margin:0; padding:0; flex:1; min-width:170px; font-size:11.5px; line-height:1.55; }
-        .dp-steps li { position:relative; padding-left:23px; margin-bottom:9px; color:#9aa0a6; animation:dp-hl 9s infinite; }
+        /* Danh sach buoc - buoc dang dien ra sang len theo hoat anh */
+        .dp-steps { list-style:none; margin:0; padding:0; flex:1; min-width:180px; font-size:11.5px; line-height:1.55; }
+        .dp-steps li { position:relative; padding-left:23px; margin-bottom:8px; color:#9aa0a6; }
         .dp-steps li b { position:absolute; left:0; top:1px; width:15px; height:15px; border:1px solid currentColor; font-size:9px; display:flex; align-items:center; justify-content:center; font-weight:bold; }
-        .dp-steps li:nth-child(1) { animation-delay:0s; }
-        .dp-steps li:nth-child(2) { animation-delay:3s; }
-        .dp-steps li:nth-child(3) { animation-delay:6s; }
-        @keyframes dp-hl { 0%,3%{color:#9aa0a6} 6%,29%{color:var(--accent-hover)} 33%,100%{color:#9aa0a6} }
+        @keyframes dp-h3 { 0%{color:#9aa0a6} 2%,30%{color:#066989} 34%,100%{color:#9aa0a6} }
+        @keyframes dp-h4 { 0%{color:#9aa0a6} 1.5%,23%{color:#066989} 26%,100%{color:#9aa0a6} }
+        @keyframes dp-h5 { 0%{color:#9aa0a6} 1%,18%{color:#066989} 21%,100%{color:#9aa0a6} }
         .dp-note { flex-basis:100%; font-size:11px; color:var(--text-soft); border-top:1px dashed #cfcfc7; padding-top:8px; margin-top:2px; line-height:1.55; }
 
-        /* Máy đặt chế độ "giảm chuyển động" → dừng hoạt ảnh, giữ 1 cảnh tĩnh */
+        /* May dat che do "giam chuyen dong" -> dung hoat anh, giu 1 canh tinh */
         @media (prefers-reduced-motion: reduce) {
             .dp-scene, .dp-finger, .dp-swipe, .dp-flash, .dp-steps li { animation: none !important; }
-            .dp-scene { opacity:0; } .dp-s2 { opacity:1; }
+            .dp-scene { opacity:0; } .dp-scene.chot { opacity:1; }
             .dp-steps li { color: var(--text-soft); }
         }
 
@@ -354,7 +394,7 @@
                     <div class="welcome-step-num">1</div>
                     <div class="welcome-step-content">
                         <h4>Chuẩn bị ảnh giấy tờ</h4>
-                        <p>Chụp màn hình <b>VNeID</b> (ứng dụng định danh điện tử) hoặc chụp ảnh <b>CCCD</b> hai mặt. Nếu đã có bằng lái cũ, chụp thêm ảnh <b>GPLX</b>.</p>
+                        <p>Chụp <b>2 ảnh màn hình "Căn cước điện tử"</b> trong app <b>VNeID</b>. Nếu đã có bằng lái cũ, chụp thêm ảnh <b>GPLX</b> hai mặt.</p>
                     </div>
                 </div>
                 <div class="welcome-step">
@@ -380,7 +420,7 @@
                 </div>
 
                 <div style="background:var(--accent-soft);padding:14px;margin:10px 0 16px;border:1px solid var(--line);border-left:3px solid var(--accent-color);font-size:12px;line-height:1.6;">
-                    <b>VNeID là gì?</b> Là ứng dụng định danh điện tử quốc gia. Tải miễn phí trên App Store / Google Play. Đăng nhập bằng số CCCD → vào mục <b>"Thông tin công dân"</b> → chụp màn hình trang thông tin cá nhân.
+                    <b>Lấy ảnh ở đâu?</b> Mở app <b>VNeID</b> (tải miễn phí trên App Store / Google Play) → tab <b>"Ví giấy tờ"</b> → <b>"Xem thông tin chi tiết"</b> → nhập passcode → bấm mục <b>"Căn cước điện tử"</b>. Chụp màn hình ở đó. Trong app có nút <b>"?"</b> chiếu hoạt ảnh từng bước.
                 </div>
 
                 <button class="welcome-btn" onclick="dongWelcome()">BẮT ĐẦU ĐĂNG KÝ</button>
@@ -501,40 +541,31 @@
 
             <div class="section-title">III. Tải Ảnh VNeID (Bắt Buộc)</div>
             <div class="note">
-                <b>Cần 2 ảnh từ VNeID:</b><br>
-                • <b>Ảnh 1 — Trang chính:</b> Có hiển thị thẻ CCCD ảo (số CCCD, họ tên, ảnh chân dung).<br>
-                • <b>Ảnh 2 — Trang phụ:</b> Cuộn xuống — có ngày cấp CCCD, số điện thoại, số CMT cũ (nếu có).
+                <b>Cần 2 ảnh chụp màn hình <u>"Căn cước điện tử"</u> trong app VNeID:</b><br>
+                • <b>Ảnh 1 — phần trên:</b> ảnh chân dung, số định danh, họ tên, ngày sinh.<br>
+                • <b>Ảnh 2 — cuộn xuống:</b> ngày cấp, số CMND 9 số (nếu có) và số thuê bao di động.<br>
+                Bấm nút <b>?</b> ở góc mỗi ô để xem hoạt ảnh chỉ từng bước.
             </div>
             <div class="upload-grid">
                 <div class="upload-card" id="card_vneid_main">
                     <button class="upload-help-btn" onclick="event.stopPropagation();toggleHelp('help_vneid_main')" title="Hướng dẫn">?</button>
-                    <div class="title">[+] VNeID — Ảnh chính</div>
-                    <div class="subtitle">Trang có CCCD ảo</div>
+                    <div class="title">[+] Căn cước điện tử — phần trên</div>
+                    <div class="subtitle">Ảnh, số định danh, họ tên</div>
                     <input type="file" id="files_vneid_main" accept="image/*">
                     <div id="status_files_vneid_main" class="file-status"></div>
                     <div class="upload-instruction" id="help_vneid_main">
-                        <b>📱 Ảnh chính VNeID:</b>
-                        <ol>
-                            <li>Mở app <b>VNeID</b> → đăng nhập</li>
-                            <li>Vào <b>"Căn cước điện tử"</b> hoặc <b>"Thông tin công dân"</b></li>
-                            <li>Chụp màn hình trang <b>có hiển thị thẻ CCCD ảo</b> (số CCCD, họ tên, ảnh)</li>
-                        </ol>
+                        <b>Đường đi trong app VNeID:</b>
                         <div class="dp" data-demo="vneid_main"></div>
                     </div>
                 </div>
                 <div class="upload-card" id="card_vneid_sub">
                     <button class="upload-help-btn" onclick="event.stopPropagation();toggleHelp('help_vneid_sub')" title="Hướng dẫn">?</button>
-                    <div class="title">[+] VNeID — Ảnh phụ</div>
-                    <div class="subtitle">Ngày cấp / SĐT / CMT cũ</div>
+                    <div class="title">[+] Căn cước điện tử — cuộn xuống</div>
+                    <div class="subtitle">Ngày cấp / SĐT / CMND cũ</div>
                     <input type="file" id="files_vneid_sub" accept="image/*">
                     <div id="status_files_vneid_sub" class="file-status"></div>
                     <div class="upload-instruction" id="help_vneid_sub">
-                        <b>📱 Ảnh phụ VNeID:</b>
-                        <ol>
-                            <li>Cùng trang VNeID, <b>cuộn xuống</b></li>
-                            <li>Chụp phần có <b>ngày cấp CCCD</b>, <b>số điện thoại</b>, <b>số CMT cũ</b></li>
-                        </ol>
-                        <div class="tip">💡 Thông tin SĐT và ngày cấp thường nằm ở trang phụ.</div>
+                        <b>Cuộn xuống trong chính màn hình đó:</b>
                         <div class="dp" data-demo="vneid_sub"></div>
                     </div>
                 </div>
@@ -907,78 +938,124 @@
 
         // ============================================================
         // HOẠT ẢNH HƯỚNG DẪN CHỤP ẢNH
-        // Mô phỏng màn hình điện thoại bằng CSS — không tải video,
-        // chỉ dựng khi học viên bấm "?" (đỡ tốn pin khi chưa xem).
+        // Các bước dựng theo ĐÚNG video thao tác thật trên app VNeID:
+        //   Trang chủ → Ví giấy tờ → Xem thông tin chi tiết → nhập passcode
+        //   → Thông tin thẻ Căn cước → mục "Căn cước điện tử" → chụp màn hình.
+        // Chỉ lấy ảnh ở màn "Căn cước điện tử"; KHÔNG dùng ảnh thẻ CCCD.
+        // Thuần CSS, chỉ dựng khi học viên bấm "?" (đỡ tốn pin).
         // ============================================================
         const _L = (w) => `<div class="dp-line" style="width:${w}"></div>`;
 
+        // Màn hình "Căn cước điện tử" — dùng lại ở nhiều cảnh
+        const _MAN_CCDT = (phanDuoi) => `
+            <div class="dp-appbar trang">← Căn cước điện tử</div>
+            <div class="dp-body">
+                <div class="dp-idcard">
+                    <div class="dp-face"></div>
+                    <div>
+                        <div class="dp-idtitle">CĂN CƯỚC ĐIỆN TỬ</div>
+                        <div class="dp-idtxt">001199008xxx<br><b>NGUYỄN VĂN A</b><br>01/01/1990</div>
+                    </div>
+                </div>
+                ${phanDuoi}
+            </div>`;
+
         const DEMO_HD = {
             vneid_main: {
-                buoc: ['Mở app VNeID rồi đăng nhập',
-                       'Bấm "Căn cước điện tử" — thẻ CCCD hiện ra',
-                       'Chụp màn hình: giữ nút Nguồn + Giảm âm lượng'],
-                luuy: 'Ảnh phải đọc rõ: số CCCD, họ và tên, ngày sinh và ảnh chân dung.',
+                buoc: ['Mở VNeID, bấm tab "Ví giấy tờ" ở dưới cùng',
+                       'Bấm "Xem thông tin chi tiết" dưới thẻ căn cước',
+                       'Nhập passcode 6 số',
+                       'Ở trang thông tin thẻ, bấm mục "Căn cước điện tử"',
+                       'Chụp màn hình phần trên: ảnh, số, họ tên, ngày sinh'],
+                luuy: 'Chỉ cần màn hình <b>Căn cước điện tử</b> — không cần chụp thẻ CCCD hay giấy tờ gốc.',
                 canh: [
-                    `<div class="dp-appbar">VNeID</div><div class="dp-body">
-                        ${_L('72%')}${_L('48%')}
-                        <div class="dp-btn">Căn cước điện tử<span class="dp-finger"></span></div>
-                        <div class="dp-btn mo">Ví giấy tờ</div>
-                        <div class="dp-btn mo">Thông báo lưu trú</div></div>`,
-                    `<div class="dp-appbar">CĂN CƯỚC ĐIỆN TỬ</div><div class="dp-body">
-                        <span class="dp-tag">CHỤP TRANG NÀY</span>
-                        <div class="dp-card"><div class="dp-face"></div>
-                            <div class="dp-txt"><b>NGUYỄN VĂN A</b><br>031 234 567 890<br>01/01/1990</div></div>
-                        <div style="margin-top:8px">${_L('88%')}${_L('64%')}</div></div>`,
-                    `<div class="dp-appbar">CĂN CƯỚC ĐIỆN TỬ</div><div class="dp-body">
-                        <div class="dp-shot">ẢNH ĐÃ LƯU</div>
-                        <div class="dp-ok">✓ Ảnh chính<br>đủ thông tin</div></div>`
+                    `<div class="dp-appbar do">VNeID</div>
+                     <div class="dp-vn-user"><div class="dp-vn-ava"></div><div class="dp-vn-name">NGUYỄN VĂN A</div></div>
+                     <div class="dp-qr"><div>Mã QR<br>Thẻ CCCD</div><div>Mã QR<br>Định danh điện tử</div></div>
+                     <div class="dp-body"><div class="dp-idtxt"><b>Nhóm dịch vụ</b></div>
+                        <div class="dp-grid4"><div></div><div></div><div></div><div></div></div>
+                        <div class="dp-grid4"><div></div><div></div><div></div><div></div></div></div>
+                     <div class="dp-tabbar"><span>Trang chủ</span><span>Ví giấy tờ</span><span>Thông báo</span><span>Cài đặt</span>
+                        <span class="dp-finger" style="left:32%;bottom:1px;top:auto;margin-top:0"></span></div>`,
+
+                    `<div class="dp-appbar trang">Ví giấy tờ</div>
+                     <div class="dp-body">
+                        <div class="dp-idcard mo"><div class="dp-face"></div>
+                            <div><div class="dp-idtitle">CĂN CƯỚC ĐIỆN TỬ</div>
+                            <div class="dp-idtxt">0*******855<br>**** ****<br>**/**/****</div></div></div>
+                        <div class="dp-btn vien">Xem thông tin chi tiết<span class="dp-finger"></span></div>
+                        <div style="margin-top:8px">${_L('70%')}${_L('50%')}</div></div>
+                     <div class="dp-tabbar"><span>Trang chủ</span><span class="on">Ví giấy tờ</span><span>Thông báo</span><span>Cài đặt</span></div>`,
+
+                    `<div class="dp-appbar trang">Ví giấy tờ</div>
+                     <div class="dp-body"><div class="dp-idcard mo"><div class="dp-face"></div>
+                        <div><div class="dp-idtitle">CĂN CƯỚC ĐIỆN TỬ</div>
+                        <div class="dp-idtxt">0*******855</div></div></div></div>
+                     <div class="dp-pass"><div class="dp-pass-t">Nhập passcode</div>
+                        <div class="dp-dots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+                        <div class="dp-keys"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>`,
+
+                    `<div class="dp-appbar trang">← Thông tin thẻ Căn cước</div>
+                     <div class="dp-body">
+                        <div class="dp-idcard"><div class="dp-face"></div>
+                            <div><div class="dp-idtitle">CĂN CƯỚC CÔNG DÂN</div>
+                            <div class="dp-idtxt">001199008xxx<br><b>NGUYỄN VĂN A</b></div></div></div>
+                        <div class="dp-row" style="margin-top:6px">Ngày cấp<b>05/07/2021</b></div>
+                        <div class="dp-link">Căn cước điện tử<span class="dp-finger"></span></div>
+                        <div class="dp-link">Lịch sử cấp thẻ CC/CCCD/CMND</div></div>`,
+
+                    _MAN_CCDT(`<div style="margin-top:7px"><span class="dp-tag">CHỤP MÀN HÌNH NÀY</span></div>
+                        <div class="dp-row">Nơi thường trú<b>Hải Phòng</b></div>
+                        <div class="dp-row">Dân tộc<b>Kinh</b></div>
+                        <div class="dp-ok">✓ Ảnh chính</div>`)
                 ]
             },
+
             vneid_sub: {
-                buoc: ['Vẫn ở trang Căn cước điện tử',
-                       'Vuốt xuống tới phần Ngày cấp / Số thuê bao',
+                buoc: ['Vẫn ở màn hình "Căn cước điện tử"',
+                       'Vuốt xuống tới Ngày cấp / Số CMND / Số thuê bao',
                        'Chụp màn hình phần này'],
-                luuy: 'Đây là trang có ngày cấp CCCD, số điện thoại và số CMND cũ — khác với ảnh chính.',
+                luuy: 'Ảnh phụ lấy <b>cùng một màn hình</b> với ảnh chính, chỉ khác là đã cuộn xuống dưới.',
                 canh: [
-                    `<div class="dp-appbar">CĂN CƯỚC ĐIỆN TỬ</div><div class="dp-body">
-                        <div class="dp-card"><div class="dp-face"></div>
-                            <div class="dp-txt"><b>NGUYỄN VĂN A</b><br>031 234 567 890</div></div>
-                        <div style="margin-top:8px">${_L('88%')}${_L('70%')}</div>
-                        <div class="dp-swipe"></div></div>`,
-                    `<div class="dp-appbar">CĂN CƯỚC ĐIỆN TỬ</div><div class="dp-body">
-                        <span class="dp-tag warn">CHỤP PHẦN NÀY</span>
-                        <div class="dp-hl">Ngày cấp: <b>01/01/2022</b></div>
-                        <div class="dp-hl">Số thuê bao di động:<br><b>09xx xxx xxx</b></div>
-                        <div class="dp-hl">Số CMND cũ: <b>031234567</b></div></div>`,
-                    `<div class="dp-appbar">CĂN CƯỚC ĐIỆN TỬ</div><div class="dp-body">
-                        <div class="dp-shot">ẢNH ĐÃ LƯU</div>
-                        <div class="dp-ok">✓ Ảnh phụ<br>đủ ngày cấp + SĐT</div></div>`
+                    _MAN_CCDT(`<div class="dp-row" style="margin-top:6px">Nơi sinh<b>Hải Phòng</b></div>
+                        <div class="dp-row">Quê quán<b>Hải Phòng</b></div>
+                        <div class="dp-row">Dân tộc<b>Kinh</b></div>
+                        <div class="dp-swipe"></div>`),
+
+                    `<div class="dp-appbar trang">← Căn cước điện tử</div>
+                     <div class="dp-body"><span class="dp-tag warn">CHỤP PHẦN NÀY</span>
+                        <div class="dp-hl">Ngày cấp Căn cước công dân<br>gần nhất: <b>05/07/2021</b></div>
+                        <div class="dp-hl">Số chứng minh nhân dân 9 số:<br><b>0317xxxxx</b></div>
+                        <div class="dp-hl">Số thuê bao di động<br>Đăng ký tài khoản định danh:<br><b>09xx xxx xxx</b></div></div>`,
+
+                    `<div class="dp-appbar trang">← Căn cước điện tử</div>
+                     <div class="dp-body"><div class="dp-shot">ẢNH ĐÃ LƯU</div>
+                        <div class="dp-ok">✓ Ảnh phụ<br>đủ ngày cấp + số thuê bao</div></div>`
                 ]
             },
+
             gplx: {
                 buoc: ['Đặt bằng lái trên mặt phẳng, đủ sáng',
                        'Chụp mặt trước, rồi lật chụp mặt sau',
-                       'Tải lên 2 ảnh (bằng ảo có sẵn 2 mặt thì 1 ảnh)'],
+                       'Tải lên 2 ảnh — bằng ảo có sẵn 2 mặt thì 1 ảnh'],
                 luuy: 'Chụp thẳng từ trên xuống, không chéo, không loá đèn, thấy đủ 4 góc thẻ.',
                 canh: [
                     `<div class="dp-appbar dark">MÁY ẢNH</div>
                      <div class="dp-view"><div class="dp-gplx">
-                        <div style="display:flex;gap:5px"><div class="dp-face" style="width:20px;height:25px"></div>
+                        <div style="display:flex;gap:5px"><div class="dp-face" style="width:20px;height:25px;background:#cfd7dc;border:1px solid #b7c1c7"></div>
                         <div style="flex:1">${_L('100%')}${_L('80%')}${_L('60%')}</div></div>
-                        <div style="font-size:7px;text-align:center;margin-top:4px;letter-spacing:1px">MẶT TRƯỚC</div>
-                     </div></div>`,
+                        <div class="dp-cap">MẶT TRƯỚC</div></div></div>`,
                     `<div class="dp-appbar dark">MÁY ẢNH</div>
                      <div class="dp-view"><div class="dp-gplx">
                         ${_L('100%')}${_L('90%')}${_L('70%')}
-                        <div style="font-size:7px;text-align:center;margin-top:4px;letter-spacing:1px">MẶT SAU — HẠNG / NGÀY</div>
-                     </div></div>`,
+                        <div class="dp-cap">MẶT SAU — HẠNG / NGÀY</div></div></div>`,
                     `<div class="dp-appbar dark">MÁY ẢNH</div><div class="dp-body">
-                        <div class="dp-shots">
-                            <div class="dp-shot" style="height:44px">TRƯỚC</div>
-                            <div class="dp-shot" style="height:44px">SAU</div></div>
+                        <div class="dp-shots"><div class="dp-shot" style="height:44px">TRƯỚC</div>
+                        <div class="dp-shot" style="height:44px">SAU</div></div>
                         <div class="dp-ok">✓ Đủ 2 mặt</div></div>`
                 ]
             },
+
             vnetraffic: {
                 buoc: ['Mở app VNeTraffic và đăng nhập',
                        'Ở lại trang chủ — nơi hiện thông tin GPLX',
@@ -990,7 +1067,8 @@
                         <div class="dp-btn">Đăng nhập<span class="dp-finger"></span></div></div>`,
                     `<div class="dp-appbar">VNeTraffic</div><div class="dp-body">
                         <span class="dp-tag">CHỤP TRANG NÀY</span>
-                        <div class="dp-card"><div class="dp-txt"><b>GIẤY PHÉP LÁI XE</b><br>Hạng: <b>B</b><br>Số: 031234567890<br>Trạng thái: Còn hạn</div></div>
+                        <div class="dp-idcard" style="background:#fff;border-color:var(--line)">
+                            <div class="dp-idtxt"><b>GIẤY PHÉP LÁI XE</b><br>Hạng: <b>B</b><br>Số: 031234567890<br>Trạng thái: Còn hạn</div></div>
                         <div style="margin-top:8px">${_L('80%')}</div></div>`,
                     `<div class="dp-appbar">VNeTraffic</div><div class="dp-body">
                         <div class="dp-shot">ẢNH ĐÃ LƯU</div>
@@ -1003,12 +1081,21 @@
             if (!box || box.dataset.dung === '1') return;      // mỗi ô chỉ dựng 1 lần
             const d = DEMO_HD[box.dataset.demo];
             if (!d) return;
-            box.innerHTML =
-                `<div class="dp-phone"><div class="dp-notch"></div><div class="dp-screen">`
-                + d.canh.map((c, i) => `<div class="dp-scene dp-s${i + 1}">${c}</div>`).join('')
-                + `<div class="dp-flash"></div></div></div>`
-                + `<ol class="dp-steps">` + d.buoc.map((b, i) => `<li><b>${i + 1}</b>${b}</li>`).join('') + `</ol>`
-                + (d.luuy ? `<div class="dp-note">💡 ${d.luuy}</div>` : '');
+            const n = d.canh.length;                            // 3, 4 hoặc 5 cảnh
+            const tong = n * 3;                                 // mỗi cảnh 3 giây
+
+            const canh = d.canh.map((c, i) => {
+                const chot = (i === n - 1) ? ' chot' : '';       // cảnh cuối = cảnh giữ lại khi tắt hoạt ảnh
+                const flash = (i === n - 1) ? '<div class="dp-flash"></div>' : '';
+                return `<div class="dp-scene dp-s${i + 1}${chot}" style="animation:dp-c${n} ${tong}s infinite ${i * 3}s">${c}${flash}</div>`;
+            }).join('');
+
+            const buoc = d.buoc.map((b, i) =>
+                `<li style="animation:dp-h${n} ${tong}s infinite ${i * 3}s"><b>${i + 1}</b>${b}</li>`).join('');
+
+            box.innerHTML = `<div class="dp-phone"><div class="dp-notch"></div><div class="dp-screen">${canh}</div></div>`
+                + `<ol class="dp-steps">${buoc}</ol>`
+                + (d.luuy ? `<div class="dp-note">Lưu ý: ${d.luuy}</div>` : '');
             box.dataset.dung = '1';
         }
 
@@ -1209,7 +1296,7 @@
             const f1 = document.getElementById('files_vneid_main').files.length;
             const f2 = document.getElementById('files_vneid_sub').files.length;
             if (f1 === 0 || f2 === 0) {
-                alert("Vui lòng tải đủ 2 ảnh VNeID:\n• Ảnh chính (có CCCD ảo)\n• Ảnh phụ (ngày cấp, SĐT)");
+                alert("Cần đủ 2 ảnh màn hình \"Căn cước điện tử\" trong VNeID:\n• Ảnh 1 — phần trên (ảnh, số định danh, họ tên)\n• Ảnh 2 — cuộn xuống (ngày cấp, số thuê bao)");
                 if (f1 === 0) toggleHelp('help_vneid_main', true);
                 else toggleHelp('help_vneid_sub', true);
                 return;
@@ -2221,15 +2308,15 @@
                                 <div style="font-family:var(--font-mono);font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">VNeID (Căn cước điện tử)</div>
                                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
                                     <div class="upload-card" id="bs_card_vneid_main" style="padding:14px;border:1px dashed #888;position:relative;cursor:pointer;">
-                                        <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] VNeID — Ảnh chính</div>
-                                        <div style="font-size:11px;color:#888;">Trang có CCCD ảo (số, họ tên, ảnh)</div>
+                                        <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] Căn cước điện tử — phần trên</div>
+                                        <div style="font-size:11px;color:#888;">Ảnh, số định danh, họ tên</div>
                                         <input type="file" id="bs_files_vneid_main" accept="image/*" multiple style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;"
                                             onchange="bsMarkCard(this,'bs_card_vneid_main')">
                                         <div class="bs-status" style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
                                     </div>
                                     <div class="upload-card" id="bs_card_vneid_sub" style="padding:14px;border:1px dashed #888;position:relative;cursor:pointer;">
-                                        <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] VNeID — Ảnh phụ</div>
-                                        <div style="font-size:11px;color:#888;">Cuộn xuống: ngày cấp, SĐT, CMT cũ</div>
+                                        <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] Căn cước điện tử — cuộn xuống</div>
+                                        <div style="font-size:11px;color:#888;">Ngày cấp, SĐT, CMND cũ</div>
                                         <input type="file" id="bs_files_vneid_sub" accept="image/*" multiple style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;"
                                             onchange="bsMarkCard(this,'bs_card_vneid_sub')">
                                         <div class="bs-status" style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
