@@ -46,17 +46,14 @@
         .nav-item.active { color: var(--accent-color); font-weight: bold; background-color: var(--accent-soft); border-left-color: var(--accent-color); }
 
         /* ===== KHUNG NỘI DUNG ===== */
-        .main-wrapper { margin-left: 264px; width: calc(100% - 264px); padding: 32px 40px 64px; box-sizing: border-box; }
+        .main-wrapper { margin-left: 264px; width: calc(100% - 264px); padding: 76px 40px 64px; box-sizing: border-box; }
         .container-main { max-width: 880px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border-color); padding: 32px 34px 36px; box-sizing: border-box; }
 
         /* ===== HERO / THANH ĐẦU TRANG (kiểu getcroc) ===== */
         .page-hero { max-width: 880px; margin: 0 auto 18px; }
-        .hero-strip { border: 1px solid var(--border-color); background: var(--surface); }
-        /* Ảnh bìa: cắt bớt phần trời phía trên, giữ khu vực có logo ở dưới.
-           Đổi max-height nếu muốn ảnh cao/thấp hơn. Thiếu file ảnh thì tự ẩn. */
-        .hero-bia { display: block; width: 100%; height: auto; max-height: 170px; object-fit: cover; object-position: center bottom; }
-        .hero-cta { display: block; width: 100%; box-sizing: border-box; background: var(--accent-color); color: #fff; border: none; border-top: 1px solid var(--border-color); padding: 13px 15px; font-family: var(--font-mono); font-size: 15px; font-weight: bold; letter-spacing: 1px; text-align: center; text-decoration: none; cursor: pointer; transition: 0.15s; }
-        .hero-cta:hover { background: var(--accent-hover); }
+        .hero-strip { border: 1px solid var(--border-color); background: var(--surface); font-size: 0; }
+        /* Ảnh bìa hiện TRỌN VẸN — không cắt. Thiếu file thì ẩn cả ô, không để khung rỗng. */
+        .hero-bia { display: block; width: 100%; height: auto; }
 
         /* ===== TIÊU ĐỀ ===== */
         h2.title-main { font-family: var(--font-mono); font-size: 26px; font-weight: 800; margin: 0 0 22px; border-bottom: 1px solid var(--line); padding-bottom: 14px; letter-spacing: -0.8px; line-height: 1.2; }
@@ -227,21 +224,29 @@
             .dp-steps li { color: var(--text-soft); }
         }
 
-        /* ===== THANH TRÊN + MENU TRƯỢT (điện thoại) ===== */
-        .mobile-bar { display: none; }
+        /* ===== THANH TRÊN (topbar) + MENU TRƯỢT ===== */
+        /* Máy tính: topbar nằm bên phải sidebar, chỉ chứa 3 nút tắt.
+           Điện thoại: topbar trải hết bề ngang, thêm nút ☰ và tên trung tâm. */
+        .mobile-bar { display: flex; align-items: center; gap: 8px; position: fixed; top: 0; left: 264px; right: 0; height: 54px; padding: 0 14px; background: var(--surface); border-bottom: 1px solid var(--border-color); z-index: 900; box-sizing: border-box; }
+        .mb-burger { display: none; }
+        .mb-title { display: none; }
+        .mb-grow { flex: 1; }
+        .mb-act { width: 40px; height: 40px; border: 1px solid var(--line); background: var(--surface); color: var(--text-color); cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0; text-decoration: none; transition: 0.15s; }
+        .mb-act:hover { background: var(--accent-color); border-color: var(--accent-color); color: #fff; }
+        .mb-act.dt { color: #c8102e; border-color: #f0c2ca; }          /* nút gọi — đỏ */
+        .mb-act.dt:hover { background: #c8102e; border-color: #c8102e; color: #fff; }
         .nav-backdrop { display: none; }
         .nav-close { display: none; }
 
         @media (max-width: 768px) {
             body { flex-direction: column; }
 
-            /* Thanh cố định trên cùng */
-            .mobile-bar { display: flex; align-items: center; gap: 8px; position: fixed; top: 0; left: 0; right: 0; height: 54px; padding: 0 10px; background: var(--surface); border-bottom: 1px solid var(--border-color); z-index: 900; box-sizing: border-box; }
-            .mb-burger { width: 40px; height: 40px; border: 1px solid var(--border-color); background: var(--surface); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; cursor: pointer; padding: 0; flex-shrink: 0; }
+            /* Thanh trên: trải hết bề ngang, có nút ☰ và tên trung tâm */
+            .mobile-bar { left: 0; padding: 0 10px; gap: 6px; }
+            .mb-burger { display: flex; width: 40px; height: 40px; border: 1px solid var(--border-color); background: var(--surface); flex-direction: column; justify-content: center; align-items: center; gap: 4px; cursor: pointer; padding: 0; flex-shrink: 0; }
             .mb-burger span { display: block; width: 18px; height: 2px; background: var(--text-color); transition: 0.2s; }
             .mb-burger:active { background: var(--light-gray); }
-            .mb-title { flex: 1; font-family: var(--font-mono); font-weight: 800; font-size: 15px; letter-spacing: -0.3px; }
-            .mb-act { width: 40px; height: 40px; border: 1px solid var(--line); background: var(--surface); font-family: var(--font-mono); font-size: 16px; cursor: pointer; flex-shrink: 0; color: var(--text-color); }
+            .mb-title { display: block; font-family: var(--font-mono); font-weight: 800; font-size: 15px; letter-spacing: -0.3px; }
             .mb-act:active { background: var(--accent-soft); border-color: var(--accent-color); }
 
             /* Nền mờ sau menu */
@@ -259,8 +264,6 @@
             .main-wrapper { margin-left: 0; width: 100%; padding: 68px 12px 40px; }
             .container-main { padding: 20px 15px 26px; }
             .upload-grid { grid-template-columns: 1fr; }
-            .hero-bia { max-height: 120px; }
-            .hero-cta { font-size: 14px; padding: 12px; }
             h2.title-main { font-size: 21px; }
 
             /* Ô nhập PHẢI ≥16px: nhỏ hơn là iOS tự phóng to trang khi bấm vào ô,
@@ -443,8 +446,10 @@
             <span></span><span></span><span></span>
         </button>
         <span class="mb-title">Dương Trần</span>
-        <button class="mb-act" type="button" onclick="moWelcome()" aria-label="Hướng dẫn">?</button>
-        <button class="mb-act" type="button" onclick="chuyenManHinh('box-tracuu')" aria-label="Tra cứu hồ sơ">⌕</button>
+        <span class="mb-grow"></span>
+        <button class="mb-act" type="button" onclick="moWelcome()" aria-label="Hướng dẫn nộp hồ sơ" title="Hướng dẫn nộp hồ sơ"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="7.7" r="1.25" fill="currentColor"/><line x1="12" y1="11" x2="12" y2="17.2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>
+        <button class="mb-act" type="button" onclick="chuyenManHinh('box-tracuu')" aria-label="Tra cứu hồ sơ đã nộp" title="Tra cứu hồ sơ đã nộp"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" focusable="false"><rect x="3.4" y="3" width="11" height="15" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="6.3" y1="7.4" x2="11.5" y2="7.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="6.3" y1="10.4" x2="11.5" y2="10.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="15.6" cy="14.6" r="4.3" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="18.7" y1="17.7" x2="21.2" y2="20.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <a class="mb-act dt" href="tel:0902077049" aria-label="Gọi giáo viên 0902 077 049" title="Gọi giáo viên — 0902 077 049"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" focusable="false"><rect x="6.2" y="2.4" width="11.6" height="19.2" rx="2.6" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="10.2" y1="5.6" x2="13.8" y2="5.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="18.4" r="1.15" fill="currentColor"/></svg></a>
     </div>
     <div class="nav-backdrop" id="nav-backdrop" onclick="dongMenu()"></div>
 
@@ -479,8 +484,7 @@
         <div class="page-hero">
             <div class="hero-strip">
                 <img class="hero-bia" src="anh_bia.jpg" alt="Trung tâm Giáo dục nghề nghiệp lái xe Nam Triệu"
-                     onerror="this.style.display='none'">
-                <a class="hero-cta" href="tel:0902077049">Hotline 0902 077 049</a>
+                     onerror="this.closest('.hero-strip').style.display='none'">
             </div>
         </div>
 
