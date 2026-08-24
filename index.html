@@ -135,6 +135,7 @@
         @keyframes dp-c3 { 0%{opacity:0} 1%{opacity:1} 31%{opacity:1} 33.4%{opacity:0} 100%{opacity:0} }
         @keyframes dp-c4 { 0%{opacity:0} 0.8%{opacity:1} 23%{opacity:1} 25%{opacity:0} 100%{opacity:0} }
         @keyframes dp-c5 { 0%{opacity:0} 0.6%{opacity:1} 18.4%{opacity:1} 20%{opacity:0} 100%{opacity:0} }
+        @keyframes dp-c6 { 0%{opacity:0} 0.5%{opacity:1} 15.3%{opacity:1} 16.7%{opacity:0} 100%{opacity:0} }
 
         /* Thanh tieu de trong man hinh gia lap */
         .dp-appbar { font-size:8px; letter-spacing:1px; font-weight:bold; text-align:center; padding:17px 6px 6px; background:var(--accent-color); color:#fff; }
@@ -214,6 +215,17 @@
         .dp-vnt-tiles > div { position:relative; text-align:center; font-size:5.5px; line-height:1.25; color:#fff; }
         .dp-vnt-tiles .o { width:20px; height:20px; border-radius:50%; background:#f7e6c8; border:1px solid #e8c15a; margin:0 auto 3px; }
         .dp-vnt-tiles > div.chinh .o { background:#fff; border-color:#fff; box-shadow:0 0 0 2px #f0c040; }
+        /* Man cua hang ung dung (buoc tai app) */
+        .dp-store { padding:18px 10px 10px; text-align:center; background:#fff; height:100%; box-sizing:border-box; }
+        .dp-store .ten { font-size:9px; font-weight:bold; margin-top:6px; color:#14171a; }
+        .dp-store .nsx { font-size:6.5px; color:#8a8a82; margin-bottom:8px; }
+        .dp-store .cai { position:relative; display:inline-block; background:#0781A7; color:#fff; font-size:7.5px; font-weight:bold; padding:5px 18px; border-radius:11px; }
+        /* The GPLX trong danh sach "Thong tin GPLX" */
+        .dp-the-gplx { position:relative; background:#c4202c; border-radius:4px; padding:6px 7px; margin:0 8px 6px; color:#ffd9c8; font-size:5.8px; line-height:1.45; }
+        .dp-the-gplx .hang { font-size:11px; font-weight:bold; color:#fff; letter-spacing:0.5px; }
+        .dp-the-gplx .ok { position:absolute; top:7px; right:7px; background:#2e9e4f; color:#fff; font-size:5.5px; padding:1px 5px; border-radius:7px; }
+        .dp-the-gplx .d { display:grid; grid-template-columns:1fr 1fr; gap:1px 6px; margin-top:5px; }
+        .dp-the-gplx b { color:#fff; }
         /* The GPLX trong man "Thong tin GPLX" */
         .dp-gplx-card { background:#f6d9d9; border:1px solid #e0aaaa; padding:5px; display:flex; gap:5px; }
         .dp-gplx-card .dp-face { width:22px; height:28px; background:#cfd7dc; border:1px solid #b7c1c7; flex-shrink:0; }
@@ -241,6 +253,7 @@
         @keyframes dp-h3 { 0%{color:#9aa0a6} 2%,30%{color:#066989} 34%,100%{color:#9aa0a6} }
         @keyframes dp-h4 { 0%{color:#9aa0a6} 1.5%,23%{color:#066989} 26%,100%{color:#9aa0a6} }
         @keyframes dp-h5 { 0%{color:#9aa0a6} 1%,18%{color:#066989} 21%,100%{color:#9aa0a6} }
+        @keyframes dp-h6 { 0%{color:#9aa0a6} 0.8%,15%{color:#066989} 17.5%,100%{color:#9aa0a6} }
         .dp-note { flex-basis:100%; font-size:11px; color:var(--text-soft); border-top:1px dashed #cfcfc7; padding-top:8px; margin-top:2px; line-height:1.55; }
 
         /* May dat che do "giam chuyen dong" -> dung hoat anh, giu 1 canh tinh */
@@ -620,7 +633,7 @@
             </div>
 
             <h2 class="title-main">Bước 2 — Bằng Lái & VNeTraffic</h2>
-            <div class="note">Tích các loại bằng lái <b>bạn đang sở hữu</b>. Ảnh màn hình <b>Thông tin GPLX</b> trong app VNeTraffic <b>luôn bắt buộc</b> với mọi hạng.</div>
+            <div class="note">Tích các loại bằng lái <b>bạn đang sở hữu</b>. Ảnh từ app <b>VNeTraffic</b> (trang chủ + các thẻ GPLX) <b>luôn bắt buộc</b> với mọi hạng.</div>
 
             <!-- Banner data từ VNeID OCR sau Page 1 -->
             <div id="banner_vneid_ocr" class="hidden" style="background:#e8f5e9;border-left:4px solid #2e7d32;padding:12px;margin-bottom:16px;font-family:var(--font-mono);font-size:13px;">
@@ -673,16 +686,16 @@
 
             <!-- Block VNeTraffic — LUÔN HIỂN THỊ, BẮT BUỘC -->
             <div id="block_vnetraffic">
-                <div class="section-title">Ảnh Thông Tin GPLX Trong VNeTraffic (Bắt Buộc)</div>
+                <div class="section-title">Ảnh Từ App VNeTraffic (Bắt Buộc)</div>
                 <div class="note" style="border-left-color:var(--warn);background:#fffaf3;">
-                    <b>⚠ Bắt buộc với mọi hạng</b> — mở app <b>VNeTraffic</b> → tab <b>"Ví giấy tờ"</b> → <b>"Giấy phép lái xe"</b> → nhập passcode, rồi chụp màn hình <b>Thông tin GPLX</b>. Bấm nút <b>?</b> để xem hoạt ảnh từng bước.
+                    <b>⚠ Bắt buộc với mọi hạng.</b> Cần <b>ảnh màn hình Trang chủ</b> sau khi đăng nhập, và <b>ảnh từng thẻ GPLX đang sử dụng</b> (vào <b>Ví giấy tờ → Giấy phép lái xe</b>, bấm vào từng thẻ). Ô này nhận nhiều ảnh cùng lúc — bấm nút <b>?</b> để xem hoạt ảnh từng bước.
                 </div>
                 <div class="upload-grid">
                     <div class="upload-card" id="card_vnetraffic">
                         <button class="upload-help-btn" onclick="event.stopPropagation();moHuongDan('vnetraffic')" title="Xem hướng dẫn">?</button>
-                        <div class="title">[+] VNeTraffic — Thông tin GPLX</div>
-                        <div class="subtitle">Màn hình Thông tin GPLX</div>
-                        <input type="file" id="files_vnetraffic" accept="image/*">
+                        <div class="title">[+] VNeTraffic — Trang chủ + thẻ GPLX</div>
+                        <div class="subtitle">Nhiều ảnh: trang chủ và từng bằng</div>
+                        <input type="file" id="files_vnetraffic" accept="image/*" multiple>
                         <div id="status_files_vnetraffic" class="file-status"></div>
                     </div>
                 </div>
@@ -968,28 +981,11 @@
         // ============================================================
         const _L = (w) => `<div class="dp-line" style="width:${w}"></div>`;
 
-        // Logo VNeTraffic vẽ bằng SVG — khiên đỏ viền, thân xanh, huy hiệu CAND
-        // ở trên, chữ vàng, đèn giao thông và hai nhánh lúa ở dưới.
-        // (dựng theo logo thật trong video: khiên navy #1a1a8f, viền đỏ #d32020)
-        const _LOGO_VNT = (w, chu) => `
-            <svg viewBox="0 0 40 48" width="${w}" height="${Math.round(w * 1.2)}" aria-hidden="true" focusable="false" style="flex-shrink:0">
-                <path d="M3.6 5.6 H36.4 V24 C36.4 35.4 28.6 43.4 20 46.4 C11.4 43.4 3.6 35.4 3.6 24 Z"
-                      fill="#1a1a8f" stroke="#d32020" stroke-width="3" stroke-linejoin="round"/>
-                <path d="M13 9 H27 V17.6 C27 21.6 24 24.2 20 25.6 C16 24.2 13 21.6 13 17.6 Z"
-                      fill="#c62828" stroke="#e8c15a" stroke-width="1.1" stroke-linejoin="round"/>
-                <line x1="20" y1="10" x2="20" y2="26.4" stroke="#f2ead2" stroke-width="1.1"/>
-                <circle cx="20" cy="15.2" r="2.1" fill="#f5c518"/>
-                ${chu ? '<text x="20" y="32.6" text-anchor="middle" font-size="6.6" font-weight="bold" fill="#f5c518">VNeTraffic</text>' : ''}
-                <rect x="17.1" y="${chu ? 34.2 : 30}" width="5.8" height="10.4" rx="1.4" fill="#29b6d8" stroke="#8fe6f6" stroke-width="0.6"/>
-                <circle cx="20" cy="${chu ? 36.7 : 32.5}" r="1.1" fill="#e53935"/>
-                <circle cx="20" cy="${chu ? 39.4 : 35.2}" r="1.1" fill="#fdd835"/>
-                <circle cx="20" cy="${chu ? 42.1 : 37.9}" r="1.1" fill="#43a047"/>
-                <path d="M14.2 43.4 C11.6 41.4 10.4 38.8 10.6 36.2" fill="none" stroke="#e8c15a" stroke-width="1.2" stroke-linecap="round"/>
-                <path d="M25.8 43.4 C28.4 41.4 29.6 38.8 29.4 36.2" fill="none" stroke="#e8c15a" stroke-width="1.2" stroke-linecap="round"/>
-            </svg>`;
-
-        // Thanh tiêu đề của app VNeTraffic: logo nhỏ + tên
-        const _VNT_BAR = (ten) => `<div class="dp-appbar vnt">${_LOGO_VNT(11, false)}<span>${ten}</span></div>`;
+        // Logo VNeTraffic — ẢNH THẬT cắt từ video hướng dẫn, đã tách nền,
+        // thu về 96px và giảm còn 64 màu (~8 KB). Nhúng thẳng vào file nên
+        // không cần thêm tệp ảnh và vẫn hiện được khi mất mạng.
+        const LOGO_VNT_SRC = 'data:image/png;base64,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';
+        const _LOGO_VNT = (h) => `<img src="${LOGO_VNT_SRC}" alt="VNeTraffic" height="${h}" style="height:${h}px;width:auto;display:block;flex-shrink:0">`;
 
         // Màn hình "Căn cước điện tử" — dùng lại ở nhiều cảnh
         const _MAN_CCDT = (phanDuoi) => `
@@ -1110,64 +1106,78 @@
             },
 
             vnetraffic: {
-                ten: 'Ảnh "Thông tin GPLX" trong app VNeTraffic',
-                buoc: ['Mở VNeTraffic, đăng nhập bằng số định danh',
-                       'Bấm tab "Ví giấy tờ" ở dưới cùng',
-                       'Mục "Chi tiết giấy tờ" → bấm "Giấy phép lái xe"',
-                       'Nhập passcode 6 số',
-                       'Chụp màn hình "Thông tin GPLX"'],
-                luuy: 'Bắt buộc với <b>mọi hạng</b>, kể cả khi bạn chưa có bằng lái nào — khi đó màn hình sẽ báo chưa có dữ liệu, cứ chụp lại màn hình đó.',
+                ten: 'Ảnh VNeTraffic — trang chủ và các thẻ GPLX',
+                buoc: ['Tải app <b>VNeTraffic</b> (Cục CSGT) trên CH Play / App Store',
+                       'Bấm <b>"Tài khoản định danh điện tử"</b> để đăng nhập bằng VNeID',
+                       'Đăng nhập xong: <b>chụp màn hình Trang chủ</b> — ảnh thứ nhất',
+                       'Tab <b>"Ví giấy tờ"</b> → mục <b>"Giấy phép lái xe"</b>',
+                       'Bấm vào <b>từng thẻ đang sử dụng</b> (mô tô, ô tô)',
+                       '<b>Chụp màn hình từng thẻ</b> rồi tải lên cùng ảnh trang chủ'],
+                luuy: 'Ô này nhận <b>nhiều ảnh</b>: 1 ảnh trang chủ + mỗi bằng đang dùng 1 ảnh. Chưa có bằng nào thì chỉ cần ảnh trang chủ.',
                 canh: [
+                    `<div class="dp-store">
+                        <div style="display:flex;justify-content:center">${_LOGO_VNT(46)}</div>
+                        <div class="ten">VNeTraffic</div>
+                        <div class="nsx">Cục Cảnh sát giao thông</div>
+                        <div class="cai">CÀI ĐẶT<span class="dp-finger"></span></div>
+                        <div style="margin-top:12px">${_L('80%')}${_L('60%')}${_L('70%')}</div></div>`,
+
                     `<div class="dp-vnt">
-                        <div style="padding:16px 0 7px;text-align:center">${_LOGO_VNT(34, true)}</div>
+                        <div style="padding:14px 0 7px;display:flex;justify-content:center">${_LOGO_VNT(38)}</div>
                         <div class="dp-vnt-card">
                             <div class="dp-vnt-t">Đăng nhập</div>
                             <div class="dp-vnt-lb">Tài khoản *</div>
-                            <div class="dp-vnt-in">001199008xxx</div>
+                            <div class="dp-vnt-in mo">Số định danh cá nhân</div>
                             <div class="dp-vnt-lb">Mật khẩu *</div>
                             <div class="dp-vnt-in mo">Nhập mật khẩu</div>
-                            <div class="dp-vnt-btn">ĐĂNG NHẬP<span class="dp-finger"></span></div>
-                            <div class="dp-vnt-btn vang">Tài khoản định danh điện tử</div>
+                            <div class="dp-vnt-btn">ĐĂNG NHẬP</div>
+                            <div style="font-size:6px;text-align:center;color:#8a8a82;margin-top:5px">Hoặc đăng nhập bằng</div>
+                            <div class="dp-vnt-btn vang">Tài khoản định danh điện tử<span class="dp-finger"></span></div>
                         </div></div>`,
 
                     `<div class="dp-vnt">
                         <div style="height:15px"></div>
-                        <div class="dp-vnt-user">${_LOGO_VNT(13, false)}<div class="dp-vnt-name">NGUYỄN VĂN A<br><span style="font-weight:normal;font-size:6px">Định danh mức 2</span></div></div>
+                        <div class="dp-vnt-user">${_LOGO_VNT(15)}<div class="dp-vnt-name">NGUYỄN VĂN A<br><span style="font-weight:normal;font-size:6px">Định danh mức 2</span></div></div>
+                        <div style="padding:0 8px 4px"><span class="dp-tag">CHỤP MÀN HÌNH NÀY</span></div>
                         <div class="dp-vnt-2"><div>Ví QR giấy tờ</div><div>Chuyển vai trò tổ chức</div></div>
                         <div class="dp-vnt-2" style="margin-top:5px"><div>Tạo phản ánh</div><div>Danh sách phản ánh</div></div>
                         <div class="dp-vnt-2" style="margin-top:5px"><div>Lịch sử vi phạm</div><div>Tra cứu phạt nguội</div></div>
-                        <div class="dp-tabbar"><span>Trang chủ</span><span>Tin tức</span><span>Ví giấy tờ</span><span>Cài đặt</span>
-                            <span class="dp-finger" style="left:60%;bottom:1px;top:auto;margin-top:0"></span></div></div>`,
+                        <div class="dp-tabbar"><span>Trang chủ</span><span>Tin tức</span><span>Ví giấy tờ</span><span>Cài đặt</span></div>
+                        <div class="dp-flash"></div></div>`,
 
                     `<div class="dp-vnt">
                         <div class="dp-appbar vnt" style="padding-top:17px">Giấy tờ</div>
-                        <div class="dp-vnt-user" style="background:#8e0f1a;margin:0 8px;border-radius:3px">${_LOGO_VNT(11, false)}<div class="dp-vnt-name">NGUYỄN VĂN A</div></div>
+                        <div class="dp-vnt-user" style="background:#8e0f1a;margin:0 8px;border-radius:3px">${_LOGO_VNT(13)}<div class="dp-vnt-name">NGUYỄN VĂN A</div></div>
                         <div style="padding:0 8px"><span class="dp-vnt-sec" style="margin-left:-8px">Chi tiết giấy tờ</span></div>
                         <div class="dp-vnt-tiles">
                             <div class="chinh"><div class="o"></div>Giấy phép lái xe<span class="dp-finger giua" style="top:auto;bottom:-6px;margin-top:0"></span></div>
                             <div><div class="o"></div>Giấy đăng ký xe</div>
                             <div><div class="o"></div>Chứng nhận kiểm định</div>
                         </div>
+                        <div style="font-size:6px;color:#ffd9c8;text-align:center;margin-top:7px">(nhập passcode nếu app hỏi)</div>
                         <div class="dp-tabbar"><span>Trang chủ</span><span>Tin tức</span><span class="on">Ví giấy tờ</span><span>Cài đặt</span></div></div>`,
 
-                    `<div class="dp-vnt">
-                        <div class="dp-appbar vnt" style="padding-top:17px">Giấy tờ</div>
-                        <div class="dp-vnt-user" style="background:#8e0f1a;margin:0 8px;border-radius:3px">${_LOGO_VNT(11, false)}<div class="dp-vnt-name">NGUYỄN VĂN A</div></div>
-                        <div class="dp-pass"><div class="dp-pass-t">Nhập passcode</div>
-                            <div class="dp-dots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
-                            <div class="dp-keys"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>`,
+                    `<div class="dp-appbar trang">← Thông tin GPLX</div>
+                     <div style="padding-top:7px">
+                        <div class="dp-the-gplx"><span class="ok">Đang sử dụng</span>
+                            <div class="hang">A2</div>
+                            <div class="d"><div>Ngày cấp<br><b>08/12/2024</b></div><div>Hết hạn<br><b>Không thời hạn</b></div></div>
+                            <span class="dp-finger" style="right:6px;top:auto;bottom:5px;margin-top:0"></span></div>
+                        <div class="dp-the-gplx"><span class="ok">Đang sử dụng</span>
+                            <div class="hang">C</div>
+                            <div class="d"><div>Ngày cấp<br><b>26/12/2025</b></div><div>Hết hạn<br><b>26/12/2030</b></div></div></div>
+                        <div style="font-size:6.5px;color:#8a8a82;text-align:center;margin-top:6px">Bấm vào từng thẻ đang sử dụng</div></div>`,
 
                     `<div class="dp-appbar trang">← Thông tin GPLX</div>
                      <div class="dp-body">
                         <div class="dp-gplx-card">
                             <div class="dp-face"></div>
                             <div><div class="dp-gplx-t">GIẤY PHÉP LÁI XE / DRIVER'S LICENSE</div>
-                            <div class="dp-gplx-x">No: 310163003522<br><b>NGUYỄN VĂN A</b><br>01/01/1990</div></div>
+                            <div class="dp-gplx-x">No: 310163003522<br><b>NGUYỄN VĂN A</b><br>Hạng / Class: <b>C</b></div></div>
                         </div>
                         <div style="margin-top:7px"><span class="dp-tag">CHỤP MÀN HÌNH NÀY</span></div>
-                        <div class="dp-row">GPLX số<b>310163003522</b></div>
                         <div class="dp-row">Hạng<b>C</b></div>
-                        <div class="dp-ok">✓ Ảnh VNeTraffic</div></div>`
+                        <div class="dp-ok">✓ Mỗi bằng một ảnh</div></div>`
                 ]
             }
         };
@@ -1744,7 +1754,7 @@
             }
             // VNeTraffic LUÔN BẮT BUỘC với mọi hạng
             if (document.getElementById('files_vnetraffic').files.length === 0) {
-                alert("Ảnh màn hình \"Thông tin GPLX\" trong app VNeTraffic là BẮT BUỘC với mọi hạng — vui lòng tải lên trước khi gửi!");
+                alert("Ảnh từ app VNeTraffic là BẮT BUỘC với mọi hạng:\n• Ảnh màn hình Trang chủ (sau khi đăng nhập)\n• Ảnh từng thẻ GPLX đang sử dụng (nếu có bằng)");
                 return;
             }
 
@@ -2505,7 +2515,7 @@
                                     <div class="upload-card" id="bs_card_vnetraffic" style="padding:14px;border:1px dashed #888;position:relative;cursor:pointer;">
                                         <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] VNeTraffic — Trang chủ</div>
                                         <div style="font-size:11px;color:#888;">Ảnh trang chủ app VNeTraffic (bắt buộc)</div>
-                                        <input type="file" id="bs_files_vnetraffic" accept="image/*" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;"
+                                        <input type="file" id="bs_files_vnetraffic" accept="image/*" multiple style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;"
                                             onchange="bsMarkCard(this,'bs_card_vnetraffic')">
                                         <div class="bs-status" style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
                                     </div>
