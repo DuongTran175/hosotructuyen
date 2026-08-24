@@ -405,6 +405,9 @@
         .dc-btn-confirm:disabled { background:#c9c9c2; color:#fff; border-color:#c9c9c2; cursor:not-allowed; }
         .dc-btn-cancel { padding:12px 18px; background:#fff; color:var(--text-color); border:1px solid var(--border-color); font-family:var(--font-mono); font-size:13px; cursor:pointer; transition:0.15s; }
         .dc-btn-cancel:hover { background:var(--light-gray); }
+        /* Nút nhỏ "chọn theo đơn vị hành chính mới" đặt dưới ô địa chỉ tự do */
+        .dc-btn-nho { margin-top:6px; padding:7px 12px; background:var(--accent-soft); color:var(--accent-hover); border:1px solid var(--accent-color); font-family:var(--font-mono); font-size:11.5px; font-weight:bold; cursor:pointer; transition:0.15s; }
+        .dc-btn-nho:hover { background:var(--accent-color); color:#fff; }
         /* Wrapper cho field địa chỉ */
         .dc-input-wrapper { display:flex; gap:0; align-items:stretch; }
         .dc-input-wrapper input[readonly] { flex:1; cursor:pointer; background:#fff; border-right:none; }
@@ -743,8 +746,16 @@
                 <div class="form-group"><label>Ngày sinh:</label><input type="text" id="ngay_sinh_chk" class="form-control" placeholder="DD/MM/YYYY"></div>
                 <div class="form-group"><label>Giới tính:</label><select id="gio_tinh_chk" class="form-control"><option value="">--</option><option value="Nam">Nam</option><option value="Nữ">Nữ</option></select></div>
             </div>
-            <div class="form-group"><label>Nơi thường trú:</label><textarea id="noi_thuong_tru_chk" class="form-control" rows="2"></textarea></div>
-            <div class="form-group"><label>Nơi ở hiện tại:</label><textarea id="noi_o_hien_tai_chk" class="form-control" rows="2"></textarea></div>
+            <div class="form-group">
+                <label>Nơi thường trú:</label>
+                <textarea id="noi_thuong_tru_chk" class="form-control" rows="2"></textarea>
+                <button type="button" class="dc-btn-nho" onclick="dcOpenPicker('noi_thuong_tru_chk')">📍 Chọn lại theo đơn vị hành chính mới</button>
+            </div>
+            <div class="form-group">
+                <label>Nơi ở hiện tại:</label>
+                <textarea id="noi_o_hien_tai_chk" class="form-control" rows="2"></textarea>
+                <button type="button" class="dc-btn-nho" onclick="dcOpenPicker('noi_o_hien_tai_chk')">📍 Chọn lại theo đơn vị hành chính mới</button>
+            </div>
 
             <!-- Thông tin GPLX đã quét được — chỉ hiện khi có data -->
             <div id="gplx_info_box" style="display:none;background:var(--accent-soft);border:1px solid var(--line);border-left:3px solid var(--accent-color);padding:12px 16px;margin-bottom:16px;">
@@ -2395,8 +2406,14 @@
                                     </select></div>
                             </div>
                             <div style="margin-top:12px;">
+                                <label style="font-size:12px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">Nơi thường trú:</label>
+                                <input id="bs_thuongtru" class="form-control" style="margin-top:5px;" placeholder="${i.noi_thuong_tru||'Chưa có'}">
+                                <button type="button" class="dc-btn-nho" onclick="dcOpenPicker('bs_thuongtru')">📍 Chọn lại theo đơn vị hành chính mới</button>
+                            </div>
+                            <div style="margin-top:12px;">
                                 <label style="font-size:12px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">Nơi ở hiện tại:</label>
                                 <input id="bs_noio" class="form-control" style="margin-top:5px;" placeholder="${i.noi_o_hien_tai||'Chưa có'}">
+                                <button type="button" class="dc-btn-nho" onclick="dcOpenPicker('bs_noio')">📍 Chọn lại theo đơn vị hành chính mới</button>
                             </div>
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:12px;">
                                 <div><label style="font-size:12px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;">Họ tên người thân:</label>
@@ -2610,6 +2627,7 @@
                 nghe_nghiep:         (document.getElementById('bs_nghe').value === 'Khác' ? lay('bs_nghe_khac', cu.nghe_nghiep) : lay('bs_nghe', cu.nghe_nghiep)),
                 noi_lam_viec:        lay('bs_noilam',  cu.noi_lam_viec),
                 hoc_luc:             lay('bs_hocluc',  cu.hoc_luc),
+                noi_thuong_tru:      lay('bs_thuongtru', cu.noi_thuong_tru),
                 noi_o_hien_tai:      lay('bs_noio',    cu.noi_o_hien_tai),
                 nguoi_lien_he_ten:   lay('bs_lh_ten',  cu.nguoi_lien_he_ten),
                 nguoi_lien_he_sdt:   lay('bs_lh_sdt',  cu.nguoi_lien_he_sdt),
