@@ -194,6 +194,32 @@
         .dp-tabbar > span { flex:1; text-align:center; font-size:5.5px; color:#a3a8ad; }
         .dp-tabbar > span.on { color:#c8102e; font-weight:bold; }
 
+        /* Man hinh gia lap app VNeTraffic (nen do, the GPLX hong) */
+        .dp-vnt { position:absolute; top:0; right:0; bottom:0; left:0; background:#b3121f; }
+        .dp-appbar.vnt { background:#b3121f; display:flex; align-items:center; justify-content:center; gap:4px; }
+        .dp-vnt-card { background:#fff; border-radius:4px; padding:7px; margin:0 8px; }
+        .dp-vnt-t { font-size:8px; font-weight:bold; text-align:center; color:#14171a; margin-bottom:6px; }
+        .dp-vnt-lb { font-size:6px; color:#8a8a82; margin-bottom:2px; }
+        .dp-vnt-in { border:1px solid #e0ded5; background:#fff; font-size:6.5px; color:#3c4248; padding:3px 4px; margin-bottom:5px; }
+        .dp-vnt-in.mo { background:#fdf6e6; color:#b5ad97; }
+        .dp-vnt-btn { position:relative; background:#a51c24; color:#fff; font-size:7px; font-weight:bold; text-align:center; padding:5px 3px; letter-spacing:0.5px; }
+        .dp-vnt-btn.vang { background:#f0c040; color:#7a4b00; margin-top:5px; }
+        .dp-vnt-user { display:flex; align-items:center; gap:5px; padding:6px 8px 4px; }
+        .dp-vnt-ava { width:16px; height:16px; border-radius:50%; background:#f7efe2; border:1px solid #e8c15a; flex-shrink:0; }
+        .dp-vnt-name { font-size:7px; color:#fff; font-weight:bold; }
+        .dp-vnt-2 { display:grid; grid-template-columns:1fr 1fr; gap:5px; padding:0 8px; }
+        .dp-vnt-2 > div { background:#c4202c; border:1px solid #d4515a; color:#ffe9ad; font-size:6px; padding:5px 4px; text-align:center; line-height:1.25; border-radius:3px; }
+        .dp-vnt-sec { font-size:6.5px; font-weight:bold; color:#fff; background:#8e0f1a; display:inline-block; padding:2px 7px; border-radius:0 8px 8px 0; margin:7px 0 4px; }
+        .dp-vnt-tiles { display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; padding:0 8px; }
+        .dp-vnt-tiles > div { position:relative; text-align:center; font-size:5.5px; line-height:1.25; color:#fff; }
+        .dp-vnt-tiles .o { width:20px; height:20px; border-radius:50%; background:#f7e6c8; border:1px solid #e8c15a; margin:0 auto 3px; }
+        .dp-vnt-tiles > div.chinh .o { background:#fff; border-color:#fff; box-shadow:0 0 0 2px #f0c040; }
+        /* The GPLX trong man "Thong tin GPLX" */
+        .dp-gplx-card { background:#f6d9d9; border:1px solid #e0aaaa; padding:5px; display:flex; gap:5px; }
+        .dp-gplx-card .dp-face { width:22px; height:28px; background:#cfd7dc; border:1px solid #b7c1c7; flex-shrink:0; }
+        .dp-gplx-t { font-size:6px; color:#b3121f; font-weight:bold; letter-spacing:0.3px; margin-bottom:2px; }
+        .dp-gplx-x { font-size:6.5px; line-height:1.5; color:#3c4248; }
+
         /* Khung ngam khi chup giay to */
         .dp-view { position:absolute; top:34px; right:9px; bottom:9px; left:9px; border:1px dashed var(--accent-color); display:flex; align-items:center; justify-content:center; }
         .dp-gplx { width:100px; border:1px solid var(--text-color); background:#fff; padding:5px; }
@@ -594,7 +620,7 @@
             </div>
 
             <h2 class="title-main">Bước 2 — Bằng Lái & VNeTraffic</h2>
-            <div class="note">Tích các loại bằng lái <b>bạn đang sở hữu</b>. Ảnh trang chủ VNeTraffic <b>luôn bắt buộc</b> với mọi hạng.</div>
+            <div class="note">Tích các loại bằng lái <b>bạn đang sở hữu</b>. Ảnh màn hình <b>Thông tin GPLX</b> trong app VNeTraffic <b>luôn bắt buộc</b> với mọi hạng.</div>
 
             <!-- Banner data từ VNeID OCR sau Page 1 -->
             <div id="banner_vneid_ocr" class="hidden" style="background:#e8f5e9;border-left:4px solid #2e7d32;padding:12px;margin-bottom:16px;font-family:var(--font-mono);font-size:13px;">
@@ -647,15 +673,15 @@
 
             <!-- Block VNeTraffic — LUÔN HIỂN THỊ, BẮT BUỘC -->
             <div id="block_vnetraffic">
-                <div class="section-title">Ảnh Trang Chủ VNeTraffic (Bắt Buộc)</div>
+                <div class="section-title">Ảnh Thông Tin GPLX Trong VNeTraffic (Bắt Buộc)</div>
                 <div class="note" style="border-left-color:var(--warn);background:#fffaf3;">
-                    <b>⚠ Bắt buộc với mọi hạng</b> — vui lòng tải ảnh <b>trang chủ app VNeTraffic</b> (sau khi đăng nhập, hiển thị thông tin GPLX của bạn).
+                    <b>⚠ Bắt buộc với mọi hạng</b> — mở app <b>VNeTraffic</b> → tab <b>"Ví giấy tờ"</b> → <b>"Giấy phép lái xe"</b> → nhập passcode, rồi chụp màn hình <b>Thông tin GPLX</b>. Bấm nút <b>?</b> để xem hoạt ảnh từng bước.
                 </div>
                 <div class="upload-grid">
                     <div class="upload-card" id="card_vnetraffic">
                         <button class="upload-help-btn" onclick="event.stopPropagation();moHuongDan('vnetraffic')" title="Xem hướng dẫn">?</button>
-                        <div class="title">[+] VNeTraffic Trang Chủ</div>
-                        <div class="subtitle">Ảnh trang chủ app VNeTraffic</div>
+                        <div class="title">[+] VNeTraffic — Thông tin GPLX</div>
+                        <div class="subtitle">Màn hình Thông tin GPLX</div>
                         <input type="file" id="files_vnetraffic" accept="image/*">
                         <div id="status_files_vnetraffic" class="file-status"></div>
                     </div>
@@ -942,6 +968,29 @@
         // ============================================================
         const _L = (w) => `<div class="dp-line" style="width:${w}"></div>`;
 
+        // Logo VNeTraffic vẽ bằng SVG — khiên đỏ viền, thân xanh, huy hiệu CAND
+        // ở trên, chữ vàng, đèn giao thông và hai nhánh lúa ở dưới.
+        // (dựng theo logo thật trong video: khiên navy #1a1a8f, viền đỏ #d32020)
+        const _LOGO_VNT = (w, chu) => `
+            <svg viewBox="0 0 40 48" width="${w}" height="${Math.round(w * 1.2)}" aria-hidden="true" focusable="false" style="flex-shrink:0">
+                <path d="M3.6 5.6 H36.4 V24 C36.4 35.4 28.6 43.4 20 46.4 C11.4 43.4 3.6 35.4 3.6 24 Z"
+                      fill="#1a1a8f" stroke="#d32020" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M13 9 H27 V17.6 C27 21.6 24 24.2 20 25.6 C16 24.2 13 21.6 13 17.6 Z"
+                      fill="#c62828" stroke="#e8c15a" stroke-width="1.1" stroke-linejoin="round"/>
+                <line x1="20" y1="10" x2="20" y2="26.4" stroke="#f2ead2" stroke-width="1.1"/>
+                <circle cx="20" cy="15.2" r="2.1" fill="#f5c518"/>
+                ${chu ? '<text x="20" y="32.6" text-anchor="middle" font-size="6.6" font-weight="bold" fill="#f5c518">VNeTraffic</text>' : ''}
+                <rect x="17.1" y="${chu ? 34.2 : 30}" width="5.8" height="10.4" rx="1.4" fill="#29b6d8" stroke="#8fe6f6" stroke-width="0.6"/>
+                <circle cx="20" cy="${chu ? 36.7 : 32.5}" r="1.1" fill="#e53935"/>
+                <circle cx="20" cy="${chu ? 39.4 : 35.2}" r="1.1" fill="#fdd835"/>
+                <circle cx="20" cy="${chu ? 42.1 : 37.9}" r="1.1" fill="#43a047"/>
+                <path d="M14.2 43.4 C11.6 41.4 10.4 38.8 10.6 36.2" fill="none" stroke="#e8c15a" stroke-width="1.2" stroke-linecap="round"/>
+                <path d="M25.8 43.4 C28.4 41.4 29.6 38.8 29.4 36.2" fill="none" stroke="#e8c15a" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>`;
+
+        // Thanh tiêu đề của app VNeTraffic: logo nhỏ + tên
+        const _VNT_BAR = (ten) => `<div class="dp-appbar vnt">${_LOGO_VNT(11, false)}<span>${ten}</span></div>`;
+
         // Màn hình "Căn cước điện tử" — dùng lại ở nhiều cảnh
         const _MAN_CCDT = (phanDuoi) => `
             <div class="dp-appbar trang">← Căn cước điện tử</div>
@@ -1061,23 +1110,64 @@
             },
 
             vnetraffic: {
-                ten: 'Cách lấy ảnh trang chủ VNeTraffic',
-                buoc: ['Mở app VNeTraffic và đăng nhập',
-                       'Ở lại trang chủ — nơi hiện thông tin GPLX',
-                       'Chụp màn hình trang chủ'],
-                luuy: 'Bắt buộc với mọi hạng, kể cả khi bạn chưa có bằng lái nào.',
+                ten: 'Ảnh "Thông tin GPLX" trong app VNeTraffic',
+                buoc: ['Mở VNeTraffic, đăng nhập bằng số định danh',
+                       'Bấm tab "Ví giấy tờ" ở dưới cùng',
+                       'Mục "Chi tiết giấy tờ" → bấm "Giấy phép lái xe"',
+                       'Nhập passcode 6 số',
+                       'Chụp màn hình "Thông tin GPLX"'],
+                luuy: 'Bắt buộc với <b>mọi hạng</b>, kể cả khi bạn chưa có bằng lái nào — khi đó màn hình sẽ báo chưa có dữ liệu, cứ chụp lại màn hình đó.',
                 canh: [
-                    `<div class="dp-appbar">VNeTraffic</div><div class="dp-body">
-                        ${_L('60%')}${_L('40%')}
-                        <div class="dp-btn">Đăng nhập<span class="dp-finger"></span></div></div>`,
-                    `<div class="dp-appbar">VNeTraffic</div><div class="dp-body">
-                        <span class="dp-tag">CHỤP TRANG NÀY</span>
-                        <div class="dp-idcard" style="background:#fff;border-color:var(--line)">
-                            <div class="dp-idtxt"><b>GIẤY PHÉP LÁI XE</b><br>Hạng: <b>B</b><br>Số: 031234567890<br>Trạng thái: Còn hạn</div></div>
-                        <div style="margin-top:8px">${_L('80%')}</div></div>`,
-                    `<div class="dp-appbar">VNeTraffic</div><div class="dp-body">
-                        <div class="dp-shot">ẢNH ĐÃ LƯU</div>
-                        <div class="dp-ok">✓ Trang chủ VNeTraffic</div></div>`
+                    `<div class="dp-vnt">
+                        <div style="padding:16px 0 7px;text-align:center">${_LOGO_VNT(34, true)}</div>
+                        <div class="dp-vnt-card">
+                            <div class="dp-vnt-t">Đăng nhập</div>
+                            <div class="dp-vnt-lb">Tài khoản *</div>
+                            <div class="dp-vnt-in">001199008xxx</div>
+                            <div class="dp-vnt-lb">Mật khẩu *</div>
+                            <div class="dp-vnt-in mo">Nhập mật khẩu</div>
+                            <div class="dp-vnt-btn">ĐĂNG NHẬP<span class="dp-finger"></span></div>
+                            <div class="dp-vnt-btn vang">Tài khoản định danh điện tử</div>
+                        </div></div>`,
+
+                    `<div class="dp-vnt">
+                        <div style="height:15px"></div>
+                        <div class="dp-vnt-user">${_LOGO_VNT(13, false)}<div class="dp-vnt-name">NGUYỄN VĂN A<br><span style="font-weight:normal;font-size:6px">Định danh mức 2</span></div></div>
+                        <div class="dp-vnt-2"><div>Ví QR giấy tờ</div><div>Chuyển vai trò tổ chức</div></div>
+                        <div class="dp-vnt-2" style="margin-top:5px"><div>Tạo phản ánh</div><div>Danh sách phản ánh</div></div>
+                        <div class="dp-vnt-2" style="margin-top:5px"><div>Lịch sử vi phạm</div><div>Tra cứu phạt nguội</div></div>
+                        <div class="dp-tabbar"><span>Trang chủ</span><span>Tin tức</span><span>Ví giấy tờ</span><span>Cài đặt</span>
+                            <span class="dp-finger" style="left:60%;bottom:1px;top:auto;margin-top:0"></span></div></div>`,
+
+                    `<div class="dp-vnt">
+                        <div class="dp-appbar vnt" style="padding-top:17px">Giấy tờ</div>
+                        <div class="dp-vnt-user" style="background:#8e0f1a;margin:0 8px;border-radius:3px">${_LOGO_VNT(11, false)}<div class="dp-vnt-name">NGUYỄN VĂN A</div></div>
+                        <div style="padding:0 8px"><span class="dp-vnt-sec" style="margin-left:-8px">Chi tiết giấy tờ</span></div>
+                        <div class="dp-vnt-tiles">
+                            <div class="chinh"><div class="o"></div>Giấy phép lái xe<span class="dp-finger giua" style="top:auto;bottom:-6px;margin-top:0"></span></div>
+                            <div><div class="o"></div>Giấy đăng ký xe</div>
+                            <div><div class="o"></div>Chứng nhận kiểm định</div>
+                        </div>
+                        <div class="dp-tabbar"><span>Trang chủ</span><span>Tin tức</span><span class="on">Ví giấy tờ</span><span>Cài đặt</span></div></div>`,
+
+                    `<div class="dp-vnt">
+                        <div class="dp-appbar vnt" style="padding-top:17px">Giấy tờ</div>
+                        <div class="dp-vnt-user" style="background:#8e0f1a;margin:0 8px;border-radius:3px">${_LOGO_VNT(11, false)}<div class="dp-vnt-name">NGUYỄN VĂN A</div></div>
+                        <div class="dp-pass"><div class="dp-pass-t">Nhập passcode</div>
+                            <div class="dp-dots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+                            <div class="dp-keys"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>`,
+
+                    `<div class="dp-appbar trang">← Thông tin GPLX</div>
+                     <div class="dp-body">
+                        <div class="dp-gplx-card">
+                            <div class="dp-face"></div>
+                            <div><div class="dp-gplx-t">GIẤY PHÉP LÁI XE / DRIVER'S LICENSE</div>
+                            <div class="dp-gplx-x">No: 310163003522<br><b>NGUYỄN VĂN A</b><br>01/01/1990</div></div>
+                        </div>
+                        <div style="margin-top:7px"><span class="dp-tag">CHỤP MÀN HÌNH NÀY</span></div>
+                        <div class="dp-row">GPLX số<b>310163003522</b></div>
+                        <div class="dp-row">Hạng<b>C</b></div>
+                        <div class="dp-ok">✓ Ảnh VNeTraffic</div></div>`
                 ]
             }
         };
@@ -1654,7 +1744,7 @@
             }
             // VNeTraffic LUÔN BẮT BUỘC với mọi hạng
             if (document.getElementById('files_vnetraffic').files.length === 0) {
-                alert("Ảnh trang chủ VNeTraffic là BẮT BUỘC với mọi hạng — vui lòng tải lên trước khi gửi!");
+                alert("Ảnh màn hình \"Thông tin GPLX\" trong app VNeTraffic là BẮT BUỘC với mọi hạng — vui lòng tải lên trước khi gửi!");
                 return;
             }
 
