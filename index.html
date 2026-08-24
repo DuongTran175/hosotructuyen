@@ -179,8 +179,6 @@
         .dp-tag.warn { background:var(--warn); }
         .dp-ok { font-size:9px; color:var(--ok); font-weight:bold; text-align:center; margin-top:12px; line-height:1.5; }
         .dp-shot { border:1px solid var(--ok); background:#f1f8f2; height:52px; margin-top:8px; display:flex; align-items:center; justify-content:center; font-size:8px; color:var(--ok); font-weight:bold; }
-        .dp-shots { display:flex; gap:6px; margin-top:8px; }
-        .dp-shots > div { flex:1; }
 
         /* Man nhap passcode */
         .dp-pass { position:absolute; left:0; right:0; bottom:0; background:#fff; border-top:1px solid var(--line); padding:8px; }
@@ -196,9 +194,6 @@
         .dp-tabbar > span { flex:1; text-align:center; font-size:5.5px; color:#a3a8ad; }
         .dp-tabbar > span.on { color:#c8102e; font-weight:bold; }
 
-        .dp-vnt-in.mo { background:#fdf6e6; color:#b5ad97; }
-        .dp-vnt-btn.vang { background:#f0c040; color:#7a4b00; margin-top:5px; }
-        .dp-vnt-tiles .o { width:20px; height:20px; border-radius:50%; background:#f7e6c8; border:1px solid #e8c15a; margin:0 auto 3px; }
         /* Ảnh chụp màn hình thật, phủ kín màn hình giả lập */
         .dp-anh { display:block; width:100%; height:100%; object-fit:cover; object-position:top center; }
         .dp-cham { position:absolute; width:22px; height:22px; margin:-11px 0 0 -11px; border-radius:50%; background:rgba(7,129,167,0.25); border:2px solid var(--accent-color); animation:dp-tap 3s infinite; z-index:3; }
@@ -209,7 +204,6 @@
         .dp-store .ten { font-size:9px; font-weight:bold; margin-top:6px; color:#14171a; }
         .dp-store .nsx { font-size:6.5px; color:#8a8a82; margin-bottom:8px; }
         .dp-store .cai { position:relative; display:inline-block; background:#0781A7; color:#fff; font-size:7.5px; font-weight:bold; padding:5px 18px; border-radius:11px; }
-        .dp-gplx-card .dp-face { width:22px; height:28px; background:#cfd7dc; border:1px solid #b7c1c7; flex-shrink:0; }
 
         /* Khung ngam khi chup giay to */
         .dp-view { position:absolute; top:34px; right:9px; bottom:9px; left:9px; border:1px dashed var(--accent-color); display:flex; align-items:center; justify-content:center; }
@@ -228,7 +222,11 @@
         /* Danh sach buoc - buoc dang dien ra sang len theo hoat anh */
         .dp-steps { list-style:none; margin:0; padding:0; flex:1; min-width:180px; font-size:11.5px; line-height:1.55; }
         .dp-steps li { position:relative; padding-left:23px; margin-bottom:8px; color:#9aa0a6; }
-        .dp-steps li b { position:absolute; left:0; top:1px; width:15px; height:15px; border:1px solid currentColor; font-size:9px; display:flex; align-items:center; justify-content:center; font-weight:bold; }
+        /* Ô số thứ tự — PHẢI dùng lớp riêng, không dùng <b>.
+           Nếu bắt <b> thì mọi chữ in đậm trong câu mô tả cũng bị kéo về
+           góc trái và xếp chồng lên nhau. */
+        .dp-steps li .stt { position:absolute; left:0; top:1px; width:15px; height:15px; border:1px solid currentColor; font-size:9px; display:flex; align-items:center; justify-content:center; font-weight:bold; }
+        .dp-steps li b { color:var(--text-color); font-weight:bold; }
         @keyframes dp-h3 { 0%{color:#9aa0a6} 2%,30%{color:#066989} 34%,100%{color:#9aa0a6} }
         @keyframes dp-h4 { 0%{color:#9aa0a6} 1.5%,23%{color:#066989} 26%,100%{color:#9aa0a6} }
         @keyframes dp-h5 { 0%{color:#9aa0a6} 1%,18%{color:#066989} 21%,100%{color:#9aa0a6} }
@@ -655,28 +653,13 @@
                 <div style="font-size:12px;color:#888;font-family:var(--font-mono);" id="ghi_chu_nang_hang"></div>
             </div>
 
-            <!-- Ảnh thẻ GPLX trong VNeTraffic — chỉ hiện khi có bằng -->
-            <div id="block_vnetraffic_the" class="hidden">
-                <div class="section-title">Ảnh Thẻ GPLX Trong VNeTraffic</div>
-                <div class="note">Vào <b>Ví giấy tờ → Giấy phép lái xe</b>, bấm vào <b>từng thẻ đang sử dụng</b> rồi chụp màn hình. Có mấy bằng thì tải lên mấy ảnh.</div>
-                <div class="upload-grid">
-                    <div class="upload-card vneid-card" id="card_vnetraffic_the">
-                        <button class="upload-help-btn" onclick="event.stopPropagation();moHuongDan('vnt_the')" title="Xem hướng dẫn">?</button>
-                        <div class="title">[+] VNeTraffic — Thẻ GPLX</div>
-                        <div class="subtitle">Mỗi bằng đang dùng một ảnh</div>
-                        <input type="file" id="files_vnetraffic_the" accept="image/*" multiple>
-                        <div id="status_files_vnetraffic_the" class="file-status"></div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Ảnh chụp bằng lái cứng — chỉ hiện khi tick -->
             <div id="block_gplx_moto" class="hidden">
-                <div class="section-title">Ảnh Bằng Mô Tô (chụp bằng thật)</div>
-                <div class="note">Có thể tải <b>1 ảnh</b> (bằng ảo có cả 2 mặt) hoặc <b>2 ảnh</b> (mặt trước + mặt sau chụp riêng).</div>
+                <div class="section-title">Ảnh Bằng Mô Tô</div>
+                <div class="note">Chụp màn hình thẻ trong <b>VNeTraffic</b>, hoặc chụp ảnh bằng thật (mặt trước + mặt sau). Bấm <b>?</b> để xem hoạt ảnh.</div>
                 <div class="upload-grid">
                     <div class="upload-card" id="card_gplx_moto">
-                        <button class="upload-help-btn" onclick="event.stopPropagation();moHuongDan('gplx')" title="Xem hướng dẫn">?</button>
+                        <button class="upload-help-btn" onclick="event.stopPropagation();moHuongDan('bang_lai')" title="Xem hướng dẫn">?</button>
                         <div class="title">[+] GPLX Mô Tô</div>
                         <div class="subtitle">1 hoặc 2 ảnh</div>
                         <input type="file" id="files_gplx_moto" accept="image/*" multiple>
@@ -686,11 +669,11 @@
             </div>
 
             <div id="block_gplx_oto" class="hidden">
-                <div class="section-title">Ảnh Bằng Ô Tô (chụp bằng thật — hạng cao nhất)</div>
-                <div class="note">Chỉ chụp <b>hạng cao nhất</b> bạn đang có. Có thể 1 ảnh (bằng ảo) hoặc 2 ảnh (trước + sau).</div>
+                <div class="section-title">Ảnh Bằng Ô Tô (hạng cao nhất)</div>
+                <div class="note">Chỉ lấy <b>hạng cao nhất</b> bạn đang có. Chụp màn hình thẻ trong <b>VNeTraffic</b>, hoặc chụp ảnh bằng thật 2 mặt.</div>
                 <div class="upload-grid">
                     <div class="upload-card" id="card_gplx_oto">
-                        <button class="upload-help-btn" onclick="event.stopPropagation();moHuongDan('gplx')" title="Xem hướng dẫn">?</button>
+                        <button class="upload-help-btn" onclick="event.stopPropagation();moHuongDan('bang_lai')" title="Xem hướng dẫn">?</button>
                         <div class="title">[+] GPLX Ô Tô</div>
                         <div class="subtitle">1 hoặc 2 ảnh</div>
                         <input type="file" id="files_gplx_oto" accept="image/*" multiple>
@@ -1091,26 +1074,32 @@
                 ]
             },
 
-            gplx: {
-                ten: 'Cách chụp giấy phép lái xe đang có',
-                buoc: ['Đặt bằng lái trên mặt phẳng, đủ sáng',
-                       'Chụp mặt trước, rồi lật chụp mặt sau',
-                       'Tải lên 2 ảnh — bằng ảo có sẵn 2 mặt thì 1 ảnh'],
-                luuy: 'Chụp thẳng từ trên xuống, không chéo, không loá đèn, thấy đủ 4 góc thẻ.',
+            bang_lai: {
+                ten: 'Ảnh giấy phép lái xe đang có',
+                buoc: ['<b>Cách nhanh nhất:</b> mở VNeTraffic → tab <b>"Ví giấy tờ"</b> → <b>"Giấy phép lái xe"</b>',
+                       'Bấm vào <b>thẻ đang sử dụng</b> (mô tô hoặc ô tô)',
+                       '<b>Chụp màn hình</b> thẻ hiện ra — ảnh rõ, đủ thông tin',
+                       '<b>Cách khác:</b> chụp ảnh bằng thật, <b>mặt trước và mặt sau</b>'],
+                luuy: 'Ảnh nào cũng được, miễn đọc rõ số bằng, hạng và ngày cấp. Chụp bằng thật thì đặt trên mặt phẳng, đủ sáng, không loá đèn.',
                 canh: [
+                    `${_ANH('vi', 'Màn hình Ví giấy tờ')}
+                     <span class="dp-cham" style="top:51%;left:17%"></span>`,
+
+                    `${_ANH('list', 'Danh sách thẻ GPLX đang sử dụng')}
+                     <span class="dp-cham" style="top:26%;left:50%"></span>`,
+
+                    `<div class="dp-appbar trang">← Thông tin GPLX</div>
+                     <div style="padding:8px">
+                        <img src="${ANH_VNT.the}" alt="Thẻ GPLX" style="display:block;width:100%">
+                        <div style="margin-top:8px;text-align:center"><span class="dp-tag">CHỤP MÀN HÌNH NÀY</span></div>
+                        <div class="dp-ok">✓ Xong một bằng</div></div>
+                     <div class="dp-flash"></div>`,
+
                     `<div class="dp-appbar dark">MÁY ẢNH</div>
                      <div class="dp-view"><div class="dp-gplx">
                         <div style="display:flex;gap:5px"><div class="dp-face" style="width:20px;height:25px;background:#cfd7dc;border:1px solid #b7c1c7"></div>
                         <div style="flex:1">${_L('100%')}${_L('80%')}${_L('60%')}</div></div>
-                        <div class="dp-cap">MẶT TRƯỚC</div></div></div>`,
-                    `<div class="dp-appbar dark">MÁY ẢNH</div>
-                     <div class="dp-view"><div class="dp-gplx">
-                        ${_L('100%')}${_L('90%')}${_L('70%')}
-                        <div class="dp-cap">MẶT SAU — HẠNG / NGÀY</div></div></div>`,
-                    `<div class="dp-appbar dark">MÁY ẢNH</div><div class="dp-body">
-                        <div class="dp-shots"><div class="dp-shot" style="height:44px">TRƯỚC</div>
-                        <div class="dp-shot" style="height:44px">SAU</div></div>
-                        <div class="dp-ok">✓ Đủ 2 mặt</div></div>`
+                        <div class="dp-cap">HOẶC CHỤP BẰNG THẬT<br>MẶT TRƯỚC + MẶT SAU</div></div></div>`
                 ]
             },
 
@@ -1135,28 +1124,6 @@
                      <span class="dp-tag dp-tag-noi" style="top:45%;left:8px">CHỤP MÀN HÌNH NÀY</span>
                      <div class="dp-flash"></div>`
                 ]
-            },
-
-            vnt_the: {
-                ten: 'Ảnh thẻ GPLX trong VNeTraffic',
-                buoc: ['Tab <b>"Ví giấy tờ"</b> → mục <b>"Giấy phép lái xe"</b> (nhập passcode nếu app hỏi)',
-                       'Bấm vào <b>từng thẻ đang sử dụng</b> — mô tô, ô tô',
-                       '<b>Chụp màn hình từng thẻ</b>, mỗi bằng một ảnh'],
-                luuy: 'Chỉ làm bước này nếu bạn <b>đã có bằng lái</b>. Có mấy bằng thì chụp mấy ảnh, tải lên cùng lúc được.',
-                canh: [
-                    `${_ANH('vi', 'Màn hình Ví giấy tờ')}
-                     <span class="dp-cham" style="top:51%;left:17%"></span>`,
-
-                    `${_ANH('list', 'Danh sách thẻ GPLX đang sử dụng')}
-                     <span class="dp-cham" style="top:26%;left:50%"></span>`,
-
-                    `<div class="dp-appbar trang">← Thông tin GPLX</div>
-                     <div style="padding:8px">
-                        <img src="${ANH_VNT.the}" alt="Thẻ GPLX" style="display:block;width:100%">
-                        <div style="margin-top:8px;text-align:center"><span class="dp-tag">CHỤP MÀN HÌNH NÀY</span></div>
-                        <div class="dp-ok">✓ Mỗi bằng một ảnh</div></div>
-                     <div class="dp-flash"></div>`
-                ]
             }
         };
 
@@ -1174,7 +1141,7 @@
             }).join('');
 
             const buoc = d.buoc.map((b, i) =>
-                `<li style="animation:dp-h${n} ${tong}s infinite ${i * 3}s"><b>${i + 1}</b>${b}</li>`).join('');
+                `<li style="animation:dp-h${n} ${tong}s infinite ${i * 3}s"><span class="stt">${i + 1}</span>${b}</li>`).join('');
 
             box.innerHTML = `<div class="dp-phone"><div class="dp-notch"></div><div class="dp-screen">${canh}</div></div>`
                 + `<ol class="dp-steps">${buoc}</ol>`
@@ -1234,7 +1201,7 @@
             }
         }
 
-        ['files_vneid_main','files_vneid_sub','files_gplx_moto','files_gplx_oto','files_vnetraffic','files_vnetraffic_the'].forEach(id => {
+        ['files_vneid_main','files_vneid_sub','files_gplx_moto','files_gplx_oto','files_vnetraffic'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.addEventListener('change', e => {
                 const count = e.target.files.length;
@@ -1334,8 +1301,6 @@
             const hasOto = document.getElementById('cb_co_bang_oto').checked;
             document.getElementById('block_gplx_moto').classList.toggle('hidden', !hasMoto);
             document.getElementById('block_gplx_oto').classList.toggle('hidden', !hasOto);
-            // Ô ảnh thẻ GPLX trong VNeTraffic — chỉ có nghĩa khi đã có bằng
-            document.getElementById('block_vnetraffic_the').classList.toggle('hidden', !(hasMoto || hasOto));
             // Tô sáng thẻ đang tick — làm bằng JS chứ không dùng CSS :has()
             // (máy cũ không hiểu :has(), mà app này chạy trên điện thoại đủ đời)
             document.getElementById('cb_co_bang_moto').closest('.check-card')?.classList.toggle('on', hasMoto);
@@ -1759,10 +1724,7 @@
                 // Upload các ảnh còn lại (GPLX + VNeTraffic) — VNeID đã upload ở Page 1
                 const gplxMoto  = hasMoto ? await uploadFiles('files_gplx_moto', 'gplx_moto') : [];
                 const gplxOto   = hasOto  ? await uploadFiles('files_gplx_oto',  'gplx_oto')  : [];
-                // Ảnh trang chủ + ảnh các thẻ GPLX gộp chung một mảng files_vnetraffic
-                // (giữ nguyên cấu trúc dữ liệu cũ để agent/backend không phải sửa)
-                const vntraffic = [...await uploadFiles('files_vnetraffic', 'vt'),
-                                   ...await uploadFiles('files_vnetraffic_the', 'vt_the')];
+                const vntraffic = await uploadFiles('files_vnetraffic', 'vt');
 
                 const anh = {
                     files_vneid_main: curAnh.files_vneid_main || curAnh.files_vneid || [],  // backward compat
