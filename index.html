@@ -1108,7 +1108,7 @@
                 buoc: ['Tải app <b>VNeTraffic</b> (Cục CSGT) trên CH Play / App Store',
                        'Bấm <b>"Tài khoản định danh điện tử"</b> — đăng nhập bằng VNeID',
                        'Đăng nhập xong, <b>chụp màn hình Trang chủ</b>'],
-                luuy: 'Bắt buộc với mọi hạng, kể cả khi bạn chưa có bằng lái nào. Ảnh minh hoạ là màn hình thật, đã che thông tin cá nhân.',
+                luuy: 'Bắt buộc với mọi hạng, kể cả khi bạn chưa có bằng lái nào.',
                 canh: [
                     `<div class="dp-store">
                         <div style="display:flex;justify-content:center">${_LOGO_VNT(46)}</div>
@@ -2726,10 +2726,12 @@
         });
 
         // ===== ĐỊA CHỈ 2 CẤP PICKER =====
-        // Dữ liệu từ provinces.open-api.vn (có cache localStorage theo tỉnh)
-        // Hỗ trợ cả hệ cũ 3 cấp (tỉnh→huyện→xã) và hệ mới 2 cấp (tỉnh→xã) sau sáp nhập 2025.
+        // Dữ liệu từ provinces.open-api.vn — BẮT BUỘC dùng nhánh /v2:
+        //   /api/     -> chuyển hướng sang v1 = 63 tỉnh + cấp huyện (dữ liệu CŨ)
+        //   /api/v2/  -> 34 tỉnh/thành, xã/phường trực tiếp (sau sáp nhập 01/7/2025)
+        // Đổi khoá cache khi đổi nguồn, nếu không máy đã lưu bản cũ sẽ giữ tới 7 ngày.
         (function() {
-            const API_BASE  = 'https://provinces.open-api.vn/api';
+            const API_BASE  = 'https://provinces.open-api.vn/api/v2';
             const CACHE_TTL = 7 * 24 * 3600 * 1000;  // 7 ngày
             let _dcTarget   = null;
             let _dcLoading  = false;
@@ -2747,42 +2749,44 @@
                 try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data })); } catch {}
             }
 
+            // Dọn cache của nguồn cũ (63 tỉnh) — chỉ chạy một lần cho mỗi máy
+            try {
+                if (!localStorage.getItem('dc_da_don_v1')) {
+                    for (let i = localStorage.length - 1; i >= 0; i--) {
+                        const k = localStorage.key(i);
+                        if (k === 'dc_provinces' || (k && k.startsWith('dc_wards_') && !k.startsWith('dc_wards_v2_')))
+                            localStorage.removeItem(k);
+                    }
+                    localStorage.setItem('dc_da_don_v1', '1');
+                }
+            } catch (e) {}
+
             async function dcLoadProvinces() {
-                let provinces = dcCacheGet('dc_provinces');
+                let provinces = dcCacheGet('dc_provinces_v2');
                 if (!provinces) {
                     const r = await fetch(`${API_BASE}/?depth=1`);
                     if (!r.ok) throw new Error('Không tải được danh sách tỉnh/thành');
                     provinces = await r.json();
-                    dcCacheSet('dc_provinces', provinces);
+                    dcCacheSet('dc_provinces_v2', provinces);
                 }
                 return provinces;
             }
 
             async function dcLoadWards(provinceCode) {
-                const cacheKey = `dc_wards_${provinceCode}`;
+                const cacheKey = `dc_wards_v2_${provinceCode}`;
                 let wards = dcCacheGet(cacheKey);
                 if (wards) return wards;
 
-                // Thử depth=2 trước (hệ 2 cấp sau sáp nhập)
-                const r2 = await fetch(`${API_BASE}/p/${provinceCode}?depth=2`);
-                if (!r2.ok) throw new Error('Không tải được danh sách xã/phường');
-                const data2 = await r2.json();
-
-                if (data2.wards && data2.wards.length > 0) {
-                    // API đã cập nhật sang 2 cấp (sau sáp nhập 2025)
-                    wards = data2.wards;
-                } else {
-                    // API cũ 3 cấp — lấy thêm depth=3 để có xã
-                    const r3 = await fetch(`${API_BASE}/p/${provinceCode}?depth=3`);
-                    const data3 = await r3.json();
-                    wards = [];
-                    for (const d of (data3.districts || [])) {
-                        for (const w of (d.wards || [])) wards.push(w);
-                    }
-                }
+                const r = await fetch(`${API_BASE}/p/${provinceCode}?depth=2`);
+                if (!r.ok) throw new Error('Không tải được danh sách xã/phường');
+                const data = await r.json();
+                wards = data.wards || [];
+                if (!wards.length) throw new Error('Tỉnh/thành này chưa có dữ liệu xã/phường');
                 dcCacheSet(cacheKey, wards);
                 return wards;
             }
+
+            let _dcThuCong = false;   // true khi không tải được danh sách -> nhập tay
 
             function dcUpdatePreview() {
                 const selTinh = document.getElementById('dc-sel-tinh');
@@ -2790,6 +2794,20 @@
                 const street  = (document.getElementById('dc-street')?.value || '').trim();
                 const preview = document.getElementById('dc-preview');
                 const btnOk   = document.getElementById('dc-btn-ok');
+
+                // Chế độ nhập tay: lấy nguyên những gì người dùng gõ
+                if (_dcThuCong) {
+                    if (street.length < 8) {
+                        preview.textContent = 'Gõ địa chỉ đầy đủ: thôn/số nhà, xã/phường, tỉnh/thành';
+                        preview.className = 'dc-preview-box empty';
+                        btnOk.disabled = true;
+                    } else {
+                        preview.textContent = street;
+                        preview.className = 'dc-preview-box';
+                        btnOk.disabled = false;
+                    }
+                    return;
+                }
 
                 const tenTinh = selTinh.selectedIndex > 0 ? selTinh.options[selTinh.selectedIndex].text : '';
                 const tenXa   = selXa.value || '';
@@ -2868,7 +2886,9 @@
                             selTinh.appendChild(opt);
                         }
                     } catch (e) {
-                        selTinh.innerHTML = '<option value="">⚠ Không tải được — kiểm tra mạng</option>';
+                        // Không tải được danh sách -> chuyển sang nhập tay, đừng để người dùng kẹt
+                        selTinh.innerHTML = '<option value="">⚠ Không tải được danh sách</option>';
+                        dcBatNhapTay();
                     }
                     selTinh.disabled = false;
                 } else {
@@ -2880,6 +2900,21 @@
                 // Focus chọn tỉnh
                 setTimeout(() => selTinh.focus(), 100);
             };
+
+            // Chuyển modal sang chế độ gõ tay toàn bộ địa chỉ
+            function dcBatNhapTay() {
+                _dcThuCong = true;
+                const g = document.getElementById('dc-nhom-street');
+                const st = document.getElementById('dc-street');
+                document.getElementById('dc-sel-xa').disabled = true;
+                if (g) g.querySelector('label').innerHTML =
+                    'Địa chỉ đầy đủ <span style="font-weight:normal;color:var(--warn);">(mạng lỗi — vui lòng gõ tay)</span>';
+                if (st) {
+                    st.placeholder = 'VD: Thôn Hà Luận 2, Phường Hòa Bình, Thành phố Hải Phòng';
+                    st.focus();
+                }
+                dcUpdatePreview();
+            }
 
             window.dcClosePicker = function() {
                 document.getElementById('dc-picker-modal').classList.remove('show');
@@ -2912,7 +2947,7 @@
         <div class="dc-modal-box">
             <div class="dc-modal-header">
                 <h3>📍 Chọn địa chỉ (2 cấp)</h3>
-                <p>Tỉnh/Thành phố → Xã/Phường/Thị trấn (hệ thống sau sáp nhập 2025)</p>
+                <p>Tỉnh/Thành phố → Xã/Phường (34 tỉnh thành, sau sáp nhập 01/7/2025)</p>
             </div>
             <div class="dc-modal-body">
                 <div class="dc-field-group">
@@ -2928,7 +2963,7 @@
                     </select>
                     <div class="dc-loading" id="dc-xa-loading">Đang tải danh sách...</div>
                 </div>
-                <div class="dc-field-group">
+                <div class="dc-field-group" id="dc-nhom-street">
                     <label>3. Số nhà, tên đường <span style="font-weight:normal;color:#aaa;">(tùy chọn)</span></label>
                     <input type="text" id="dc-street" class="dc-street-input"
                            placeholder="VD: 45 Lê Lợi, Khu 3"
