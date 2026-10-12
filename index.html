@@ -13,18 +13,22 @@
         const THUONG_HIEU = {
             'vuhungha': { ten: 'Hùng Hà', sdt: '' },
         };
+        // Tên + SĐT lấy từ bảng Supabase `agent_profile` (sửa trong phần mềm máy tính:
+        // Hồ sơ cá nhân → ⋯ → Agent tuyển sinh). THUONG_HIEU trên chỉ là dự phòng khi
+        // chưa đọc được Supabase.
         (function () {
             const ag = (new URLSearchParams(location.search).get('agent') || '').trim().toLowerCase();
-            const th = THUONG_HIEU[ag];
-            if (!th) return;
-            document.title = 'Hệ Sinh Thái ' + th.ten + ' | Nộp hồ sơ trực tuyến';
-            document.addEventListener('DOMContentLoaded', function () {
+            if (!ag) return;
+            function apDung(th) {
+                if (!th || !th.ten) return;
+                document.title = 'Hệ Sinh Thái ' + th.ten + ' | Nộp hồ sơ trực tuyến';
                 document.querySelectorAll('[data-th="ten"]').forEach(e => e.textContent = th.ten);
                 document.querySelectorAll('[data-th="ten-hoa"]').forEach(e => e.textContent = th.ten.toUpperCase());
                 document.querySelectorAll('[data-th="logo"]').forEach(e => e.remove());
                 const so = (th.sdt || '').replace(/\D/g, '');
                 document.querySelectorAll('[data-th="goi"]').forEach(e => {
                     if (!so) { e.style.display = 'none'; return; }
+                    e.style.display = '';
                     const dep = so.replace(/^(\d{4})(\d{3})(\d+)$/, '$1 $2 $3');
                     if (e.tagName === 'A') {
                         e.href = 'tel:' + so;
@@ -35,6 +39,17 @@
                         e.textContent = 'Gọi Giáo Viên — ' + dep;
                     }
                 });
+            }
+            document.addEventListener('DOMContentLoaded', function () {
+                apDung(THUONG_HIEU[ag]);
+                try {
+                    fetch(SUPABASE_URL + '/rest/v1/agent_profile?select=ten_hien_thi,sdt&username=eq.'
+                          + encodeURIComponent(ag),
+                          { headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY } })
+                        .then(r => r.ok ? r.json() : [])
+                        .then(ds => { if (ds && ds[0]) apDung({ ten: ds[0].ten_hien_thi, sdt: ds[0].sdt }); })
+                        .catch(() => {});
+                } catch (e) { /* giữ dự phòng */ }
             });
         })();
     </script>
