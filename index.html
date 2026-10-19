@@ -60,10 +60,10 @@
            không bo góc, điểm nhấn teal thay cho neon magenta cũ.
            ============================================================ */
         :root {
-            --bg-color: #f4f4f1;          /* nền trang (hơi ngà cho đỡ chói) */
+            --bg-color: #e3e7eb;          /* nền trang (hơi ngà cho đỡ chói) */
             --surface: #ffffff;           /* nền thẻ / panel */
             --text-color: #14171a;
-            --text-soft: #6b7280;         /* chữ phụ, nhãn */
+            --text-soft: #5b6472;         /* chữ phụ, nhãn */
             --border-color: #14171a;      /* viền đậm (giữ tên biến cũ) */
             --line: #e4e4de;              /* viền mảnh */
             --accent-color: #0781A7;      /* điểm nhấn — đồng bộ app máy tính */
@@ -73,6 +73,8 @@
             --sidebar-bg: #ffffff;
             --sidebar-text: #14171a;
             --ok: #2e7d32; --warn: #e65100; --err: #c62828;
+            --khoi-bg:#f7f8fa; --khoi-vien:#d3d9df; --o-nen:#e8f3fb; --o-vien:#6b7f90; --o-vien-dam:#4f6273; --o-goi-y:#5b6270; --o-focus:rgba(7,129,167,.30);
+            --bong-the:0 1px 3px rgba(20,23,26,.08),0 6px 18px rgba(20,23,26,.06);
             --font-mono: ui-monospace, 'Cascadia Mono', Consolas, 'JetBrains Mono', 'SFMono-Regular', Menlo, 'Courier New', monospace;
         }
         * { -webkit-tap-highlight-color: transparent; }
@@ -95,7 +97,7 @@
 
         /* ===== KHUNG NỘI DUNG ===== */
         .main-wrapper { margin-left: 264px; width: calc(100% - 264px); padding: 76px 40px 64px; box-sizing: border-box; }
-        .container-main { max-width: 880px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border-color); padding: 32px 34px 36px; box-sizing: border-box; }
+        .container-main { max-width: 880px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border-color); padding: 32px 34px 36px; box-sizing: border-box; box-shadow: var(--bong-the); }
 
         /* ===== HERO / THANH ĐẦU TRANG (kiểu getcroc) ===== */
         .page-hero { max-width: 880px; margin: 0 auto 18px; }
@@ -111,9 +113,10 @@
         /* ===== FORM ===== */
         .form-group { margin-bottom: 18px; }
         .form-group label { display: block; font-weight: bold; margin-bottom: 6px; font-size: 12px; letter-spacing: 0.3px; color: #3c4248; }
-        .form-control { width: 100%; padding: 12px 13px; border: 1px solid var(--line); box-sizing: border-box; font-family: var(--font-mono); font-size: 14px; background-color: var(--surface); color: var(--text-color); border-radius: 0; transition: 0.15s; }
-        .form-control:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px var(--accent-soft); background-color: #fff; }
-        .form-control::placeholder { color: #a3a8ad; }
+        .form-control { width: 100%; padding: 12px 13px; border: 1px solid var(--o-vien); box-sizing: border-box; font-family: var(--font-mono); font-size: 14px; background-color: var(--o-nen); color: var(--text-color); border-radius: 0; transition: 0.15s; }
+        .form-control:hover { border-color: var(--o-vien-dam); }
+        .form-control:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px var(--o-focus); background-color: #fff; }
+        .form-control::placeholder { color: var(--o-goi-y); }
         select.form-control { -webkit-appearance: none; appearance: none; cursor: pointer; padding-right: 34px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%236b7280' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 13px; }
         textarea.form-control { resize: vertical; min-height: 76px; }
 
@@ -138,18 +141,19 @@
 
         /* ===== Ô TẢI ẢNH ===== */
         .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-        .upload-card { position: relative; border: 1px dashed #b6b6ad; padding: 26px 18px; text-align: center; cursor: pointer; transition: 0.15s; background-color: var(--surface); }
+        .upload-card { position: relative; border: 1px dashed #7f8c99; padding: 26px 18px; text-align: center; cursor: pointer; transition: 0.15s; background-color: var(--surface); }
         .upload-card:hover { border-color: var(--accent-color); background-color: var(--accent-soft); }
         .upload-card.has-file { border-style: solid; border-color: var(--accent-color); background-color: var(--accent-soft); color: var(--text-color); }
         .upload-card .title { font-weight: bold; font-size: 13px; margin-bottom: 4px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.5px; }
         .upload-card .subtitle { font-size: 12px; color: var(--text-soft); }
+        .upload-card.o-anh .subtitle { color:#4b5563; }
         .upload-card.has-file .subtitle { color: var(--accent-hover); }
         .upload-card input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
         .file-status { margin-top: 9px; font-size: 12px; font-weight: bold; color: var(--accent-hover); }
         .upload-card.vneid-card { grid-column: 1 / -1; }
 
         /* ===== THẺ TICK CHỌN (loại bằng lái đang có) ===== */
-        .check-card { display:flex; align-items:center; gap:11px; padding:13px 14px; border:1px solid var(--line); background:var(--surface); cursor:pointer; font-family:var(--font-mono); font-size:13px; transition:0.15s; }
+        .check-card { display:flex; align-items:center; gap:11px; padding:13px 14px; border:1px solid var(--o-vien); background:var(--surface); cursor:pointer; font-family:var(--font-mono); font-size:13px; transition:0.15s; }
         .check-card:hover { border-color:var(--accent-color); background:var(--accent-soft); }
         .check-card input[type="checkbox"] { width:18px; height:18px; accent-color:var(--accent-color); cursor:pointer; flex-shrink:0; }
         .check-card.on { border-color:var(--accent-color); background:var(--accent-soft); }
@@ -164,7 +168,7 @@
         .hidden { display: none !important; }
 
         /* ===== OVERLAY CHỜ ===== */
-        #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(244, 244, 241, 0.96); backdrop-filter: blur(3px); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; text-align: center; padding: 16px; box-sizing: border-box; }
+        #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(227, 231, 235, 0.97); backdrop-filter: blur(3px); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; text-align: center; padding: 16px; box-sizing: border-box; }
         .spinner { width: 50px; height: 50px; border: 3px solid var(--line); border-top: 3px solid var(--accent-color); border-radius: 50%; animation: spin 0.9s linear infinite; margin: 0 auto 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
@@ -439,11 +443,13 @@
         .dc-modal-body { padding:18px; }
         .dc-field-group { margin-bottom:14px; }
         .dc-field-group label { display:block; font-size:11px; font-weight:bold; margin-bottom:5px; text-transform:uppercase; letter-spacing:1px; color:var(--text-soft); }
-        .dc-select { width:100%; padding:11px; border:1px solid var(--line); font-family:var(--font-mono); font-size:14px; background:#fff; color:var(--text-color); -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%236b7280' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 11px center; background-size:13px; padding-right:32px; cursor:pointer; box-sizing:border-box; transition:0.15s; }
-        .dc-select:focus { outline:none; border-color:var(--accent-color); box-shadow:0 0 0 3px var(--accent-soft); }
+        .dc-select { width:100%; padding:11px; border:1px solid var(--o-vien); font-family:var(--font-mono); font-size:14px; background-color:var(--o-nen); color:var(--text-color); -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%236b7280' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 11px center; background-size:13px; padding-right:32px; cursor:pointer; box-sizing:border-box; transition:0.15s; }
+        .dc-select:hover, .dc-street-input:hover { border-color:var(--o-vien-dam); }
+        .dc-select:focus { outline:none; border-color:var(--accent-color); box-shadow:0 0 0 3px var(--o-focus); background-color:#fff; }
         .dc-select:disabled { background-color:var(--light-gray); color:#a3a8ad; cursor:not-allowed; }
-        .dc-street-input { width:100%; padding:11px; border:1px solid var(--line); font-family:var(--font-mono); font-size:14px; box-sizing:border-box; transition:0.15s; }
-        .dc-street-input:focus { outline:none; border-color:var(--accent-color); box-shadow:0 0 0 3px var(--accent-soft); }
+        .dc-street-input { width:100%; padding:11px; border:1px solid var(--o-vien); font-family:var(--font-mono); font-size:14px; background-color:var(--o-nen); box-sizing:border-box; transition:0.15s; }
+        .dc-street-input::placeholder { color:var(--o-goi-y); }
+        .dc-street-input:focus { outline:none; border-color:var(--accent-color); box-shadow:0 0 0 3px var(--o-focus); background-color:#fff; }
         .dc-preview-box { background:var(--light-gray); border:1px solid var(--line); border-left:3px solid var(--accent-color); padding:10px 12px; font-size:13px; min-height:36px; line-height:1.5; word-break:break-word; }
         .dc-preview-box.empty { color:#a3a8ad; font-style:italic; }
         .dc-loading { font-size:11px; color:var(--text-soft); margin-top:4px; font-style:italic; display:none; }
@@ -458,11 +464,54 @@
         .dc-btn-nho:hover { background:var(--accent-color); color:#fff; }
         /* Wrapper cho field địa chỉ */
         .dc-input-wrapper { display:flex; gap:0; align-items:stretch; }
-        .dc-input-wrapper input[readonly] { flex:1; cursor:pointer; background:#fff; border-right:none; }
+        .dc-input-wrapper input[readonly] { flex:1; cursor:pointer; background:var(--o-nen); border-right:none; }
         .dc-input-wrapper input[readonly]:focus { outline:none; box-shadow:none; border-color:var(--line); background:var(--light-gray); }
         .dc-btn-pick { padding:10px 14px; background:var(--text-color); color:#fff; border:1px solid var(--border-color); border-left:none; font-family:var(--font-mono); font-size:13px; cursor:pointer; flex-shrink:0; transition:0.15s; white-space:nowrap; -webkit-appearance:none; }
         .dc-btn-pick:hover { background:var(--accent-color); border-color:var(--accent-color); }
         .dc-clear-btn { position:absolute; right:50px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:16px; cursor:pointer; color:var(--text-soft); padding:4px; line-height:1; display:none; }
+        /* ===== KHỐI NỔI BẬT + Ô BẮT BUỘC + ĐỌC LẠI ẢNH (2026-10-19) ===== */
+        .khoi { background:var(--khoi-bg); border:1px solid var(--khoi-vien); box-shadow:0 1px 2px rgba(20,23,26,.05); padding:16px 16px 6px; margin:0 0 18px; }
+        .khoi > .section-title:first-child { margin-top:0; }
+        .khoi.khoi-bb { border-left:4px solid var(--warn); }
+        .khoi.khoi-anh { background:#e8f4f8; border-color:#b7dbe7; padding-bottom:16px; }
+        .khoi.khoi-anh .section-title { color:#4b5563; }
+        .nhan-bb { display:inline-block; margin-left:8px; padding:1px 7px; font-size:11px; font-weight:bold; color:#8a3700; background:#ffe8d4; border:1px solid #f5b98a; letter-spacing:.3px; text-transform:none; }
+        input.o-thieu, select.o-thieu, textarea.o-thieu { background-color:#ffedb3 !important; border-color:var(--warn) !important; box-shadow:inset 0 0 0 1px var(--warn); }
+        input.o-thieu:focus, select.o-thieu:focus, textarea.o-thieu:focus { box-shadow:inset 0 0 0 1px var(--warn),0 0 0 3px rgba(230,81,0,.25); }
+        input.o-thieu::placeholder, textarea.o-thieu::placeholder { color:#566070; }
+        .upload-card.o-anh { border:2px dashed #5f93a5 !important; }
+        .upload-card.o-anh::before { content:'📷'; display:block; font-size:26px; line-height:1; margin-bottom:6px; }
+        .upload-card.o-anh.o-thieu { border-color:var(--warn) !important; background-color:#ffedb3 !important; }
+        .upload-card.o-anh.co-anh { border:2px solid var(--ok) !important; background-color:#eef8ef !important; }
+        .upload-card .xem-truoc { display:none; max-width:100%; max-height:140px; margin:8px auto 0; border:1px solid var(--line); }
+        .upload-card .xem-truoc.hien { display:block; }
+        .upload-card .ten-tep { font-size:12px; color:#4b5158; margin-top:6px; word-break:break-all; }
+        .upload-card .nut-chon-lai { display:none; font-size:12px; font-weight:bold; color:#1b5e20; margin-top:6px; }
+        .upload-card.co-anh .nut-chon-lai { display:inline-block; }
+        .thanh-thieu { position:sticky; bottom:0; z-index:5; display:flex; align-items:center; justify-content:space-between; gap:10px; margin:16px 0 0; padding:10px 14px; background:#fff3cf; border:1px solid var(--warn); color:#6b2c00; font-weight:bold; font-size:13px; }
+        .thanh-thieu.du { background:#e3f4e5; border-color:var(--ok); color:#1b5e20; }
+        .thanh-thieu .tt-di { padding:7px 14px; background:#14171a; color:#fff; border:1px solid #14171a; font-family:var(--font-mono); font-size:12px; font-weight:bold; cursor:pointer; }
+        .thanh-thieu.du .tt-di { display:none; }
+        .the-de-xuat { background:#fffaf0; border:1px solid #f5b98a; border-left:4px solid var(--warn); padding:14px 16px; margin-bottom:16px; font-size:13px; color:#3b2a14; }
+        .the-de-xuat .tdx-tieude { font-weight:bold; font-size:15px; margin-bottom:6px; }
+        .the-de-xuat .tdx-chip { display:inline-block; margin:2px 4px 2px 0; padding:2px 8px; background:#e3f4e5; border:1px solid #b6dcb9; color:#1b5e20; font-size:12px; }
+        .the-de-xuat .tdx-canhbao { background:#fdeaea; border:1px solid #f3b7b7; border-left:4px solid var(--err); color:#8e1b1b; padding:10px 12px; margin:8px 0; font-weight:bold; }
+        .the-de-xuat .tdx-dong { display:grid; grid-template-columns:130px 1fr 1fr auto; gap:10px; align-items:start; padding:10px 0; border-top:1px dashed #e0c9ad; }
+        .the-de-xuat .tdx-nhan { font-weight:bold; }
+        .the-de-xuat .tdx-nhan small { display:block; color:#8a3700; font-weight:bold; }
+        .the-de-xuat .tdx-gt b { display:block; font-size:11px; color:#5b6167; text-transform:uppercase; letter-spacing:.5px; }
+        .the-de-xuat .tdx-gt { word-break:break-word; white-space:pre-line; }
+        .the-de-xuat .tdx-nut button { padding:6px 10px; margin:2px 4px 2px 0; border:1px solid #14171a; background:#fff; color:#14171a; font-family:var(--font-mono); font-size:12px; font-weight:bold; cursor:pointer; }
+        .the-de-xuat .tdx-nut button.nhan { background:#14171a; color:#fff; }
+        .the-de-xuat .tdx-dong.da-nhan { background:#eef8ef; }
+        .the-de-xuat .tdx-kq { font-size:12px; font-weight:bold; color:#1b5e20; }
+        @media (max-width: 520px) {
+            #inline-xacnhan [style*="grid-template-columns: 1fr 1fr"], #inline-xacnhan [style*="grid-template-columns:1fr 1fr"],
+            #form-bo-sung [style*="grid-template-columns: 1fr 1fr"], #form-bo-sung [style*="grid-template-columns:1fr 1fr"],
+            #inline-xacnhan .upload-grid { grid-template-columns: 1fr !important; }
+            .the-de-xuat .tdx-dong { grid-template-columns: 1fr; }
+            .thanh-thieu { flex-wrap: wrap; }
+        }
     </style>
 </head>
 <body>
@@ -609,7 +658,7 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="form-group">
                     <label>Hạng Đào Tạo (*):</label>
-                    <select id="hang_dk" class="form-control">
+                    <select id="hang_dk" class="form-control" data-bb>
                         <option value="">-- Chọn Hạng --</option><option value="A1m">A1m</option><option value="Am">Am</option><option value="B.01">B.01</option><option value="B">B</option><option value="C1">C1</option><option value="Cm">Cm</option><option value="D1">D1</option><option value="D2">D2</option><option value="Dm">Dm</option><option value="CE">CE</option>
                     </select>
                 </div>
@@ -621,7 +670,7 @@
             <!-- Ô thâm niên — chỉ hiện khi chọn hạng nâng hạng -->
             <div id="box_tham_nien" style="display:none;" class="form-group">
                 <label>⭐ Số năm lái xe an toàn (*):</label>
-                <input type="number" id="nam_lai_xe_nop" class="form-control"
+                <input type="number" id="nam_lai_xe_nop" class="form-control" data-bb
                     min="1" max="50" placeholder="VD: 3 — Số năm tính từ ngày trúng tuyển / ngày đạt kết quả">
                 <small style="color:#888;">Tính từ ngày trúng tuyển hoặc ngày đạt kết quả ghi ở mặt sau bằng lái</small>
             </div>
@@ -641,14 +690,14 @@
                     <button class="upload-help-btn" onclick="event.stopPropagation();moHuongDan('vneid_main')" title="Xem hướng dẫn">?</button>
                     <div class="title">[+] Căn cước điện tử — phần trên</div>
                     <div class="subtitle">Ảnh, số định danh, họ tên</div>
-                    <input type="file" id="files_vneid_main" accept="image/*">
+                    <input type="file" id="files_vneid_main" data-bb accept="image/*">
                     <div id="status_files_vneid_main" class="file-status"></div>
                 </div>
                 <div class="upload-card" id="card_vneid_sub">
                     <button class="upload-help-btn" onclick="event.stopPropagation();moHuongDan('vneid_sub')" title="Xem hướng dẫn">?</button>
                     <div class="title">[+] Căn cước điện tử — cuộn xuống</div>
                     <div class="subtitle">Ngày cấp / SĐT / CMND cũ</div>
-                    <input type="file" id="files_vneid_sub" accept="image/*">
+                    <input type="file" id="files_vneid_sub" data-bb accept="image/*">
                     <div id="status_files_vneid_sub" class="file-status"></div>
                 </div>
             </div>
@@ -684,7 +733,7 @@
                     <button class="upload-help-btn" onclick="event.stopPropagation();moHuongDan('vnt_home')" title="Xem hướng dẫn">?</button>
                     <div class="title">[+] VNeTraffic — Trang chủ</div>
                     <div class="subtitle">Ảnh màn hình sau khi đăng nhập</div>
-                    <input type="file" id="files_vnetraffic" accept="image/*" multiple>
+                    <input type="file" id="files_vnetraffic" data-bb accept="image/*" multiple>
                     <div id="status_files_vnetraffic" class="file-status"></div>
                 </div>
             </div>
@@ -713,7 +762,7 @@
                         <button class="upload-help-btn" onclick="event.stopPropagation();moHuongDan('bang_lai')" title="Xem hướng dẫn">?</button>
                         <div class="title">[+] GPLX Mô Tô</div>
                         <div class="subtitle">1 hoặc 2 ảnh</div>
-                        <input type="file" id="files_gplx_moto" accept="image/*" multiple>
+                        <input type="file" id="files_gplx_moto" data-bb accept="image/*" multiple>
                         <div id="status_files_gplx_moto" class="file-status"></div>
                     </div>
                 </div>
@@ -727,7 +776,7 @@
                         <button class="upload-help-btn" onclick="event.stopPropagation();moHuongDan('bang_lai')" title="Xem hướng dẫn">?</button>
                         <div class="title">[+] GPLX Ô Tô</div>
                         <div class="subtitle">1 hoặc 2 ảnh</div>
-                        <input type="file" id="files_gplx_oto" accept="image/*" multiple>
+                        <input type="file" id="files_gplx_oto" data-bb accept="image/*" multiple>
                         <div id="status_files_gplx_oto" class="file-status"></div>
                     </div>
                 </div>
@@ -784,11 +833,12 @@
             
             <input type="hidden" id="recordId"> 
             
+            <div class="khoi khoi-bb" data-khoi="ca-nhan">
             <div class="section-title">I. Dữ Liệu Cá Nhân</div>
-            <div class="form-group"><label>Họ và tên (In hoa):</label><input type="text" id="ho_va_ten_chk" class="form-control" style="font-weight:bold;" required></div>
+            <div class="form-group"><label>Họ và tên (In hoa):<span class="nhan-bb">Bắt buộc</span></label><input type="text" id="ho_va_ten_chk" class="form-control" style="font-weight:bold;" data-bb required></div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="form-group"><label>Số C.C.C.D:</label><input type="text" id="so_cccd_chk" class="form-control" required></div>
-                <div class="form-group"><label>Điện thoại cá nhân (*):</label><input type="tel" id="sdt_chk" class="form-control" required placeholder="Vui lòng điền số ĐT..."></div>
+                <div class="form-group"><label>Điện thoại cá nhân (*):<span class="nhan-bb">Bắt buộc</span></label><input type="tel" id="sdt_chk" class="form-control" data-bb required placeholder="Vui lòng điền số ĐT..."></div>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="form-group"><label>Ngày sinh:</label><input type="text" id="ngay_sinh_chk" class="form-control" placeholder="DD/MM/YYYY"></div>
@@ -803,6 +853,7 @@
                 <label>Nơi ở hiện tại:</label>
                 <textarea id="noi_o_hien_tai_chk" class="form-control" rows="2"></textarea>
                 <button type="button" class="dc-btn-nho" onclick="dcOpenPicker('noi_o_hien_tai_chk')">📍 Chọn lại theo đơn vị hành chính mới</button>
+            </div>
             </div>
 
             <!-- Thông tin GPLX đã quét được — chỉ hiện khi có data -->
@@ -826,6 +877,7 @@
                 </div>
             </div>
 
+            <div class="khoi" data-khoi="lich-hoc">
             <div class="section-title">II. Thời Gian Biểu & Công Việc</div>
             <div class="form-group">
                 <label>Thời gian biểu học thực hành mong muốn:</label>
@@ -852,10 +904,12 @@
                 <div class="form-group"><label>Trình độ văn hóa:</label><select id="hoc_luc_chk" class="form-control"><option value="THCS">THCS</option><option value="THPT" selected>THPT</option><option value="Trung cấp">Trung cấp</option><option value="Cao đẳng">Cao đẳng</option><option value="Đại học">Đại học</option></select></div>
             </div>
             <div class="form-group"><label>Nơi làm việc:</label><input type="text" id="noi_lam_viec_chk" class="form-control"></div>
+            </div>
 
+            <div class="khoi khoi-bb" data-khoi="lien-he">
             <div class="section-title">III. Liên Hệ Khẩn Cấp (Bắt Buộc)</div>
-            <div class="form-group"><label>Họ tên người thân:</label><input type="text" id="nguoi_lh_ten_chk" class="form-control" required></div>
-            <div class="form-group"><label>SĐT người thân:</label><input type="tel" id="nguoi_lh_sdt_chk" class="form-control" required></div>
+            <div class="form-group"><label>Họ tên người thân:<span class="nhan-bb">Bắt buộc</span></label><input type="text" id="nguoi_lh_ten_chk" class="form-control" data-bb required></div>
+            <div class="form-group"><label>SĐT người thân:<span class="nhan-bb">Bắt buộc</span></label><input type="tel" id="nguoi_lh_sdt_chk" class="form-control" data-bb required></div>
             <div class="form-group">
                 <label>Địa chỉ người thân:</label>
                 <div class="dc-input-wrapper">
@@ -865,6 +919,7 @@
                     <button type="button" class="dc-btn-pick" onclick="dcOpenPicker('nguoi_lh_dia_chi_chk')">📍 Chọn</button>
                 </div>
                 <div class="field-hint" id="hint_nguoi_lh_dia_chi_chk"></div>
+            </div>
             </div>
 
             <button onclick="hoanTatHoSo()" id="btnFinal" class="btn-main">LƯU TRỮ VÀO HỆ THỐNG</button>
@@ -1274,6 +1329,12 @@
             });
         });
 
+        // Ô bắt buộc + ô ảnh có xem trước cho Trang 1/2 (Trang 3 khởi tạo trong hienThiFormXacNhan)
+        khoiTaoOAnh(document.getElementById('step1'));
+        khoiTaoOAnh(document.getElementById('step2'));
+        khoiTaoBatBuoc(document.getElementById('step1'), document.getElementById('btnSubmit'));
+        khoiTaoBatBuoc(document.getElementById('step2'), document.getElementById('btnPage2').parentNode);
+
         const HANG_NANG_HANG = ["D1", "D2", "Dm", "CE", "Cm"];
         // Hạng yêu cầu PHẢI có bằng ô tô (lực ép tick "Có bằng ô tô")
         const HANG_BUOC_CO_OTO = ["Cm", "D1", "D2", "Dm", "CE"];
@@ -1365,6 +1426,7 @@
             document.getElementById('cb_co_bang_moto').closest('.check-card')?.classList.toggle('on', hasMoto);
             document.getElementById('cb_co_bang_oto').closest('.check-card')?.classList.toggle('on', hasOto);
             // VNeTraffic LUÔN bắt buộc — không ẩn nữa
+            capNhatThieu(document.getElementById('step2'));   // ô ảnh bằng chỉ bắt buộc khi đã tick
         }
 
         function quayLaiPage1() {
@@ -1459,6 +1521,7 @@
 
         // ===== PAGE 1: Validate + chuyển sang Page 2 =====
         async function nopPage1() {
+            if (diToiThieu(document.getElementById('step1'))) return;   // cuộn tới ô thiếu đầu tiên
             const hang = document.getElementById('hang_dk').value;
             if(!hang) {
                 document.getElementById('hang_dk').classList.add('input-error');
@@ -1739,6 +1802,7 @@
 
         // ===== PAGE 2: Validate + upload GPLX/VNeTraffic + UPDATE row sang CHO_XU_LY =====
         async function nopPage2() {
+            if (diToiThieu(document.getElementById('step2'))) return;   // cuộn tới ô thiếu đầu tiên
             const hasMoto = document.getElementById('cb_co_bang_moto').checked;
             const hasOto = document.getElementById('cb_co_bang_oto').checked;
             const hang = document.getElementById('hang_dk').value;
@@ -1939,6 +2003,269 @@
             if (data) hienThiFormXacNhan(data);
         }
 
+        // ============================================================
+        // Ô BẮT BUỘC (data-bb) · bộ đếm "còn thiếu" · cuộn tới ô thiếu · xem trước ảnh
+        // (2026-10-19). Dùng cho Trang 1/2/3. Mọi hàm nhận `root` vì #step3 ẩn và
+        // #inline-xacnhan mang TRÙNG id — luôn truy vấn trong root, không dùng getElementById.
+        // ============================================================
+        function _esc(v) {
+            return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+        function _anDi(el, root) {
+            for (let n = el; n && n !== root; n = n.parentElement) {
+                if (n.classList && n.classList.contains('hidden')) return true;
+                if (n.style && n.style.display === 'none') return true;
+            }
+            return false;
+        }
+        function _oBatBuocTrong(root) {
+            return Array.from(root.querySelectorAll('[data-bb]')).filter(el => {
+                if (_anDi(el, root)) return false;
+                if (el.type === 'file') return !(el.files && el.files.length);
+                return !String(el.value || '').trim();
+            });
+        }
+        function _oDeDanhDau(el) { return el.type === 'file' ? (el.closest('.upload-card') || el) : el; }
+
+        function capNhatThieu(root) {
+            root = root || document;
+            const dsTrong = _oBatBuocTrong(root);
+            root.querySelectorAll('[data-bb]').forEach(el => _oDeDanhDau(el).classList.toggle('o-thieu', dsTrong.includes(el)));
+            const bar = root.querySelector('.thanh-thieu');
+            if (bar) {
+                const n = dsTrong.length;
+                bar.classList.toggle('du', n === 0);
+                bar.querySelector('.tt-chu').textContent = n ? ('Còn thiếu ' + n + ' mục bắt buộc') : '✓ Đã đủ các mục bắt buộc';
+            }
+            return dsTrong;
+        }
+
+        // Còn thiếu → cuộn tới ô thiếu ĐẦU TIÊN, đặt con trỏ vào đó, trả true (để chặn nút Lưu/Tiếp tục)
+        function diToiThieu(root) {
+            root = root || document;
+            const ds = capNhatThieu(root);
+            if (!ds.length) return false;
+            const el = ds[0];
+            _oDeDanhDau(el).scrollIntoView({ block: 'center' });
+            try { el.focus({ preventScroll: true }); } catch (e) {}
+            return true;
+        }
+
+        // Gắn thanh dính "Còn thiếu N mục" (đặt trước `truocPhanTu`) + lắng nghe gõ/chọn để cập nhật ngay
+        function khoiTaoBatBuoc(root, truocPhanTu) {
+            if (!root) return;
+            if (!root.querySelector('.thanh-thieu') && truocPhanTu && truocPhanTu.parentNode) {
+                const bar = document.createElement('div');
+                bar.className = 'thanh-thieu';
+                bar.innerHTML = '<span class="tt-chu"></span><button type="button" class="tt-di">Đi tới</button>';
+                truocPhanTu.parentNode.insertBefore(bar, truocPhanTu);
+            }
+            if (!root._daGanThieu) {
+                root._daGanThieu = true;
+                root.addEventListener('input', () => capNhatThieu(root));
+                root.addEventListener('change', () => capNhatThieu(root));
+                root.addEventListener('click', e => { if (e.target.closest && e.target.closest('.tt-di')) diToiThieu(root); });
+            }
+            capNhatThieu(root);
+        }
+
+        // Ô ảnh: viền nét đứt + biểu tượng máy ảnh + xem trước. HEIC (iPhone) trình duyệt không vẽ
+        // được thì chỉ hiện tên tệp — backend đọc được HEIC nên VẪN gửi được.
+        function khoiTaoOAnh(root) {
+            (root || document).querySelectorAll('.upload-card').forEach(card => {
+                const inp = card.querySelector('input[type=file]');
+                if (!inp || card._oAnh) return;
+                card._oAnh = true;
+                card.classList.add('o-anh');
+                const img = document.createElement('img'); img.className = 'xem-truoc'; img.alt = 'Xem trước';
+                const ten = document.createElement('div'); ten.className = 'ten-tep';
+                const lai = document.createElement('div'); lai.className = 'nut-chon-lai'; lai.textContent = '↻ Chụp/chọn lại';
+                card.appendChild(img); card.appendChild(ten); card.appendChild(lai);
+                inp.addEventListener('change', () => {
+                    const f = inp.files && inp.files[0];
+                    card.classList.toggle('co-anh', !!f);
+                    if (card._url) { URL.revokeObjectURL(card._url); card._url = null; }
+                    img.classList.remove('hien'); ten.textContent = '';
+                    if (!f) return;
+                    if (/^image\/(jpeg|png|webp|gif)$/i.test(f.type)) {
+                        card._url = URL.createObjectURL(f); img.src = card._url; img.classList.add('hien');
+                        if (inp.files.length > 1) ten.textContent = '+ ' + (inp.files.length - 1) + ' ảnh nữa';
+                    } else {
+                        ten.textContent = f.name + ' — không xem trước được, vẫn gửi được';
+                    }
+                });
+            });
+        }
+
+        // ============================================================
+        // OCR LẠI: thẻ "đề xuất" + gửi ảnh mới ở Trang 3
+        // ============================================================
+        const NHAN_COT = {
+            ho_va_ten: 'Họ và tên', ngay_sinh: 'Ngày sinh', gioi_tinh: 'Giới tính', dan_toc: 'Dân tộc',
+            ton_giao: 'Tôn giáo', que_quan: 'Quê quán', noi_thuong_tru: 'Nơi thường trú',
+            noi_o_hien_tai: 'Nơi ở hiện tại', ngay_cap_cccd: 'Ngày cấp CCCD', noi_cap_cccd: 'Nơi cấp CCCD',
+            so_cmt_cu: 'Số CMND cũ', sdt: 'Số điện thoại', so_gplx: 'Số GPLX', ngay_cap_gplx: 'Ngày cấp GPLX',
+            noi_cap_gplx: 'Nơi cấp GPLX', hang_gplx_da_co: 'Hạng GPLX đã có',
+        };
+        const O_FORM_TRANG3 = { ho_va_ten: 'ho_va_ten_chk', ngay_sinh: 'ngay_sinh_chk', gioi_tinh: 'gio_tinh_chk',
+            sdt: 'sdt_chk', noi_thuong_tru: 'noi_thuong_tru_chk', noi_o_hien_tai: 'noi_o_hien_tai_chk' };
+        const O_FORM_BOSUNG = { sdt: 'bs_sdt', noi_thuong_tru: 'bs_thuongtru', noi_o_hien_tai: 'bs_noio' };
+        // Đề xuất đã nhận mà KHÔNG có ô trên form → giữ ở đây, ghi kèm khi bấm Lưu
+        window._de_xuat_nhan = {};
+
+        // Dựng thẻ từ hs.ocr_lai.ket_qua (trả null nếu không có gì để hiện hoặc đã xem)
+        function dungTheDeXuat(root, hs, mapO) {
+            const ocr = hs && hs.ocr_lai;
+            if (!ocr || ocr.da_xem || !ocr.ket_qua) return null;
+            const kq = ocr.ket_qua;
+            const daDien = kq.da_dien || {}, deXuat = kq.de_xuat || {}, canhBao = kq.canh_bao || [];
+            if (!Object.keys(daDien).length && !Object.keys(deXuat).length && !canhBao.length) return null;
+            window._de_xuat_nhan = {};
+            const the = document.createElement('div');
+            the.className = 'the-de-xuat';
+            let h = '<div class="tdx-tieude">📷 Kết quả đọc lại ảnh mới</div>';
+            canhBao.forEach(c => { h += '<div class="tdx-canhbao">⛔ ' + _esc(c) + '</div>'; });
+            const cd = Object.keys(daDien);
+            if (cd.length) {
+                h += '<div style="margin:6px 0;"><b>Đã tự điền vào ô còn trống:</b><br>' +
+                    cd.map(c => '<span class="tdx-chip">' + _esc(NHAN_COT[c] || c) + '</span>').join('') + '</div>';
+            }
+            const cx = Object.keys(deXuat);
+            if (cx.length) {
+                h += '<div style="margin:8px 0 2px;"><b>Ảnh mới đọc ra khác với hồ sơ — hãy chọn giá trị đúng:</b></div>';
+                cx.forEach(c => {
+                    const d = deXuat[c];
+                    h += '<div class="tdx-dong" data-cot="' + _esc(c) + '">' +
+                        '<div class="tdx-nhan">' + _esc(d.nhan || NHAN_COT[c] || c) + (d.quan_trong ? '<small>Quan trọng</small>' : '') + '</div>' +
+                        '<div class="tdx-gt"><b>Hiện tại</b>' + _esc(d.cu) + '</div>' +
+                        '<div class="tdx-gt"><b>Đọc từ ảnh mới</b>' + _esc(d.moi) + '</div>' +
+                        '<div class="tdx-nut"><button type="button" class="nhan" data-hd="nhan">Dùng giá trị mới</button>' +
+                        '<button type="button" data-hd="giu">Giữ nguyên</button><div class="tdx-kq"></div></div></div>';
+                });
+            }
+            the.innerHTML = h;
+            the.addEventListener('click', e => {
+                const nut = e.target.closest && e.target.closest('button[data-hd]');
+                if (!nut) return;
+                const dong = nut.closest('.tdx-dong'); const c = dong.dataset.cot; const d = deXuat[c];
+                const el = mapO[c] ? root.querySelector('#' + mapO[c]) : null;
+                const kqEl = dong.querySelector('.tdx-kq');
+                if (nut.dataset.hd === 'nhan') {
+                    window._de_xuat_nhan[c] = d.moi;
+                    if (el) { el.value = c === 'ho_va_ten' ? String(d.moi).toUpperCase() : d.moi; el.dispatchEvent(new Event('input', { bubbles: true })); }
+                    dong.classList.add('da-nhan'); kqEl.textContent = '✓ Đã dùng giá trị mới — bấm Lưu để xác nhận';
+                } else {
+                    delete window._de_xuat_nhan[c];
+                    if (el) { el.value = d.cu; el.dispatchEvent(new Event('input', { bubbles: true })); }
+                    dong.classList.remove('da-nhan'); kqEl.textContent = 'Giữ giá trị hiện tại';
+                }
+            });
+            return the;
+        }
+
+        // Ghi ho_so_inbox; nếu Supabase chưa có cột ocr_lai (chưa chạy migration) thì thử lại không kèm cột đó
+        async function ghiInbox(hsId, payload) {
+            let r = await db.from('ho_so_inbox').update(payload).eq('id', hsId);
+            if (r.error && 'ocr_lai' in payload && /ocr_lai|PGRST204|column/i.test((r.error.message || '') + (r.error.code || ''))) {
+                console.warn('Chưa có cột ocr_lai — ghi lại không kèm ocr_lai');
+                const p2 = Object.assign({}, payload); delete p2.ocr_lai;
+                r = await db.from('ho_so_inbox').update(p2).eq('id', hsId);
+            }
+            return r;
+        }
+
+        // Đọc các ô văn bản của Trang 3 → {cột inbox: giá trị}. KHÔNG gồm so_cccd (CCCD không đổi qua đây).
+        function docFormXacNhan(formDiv) {
+            const g = id => ((formDiv.querySelector('#' + id) || {}).value || '').trim();
+            let nghe = g('nghe_nghiep_chk'); if (nghe === 'Khác') nghe = g('nghe_nghiep_khac_chk');
+            return {
+                ho_va_ten: g('ho_va_ten_chk').toUpperCase(), ngay_sinh: g('ngay_sinh_chk'), gioi_tinh: g('gio_tinh_chk'),
+                sdt: g('sdt_chk'), noi_thuong_tru: g('noi_thuong_tru_chk'), noi_o_hien_tai: g('noi_o_hien_tai_chk'),
+                nghe_nghiep: nghe, noi_lam_viec: g('noi_lam_viec_chk'), hoc_luc: g('hoc_luc_chk'),
+                nguoi_lien_he_ten: g('nguoi_lh_ten_chk'), nguoi_lien_he_sdt: g('nguoi_lh_sdt_chk'),
+                nguoi_lien_he_dia_chi: g('nguoi_lh_dia_chi_chk'),
+            };
+        }
+        // Các cột học viên VỪA sửa so với bản lúc mở form (để agent đẩy xuống SQL trước khi OCR)
+        function cotKhachSua(moi, goc) {
+            const ds = [];
+            Object.keys(moi).forEach(c => {
+                const v = String(moi[c] || '').trim();
+                if (!v) return;
+                if (c === 'hoc_luc' && !goc.hoc_luc) return;   // ô có giá trị mặc định THPT, không phải học viên sửa
+                if (v !== String(goc[c] || '').trim()) ds.push(c);
+            });
+            return ds;
+        }
+
+        // Khối "IV. Ảnh đã gửi sai? Chụp/chọn lại" (chỉ dựng bằng JS → không trùng id với #step3)
+        function taoKhoiAnhLai(formDiv, hs) {
+            const motoOnly = ['A1m', 'Am'].includes(hs.hang_dk || '');
+            const the = (loai, tieuDe, phu) => '<div class="upload-card"><div class="title">' + tieuDe + '</div><div class="subtitle">' + phu +
+                '</div><input type="file" id="lai_files_' + loai + '" accept="image/*" multiple></div>';
+            const kh = document.createElement('div');
+            kh.className = 'khoi khoi-anh'; kh.setAttribute('data-khoi', 'anh-lai');
+            kh.innerHTML = '<div class="section-title">IV. Ảnh đã gửi sai? Chụp/chọn lại</div>' +
+                '<div class="note">Chọn lại ảnh nào bị sai hoặc mờ rồi bấm nút bên dưới. Hệ thống sẽ <b>đọc lại</b> ảnh: ô còn trống được tự điền, ' +
+                'ô đã có mà ảnh mới đọc khác sẽ <b>hỏi lại bạn</b> — không tự ghi đè.</div>' +
+                '<div class="upload-grid">' +
+                the('vneid_main', '[+] Căn cước điện tử — phần trên', 'Ảnh, số định danh, họ tên') +
+                the('vneid_sub', '[+] Căn cước điện tử — cuộn xuống', 'Ngày cấp / SĐT / CMND cũ') +
+                the('vnetraffic', '[+] VNeTraffic — Trang chủ', 'Ảnh màn hình sau khi đăng nhập') +
+                the('gplx_moto', '[+] GPLX Mô tô', 'Bằng mô tô đã có') +
+                (motoOnly ? '' : the('gplx_oto', '[+] GPLX Ô tô', 'Bằng ô tô đã có (hạng cao nhất)')) +
+                '</div><button type="button" class="btn-main" data-act="gui-anh-lai">GỬI ẢNH MỚI &amp; ĐỌC LẠI</button>';
+            return kh;
+        }
+
+        async function guiAnhMoiOcrLai(formDiv) {
+            const hs = window.temp_hs_bosung || {};
+            const hsId = hs.id || window._hs_id_xacnhan;
+            const LOAI = ['vneid_main', 'vneid_sub', 'vnetraffic', 'gplx_moto', 'gplx_oto'];
+            const co = LOAI.some(l => { const e = formDiv.querySelector('#lai_files_' + l); return e && e.files.length; });
+            if (!co) return alert('Bạn chưa chọn ảnh mới nào. Hãy bấm vào ô ảnh cần chụp/chọn lại.');
+            const btn = formDiv.querySelector('[data-act="gui-anh-lai"]');
+            btn.disabled = true; btn.innerText = 'ĐANG TẢI ẢNH LÊN...';
+            try {
+                _sessionId = '';
+                const moi = {};
+                for (const l of LOAI) moi[l] = await uploadBoSungFiles('lai_files_' + l, l, formDiv);
+                let cu = hs.anh_data || {};
+                if (typeof cu === 'string') { try { cu = JSON.parse(cu); } catch (e) { cu = {}; } }
+                const anh = Object.assign({}, cu, {
+                    files_vneid_main: [...(cu.files_vneid_main || cu.files_vneid || []), ...moi.vneid_main],
+                    files_vneid_sub:  [...(cu.files_vneid_sub || []), ...moi.vneid_sub],
+                    files_vnetraffic: [...(cu.files_vnetraffic || []), ...moi.vnetraffic],
+                    files_gplx_moto:  [...(cu.files_gplx_moto || cu.files_gplx || []), ...moi.gplx_moto],
+                    files_gplx_oto:   [...(cu.files_gplx_oto || []), ...moi.gplx_oto],
+                });
+                const cot = docFormXacNhan(formDiv);
+                const truong = cotKhachSua(cot, hs);
+                // Đề xuất đã nhận mà không có ô trên form → ghi kèm
+                Object.keys(window._de_xuat_nhan || {}).forEach(c => {
+                    if (!(c in cot)) { cot[c] = window._de_xuat_nhan[c]; truong.push(c); }
+                });
+                Object.keys(cot).forEach(c => { if (cot[c] === '') delete cot[c]; });  // không ghi ô trống đè lên inbox
+                const payload = Object.assign({}, cot, {
+                    anh_data: anh,
+                    trang_thai: 'CHO_XU_LY',
+                    loi_chi_tiet: null,
+                    ocr_lai: { truong_khach_sua: truong },
+                    cap_nhat_luc: new Date().toISOString(),
+                });
+                if (hs.local_hoc_vien_id) payload.local_hoc_vien_id = hs.local_hoc_vien_id;
+                const { error } = await ghiInbox(hsId, payload);
+                if (error) throw error;
+                document.getElementById('inline-xacnhan')?.remove();
+                document.getElementById('loading-spinner-box').classList.remove('hidden');
+                document.querySelector('#loading-spinner-box div:nth-child(2)').innerText = 'Hệ thống đang đọc lại ảnh mới...';
+                langNgheKetQua(hsId);
+            } catch (e) {
+                alert('Lỗi gửi ảnh: ' + (e.message || e));
+                btn.disabled = false; btn.innerText = 'GỬI ẢNH MỚI & ĐỌC LẠI';
+            }
+        }
+
         function hienThiFormXacNhan(hs) {
             capNhatProgress(3);
             // Sau migration v2: dùng trực tiếp các cột phẳng của ho_so_inbox
@@ -2132,21 +2459,14 @@
             // 9b. Form gọn cho A1m / Am — ẩn các section không cần thiết
             const HANG_MOTO_ONLY = ['A1m', 'Am'];
             if (HANG_MOTO_ONLY.includes(hs.hang_dk)) {
-                // Tìm và ẩn 2 section: "II. Thời Gian Biểu & Công Việc" + "III. Liên Hệ Khẩn Cấp"
-                const sectionTitles = formDiv.querySelectorAll('.section-title');
-                sectionTitles.forEach(st => {
-                    const t = (st.textContent || '').trim();
-                    if (t.startsWith('II. Thời Gian Biểu') || t.startsWith('III. Liên Hệ')) {
-                        // Ẩn section title và tất cả siblings đến section-title kế tiếp
-                        // HOẶC đến khi gặp nút #btnFinal (để không ẩn nút Lưu)
-                        st.style.display = 'none';
-                        let next = st.nextElementSibling;
-                        while (next && !next.classList.contains('section-title') && next.id !== 'btnFinal') {
-                            next.style.display = 'none';
-                            next = next.nextElementSibling;
-                        }
-                    }
+                // Ẩn 2 khối "II. Thời Gian Biểu & Công Việc" + "III. Liên Hệ Khẩn Cấp" theo data-khoi
+                // (KHÔNG duyệt anh em theo chữ tiêu đề nữa — lần trước làm ẩn nhầm cả nút Lưu, §23.5)
+                ['lich-hoc', 'lien-he'].forEach(k => {
+                    const kh = formDiv.querySelector('[data-khoi="' + k + '"]');
+                    if (kh) kh.style.display = 'none';
                 });
+                // Ô liên hệ không còn bắt buộc → bỏ data-bb để bộ đếm không tính chúng
+                formDiv.querySelectorAll('[data-khoi="lien-he"] [data-bb]').forEach(el => el.removeAttribute('data-bb'));
                 // Đảm bảo nút Lưu vẫn hiển thị (vì nó đứng sau section III, không có section-title nào sau nó)
                 const btnFinalShow = q('#btnFinal');
                 if (btnFinalShow) btnFinalShow.style.display = '';
@@ -2166,12 +2486,27 @@
             const btnFinal = q('#btnFinal');
             if (btnFinal) btnFinal.onclick = hoanTatHoSo;
 
+            // 10b. Khối gửi lại ảnh (OCR lại) + thanh "còn thiếu" + ô ảnh có xem trước
+            if (btnFinal && hs.local_hoc_vien_id) {
+                const khAnh = taoKhoiAnhLai(formDiv, hs);
+                btnFinal.parentNode.insertBefore(khAnh, btnFinal);
+                khAnh.querySelector('[data-act="gui-anh-lai"]').onclick = () => guiAnhMoiOcrLai(formDiv);
+            }
+            khoiTaoOAnh(formDiv);
+            khoiTaoBatBuoc(formDiv, btnFinal);
+
+            // 10c. Thẻ kết quả đọc lại ảnh (đề xuất / đã tự điền / cảnh báo) — đặt đầu form
+            const theDX = dungTheDeXuat(formDiv, hs, O_FORM_TRANG3);
+            if (theDX) formDiv.insertBefore(theDX, formDiv.firstChild);
+
             // 11. Hiển thị overlay
             document.getElementById('loading-overlay').style.display = 'flex';
         }
 
         async function hoanTatHoSo() {
             const formDiv = document.getElementById('inline-xacnhan') || document;
+            // Còn ô bắt buộc trống → cuộn tới ô thiếu đầu tiên, không đi tiếp
+            if (formDiv !== document && diToiThieu(formDiv)) return;
             const getVal = (id) => (formDiv.querySelector ? formDiv.querySelector('#'+id) : document.getElementById(id))?.value || '';
             const hoten = getVal('ho_va_ten_chk');
             const sdt = getVal('sdt_chk');
@@ -2233,8 +2568,12 @@
                 cap_nhat_luc: new Date().toISOString(),
             };
 
+            // Đề xuất OCR lại đã nhận mà không có ô trên form → ghi kèm; rồi đánh dấu đã xem thẻ
+            Object.keys(window._de_xuat_nhan || {}).forEach(c => { if (!(c in updateData)) updateData[c] = window._de_xuat_nhan[c]; });
+            if ((window.temp_hs_bosung || {}).ocr_lai) updateData.ocr_lai = { da_xem: true };
+
             const hs_id = (formDiv.querySelector ? formDiv.querySelector('#recordId') : document.getElementById('recordId'))?.value || document.getElementById('recordId').value;
-            const { error } = await db.from('ho_so_inbox').update(updateData).eq('id', hs_id);
+            const { error } = await ghiInbox(hs_id, updateData);
             if(!error) {
                 capNhatProgress(4);
                 document.getElementById('loading-overlay').style.display = 'none';
@@ -2423,6 +2762,8 @@
                         </div>
 
                         <div id="form-bo-sung" style="display:none;border-top:1px solid #14171a;padding:20px;background:#f7f7f4;">
+                            <div id="bs-cho" class="note" style="display:none;"></div>
+                            <div id="bs-de-xuat"></div>
                             <div style="font-family:var(--font-mono);font-size:11px;color:#999;text-transform:uppercase;letter-spacing:2px;margin-bottom:15px;">
                                 Chỉ điền ô cần bổ sung — để trống = giữ nguyên cũ
                             </div>
@@ -2494,8 +2835,8 @@
                                 </div>
                                 <input id="bs_gio_hoc_khac" class="form-control" placeholder="Ghi chú thêm về lịch học..." style="margin-top:8px;">
                             </div>
-                            <div style="margin-top:20px;border-top:1px dashed #b6b6ad;padding-top:15px;">
-                                <div style="font-family:var(--font-mono);font-size:11px;color:#999;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;">
+                            <div class="khoi khoi-anh" style="margin-top:20px;">
+                                <div style="font-family:var(--font-mono);font-size:11px;color:#4b5158;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;">
                                     IV. Upload lại ảnh giấy tờ (nếu thiếu)
                                 </div>
                                 <div style="font-size:11px;color:#888;margin-bottom:12px;">Chỉ chọn ô nào cần bổ sung — ô bỏ trống sẽ giữ nguyên ảnh cũ.</div>
@@ -2581,6 +2922,17 @@
                     </div>
                 `;
 
+                // Ô ảnh có xem trước + thẻ kết quả đọc lại ảnh (nếu lần trước còn đề xuất chưa xem)
+                const fbs = document.getElementById('form-bo-sung');
+                khoiTaoOAnh(fbs);
+                window._de_xuat_nhan = {};
+                const theBS = dungTheDeXuat(document, hs, O_FORM_BOSUNG);
+                if (theBS) {
+                    document.getElementById('bs-de-xuat').appendChild(theBS);
+                    fbs.style.display = 'block';
+                    if (fbs.previousElementSibling) fbs.previousElementSibling.style.display = 'none';
+                }
+
             } catch(e) {
                 alert("Lỗi: " + e.message);
             } finally {
@@ -2634,8 +2986,8 @@
 
             chuyenManHinh('view-screen');
         }
-        async function uploadBoSungFiles(inputId, folderPrefix) {
-            const input = document.getElementById(inputId);
+        async function uploadBoSungFiles(inputId, folderPrefix, root) {
+            const input = (root || document).querySelector('#' + inputId);
             if (!input || input.files.length === 0) return [];
             const sid = getSessionId();
             let urls = [];
@@ -2662,6 +3014,51 @@
                 card.style.background = '';
                 if (statusEl) statusEl.innerText = '';
             }
+        }
+
+        // Màn bổ sung: chờ máy tính đọc lại ảnh mới rồi hiện thẻ kết quả ngay trong form
+        function choKetQuaBoSung(hsId) {
+            const cho = document.getElementById('bs-cho');
+            const nut = document.getElementById('btn-luu-bosung');
+            cho.style.display = 'block';
+            cho.innerHTML = '⏳ <b>Đang đọc lại ảnh mới…</b> Vui lòng giữ nguyên màn hình (thường dưới 1 phút).';
+            nut.innerText = 'ĐANG ĐỌC LẠI ẢNH...';
+            const xong = () => { nut.disabled = false; nut.innerText = 'LƯU BỔ SUNG'; };
+            let lan = 0;
+            const iv = setInterval(async () => {
+                if (++lan > 100) {
+                    clearInterval(iv); xong();
+                    cho.innerHTML = 'Hệ thống vẫn đang xử lý ảnh. Bạn có thể đóng trang, mở lại sau ít phút để xem kết quả.';
+                    return;
+                }
+                try {
+                    const { data } = await db.from('ho_so_inbox').select('*').eq('id', hsId).single();
+                    if (!data) return;
+                    if (data.trang_thai === 'LOI_XU_LY') {
+                        clearInterval(iv); xong();
+                        cho.innerHTML = '⚠️ <b>Không đọc được ảnh mới:</b> ' + _esc(data.loi_chi_tiet || 'ảnh bị lỗi hoặc quá mờ') + '. Vui lòng chọn lại ảnh khác.';
+                        return;
+                    }
+                    if (['CHO_KHACH_XEM', 'KHACH_DA_SUA', 'HOAN_TAT'].includes(data.trang_thai)) {
+                        clearInterval(iv); xong();
+                        window._hs_hien_tai = data; window._i_hien_tai = data; _sessionId = '';
+                        document.querySelectorAll('#form-bo-sung input[type=file]').forEach(i => {
+                            i.value = ''; i.dispatchEvent(new Event('change'));
+                        });
+                        window._de_xuat_nhan = {};
+                        const box = document.getElementById('bs-de-xuat');
+                        box.innerHTML = '';
+                        const the = dungTheDeXuat(document, data, O_FORM_BOSUNG);
+                        if (the) {
+                            box.appendChild(the);
+                            cho.innerHTML = '✓ <b>Đã đọc xong ảnh mới.</b> Xem kết quả bên dưới, chọn giá trị đúng rồi bấm LƯU BỔ SUNG.';
+                            the.scrollIntoView({ block: 'center' });
+                        } else {
+                            cho.innerHTML = '✓ <b>Đã đọc xong ảnh mới.</b> Không có gì khác với hồ sơ hiện tại.';
+                        }
+                    }
+                } catch (e) { console.error('Polling bổ sung lỗi:', e); }
+            }, 3000);
         }
 
         async function luuBoSung() {
@@ -2692,6 +3089,12 @@
                     return { raw_list: checked, note: document.getElementById('bs_gio_hoc_khac').value.trim() };
                 })(),
             };
+
+            // Đề xuất OCR lại đã nhận mà không có ô trên form → ghi kèm
+            const nhanTay = window._de_xuat_nhan || {};
+            Object.keys(nhanTay).forEach(c => { moi[c] = nhanTay[c]; });
+            // Cột học viên vừa sửa → agent đẩy xuống SQL TRƯỚC khi đọc lại ảnh (khỏi mất chữ gõ tay)
+            const truongSua = Object.keys(moi).filter(c => typeof moi[c] === 'string' && moi[c].trim() && moi[c].trim() !== String(cu[c] || '').trim());
 
             document.getElementById('btn-luu-bosung').innerText = 'ĐANG LƯU...';
             document.getElementById('btn-luu-bosung').disabled = true;
@@ -2741,13 +3144,20 @@
                 };
                 if (co_anh_moi) {
                     updatePayload.anh_data = anh_data_moi;
+                    updatePayload.ocr_lai = { truong_khach_sua: truongSua };
+                } else if (window._hs_hien_tai.ocr_lai) {
+                    updatePayload.ocr_lai = { da_xem: true };   // đã xem thẻ đề xuất → không hiện lại
                 }
 
-                const { error } = await db.from('ho_so_inbox')
-                    .update(updatePayload)
-                    .eq('id', hs_id);
+                const { error } = await ghiInbox(hs_id, updatePayload);
 
                 if(error) throw error;
+
+                if (co_anh_moi) {
+                    // Có ảnh mới → chờ máy tính đọc lại rồi hiện thẻ đề xuất (không đóng form)
+                    choKetQuaBoSung(hs_id);
+                    return;
+                }
 
                 const msg = co_anh_moi
                     ? "✅ Đã lưu bổ sung + upload ảnh mới!\nHệ thống sẽ quét lại ảnh và đồng bộ về máy tính."
