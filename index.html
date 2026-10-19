@@ -487,8 +487,6 @@
         .dc-chon { display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--accent-soft); border:1px solid var(--accent-color); padding:10px 12px; margin-bottom:10px; }
         .dc-chon-chu { font-size:14px; font-weight:bold; color:var(--accent-hover); word-break:break-word; }
         .dc-doi { min-height:36px; padding:6px 14px; background:#fff; color:var(--accent-hover); border:1px solid var(--accent-color); font-family:var(--font-mono); font-size:13px; font-weight:bold; cursor:pointer; flex-shrink:0; }
-        .dc-tay-hang { margin-bottom:10px; }
-        .dc-btn-tay { min-height:36px; padding:6px 12px; background:#fff; color:var(--accent-hover); border:1px dashed var(--accent-color); font-family:var(--font-mono); font-size:13px; cursor:pointer; }
         .dc-chon-ds { margin-bottom:12px; border:1px solid var(--line); padding:8px 12px; }
         .dc-chon-ds summary { cursor:pointer; font-size:12.5px; color:var(--text-soft); min-height:32px; line-height:32px; }
         .dc-ghichu { font-weight:normal; color:var(--text-soft); text-transform:none; letter-spacing:0; }
@@ -515,6 +513,26 @@
         .upload-card .ten-tep { font-size:12px; color:#4b5158; margin-top:6px; word-break:break-all; }
         .upload-card .nut-chon-lai { display:none; font-size:12px; font-weight:bold; color:#1b5e20; margin-top:6px; }
         .upload-card.co-anh .nut-chon-lai { display:inline-block; }
+        /* Bằng lái: chọn cách gửi + kiểm ảnh (2026-10-19) */
+        .gplx-chon { margin:0 0 14px; position:relative; }
+        .gplx-opts { display:grid; gap:8px; margin-bottom:10px; }
+        .gplx-opt { display:flex; align-items:flex-start; gap:10px; padding:11px 12px; border:1px solid var(--o-vien); background:var(--surface); cursor:pointer; font-size:13px; line-height:1.5; color:var(--text-color); }
+        .gplx-opt:hover { border-color:var(--accent-color); }
+        .gplx-opt.on { border-color:var(--accent-color); background:var(--accent-soft); }
+        .gplx-opt input { margin-top:3px; width:18px; height:18px; accent-color:var(--accent-color); flex-shrink:0; }
+        .gplx-chua-chon { display:block; width:100%; height:0; padding:0; margin:0; border:0 !important; opacity:0; pointer-events:none; box-shadow:none !important; }
+        .gplx-cot { display:flex; flex-direction:column; gap:8px; min-width:0; }
+        .gplx-mh-luoi { display:grid; grid-template-columns:repeat(auto-fit,minmax(100px,1fr)); gap:8px; margin:10px 0; }
+        .gplx-mh { margin:0; padding:6px; background:#fff; border:1px solid var(--line); text-align:center; }
+        .gplx-mh svg { border:1px solid var(--line); }
+        .gplx-mh figcaption { margin-top:4px; font-size:11.5px; line-height:1.4; font-weight:bold; }
+        .mh-ok { color:#1b5e20; } .mh-sai { color:#a61b12; }
+        .gplx-quy-tac { margin:6px 0 8px 18px; padding:0; font-size:12.5px; line-height:1.6; }
+        .kt-hop { padding:10px 12px; background:#fdecea; border:1px solid #c0392b; color:#7a160d; font-size:12.5px; line-height:1.5; }
+        .kt-hop.nhe { background:#f1f3f5; border-color:#8a96a0; color:#2f3a42; }
+        .kt-nut-hang { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+        .kt-nut { min-height:38px; padding:7px 14px; background:#14171a; color:#fff; border:1px solid #14171a; font-family:var(--font-mono); font-size:12px; font-weight:bold; cursor:pointer; }
+        .kt-nut.kt-phu { background:#fff; color:#14171a; }
         .thanh-thieu { position:sticky; bottom:0; z-index:5; display:flex; align-items:center; justify-content:space-between; gap:10px; margin:16px 0 0; padding:10px 14px; background:#fff3cf; border:1px solid var(--warn); color:#6b2c00; font-weight:bold; font-size:13px; }
         .thanh-thieu.du { background:#e3f4e5; border-color:var(--ok); color:#1b5e20; }
         .thanh-thieu .tt-di { padding:7px 14px; background:#14171a; color:#fff; border:1px solid #14171a; font-family:var(--font-mono); font-size:12px; font-weight:bold; cursor:pointer; }
@@ -783,30 +801,14 @@
             <!-- Ảnh chụp bằng lái cứng — chỉ hiện khi tick -->
             <div id="block_gplx_moto" class="hidden">
                 <div class="section-title">Ảnh Bằng Mô Tô</div>
-                <div class="note">Chụp màn hình thẻ trong <b>VNeTraffic</b>, hoặc chụp ảnh bằng thật (mặt trước + mặt sau). Bấm <b>?</b> để xem hoạt ảnh.</div>
-                <div class="upload-grid">
-                    <div class="upload-card" id="card_gplx_moto">
-                        <button class="upload-help-btn" onclick="event.stopPropagation();moHuongDan('bang_lai')" title="Xem hướng dẫn">?</button>
-                        <div class="title">[+] GPLX Mô Tô</div>
-                        <div class="subtitle">1 hoặc 2 ảnh</div>
-                        <input type="file" id="files_gplx_moto" data-bb accept="image/*" multiple>
-                        <div id="status_files_gplx_moto" class="file-status"></div>
-                    </div>
-                </div>
+                <div class="note">Chọn cách gửi: <b>chụp màn hình thẻ trong VNeTraffic</b>, hoặc nếu bằng chưa có trên VNeTraffic (bằng giấy cũ, thẻ PET mới) thì <b>chụp bằng thật cả mặt trước lẫn mặt sau</b>.</div>
+                <div id="gplx_slot_moto"></div>
             </div>
 
             <div id="block_gplx_oto" class="hidden">
                 <div class="section-title">Ảnh Bằng Ô Tô (hạng cao nhất)</div>
-                <div class="note">Chỉ lấy <b>hạng cao nhất</b> bạn đang có. Chụp màn hình thẻ trong <b>VNeTraffic</b>, hoặc chụp ảnh bằng thật 2 mặt.</div>
-                <div class="upload-grid">
-                    <div class="upload-card" id="card_gplx_oto">
-                        <button class="upload-help-btn" onclick="event.stopPropagation();moHuongDan('bang_lai')" title="Xem hướng dẫn">?</button>
-                        <div class="title">[+] GPLX Ô Tô</div>
-                        <div class="subtitle">1 hoặc 2 ảnh</div>
-                        <input type="file" id="files_gplx_oto" data-bb accept="image/*" multiple>
-                        <div id="status_files_gplx_oto" class="file-status"></div>
-                    </div>
-                </div>
+                <div class="note">Chỉ lấy <b>hạng cao nhất</b> bạn đang có. Chọn cách gửi: <b>chụp màn hình thẻ trong VNeTraffic</b>, hoặc nếu bằng chưa có trên VNeTraffic thì <b>chụp bằng thật cả 2 mặt</b>.</div>
+                <div id="gplx_slot_oto"></div>
             </div>
 
             <div style="display:flex;gap:10px;margin-top:20px;">
@@ -1134,6 +1136,41 @@
                 ${phanDuoi}
             </div>`;
 
+        // Minh họa ĐÚNG/SAI khi chụp bằng thật — tự vẽ bằng SVG (không dùng ảnh thật của ai)
+        let _minhId = 0;
+        function _MINH_THE(kieu) {
+            const id = 'mh' + (++_minhId);
+            const the = (tf, loc) => '<g' + (tf ? ' transform="' + tf + '"' : '') + (loc ? ' filter="url(#' + id + 'f)"' : '') + '>' +
+                '<rect x="16" y="14" width="88" height="58" rx="4" fill="#f4f7f8" stroke="#14171a" stroke-width="1.5"/>' +
+                '<rect x="22" y="22" width="20" height="26" fill="#cfd7dc"/>' +
+                '<rect x="48" y="24" width="48" height="4" fill="#7d8a93"/><rect x="48" y="33" width="38" height="4" fill="#7d8a93"/>' +
+                '<rect x="48" y="42" width="44" height="4" fill="#7d8a93"/><rect x="22" y="56" width="74" height="4" fill="#7d8a93"/></g>';
+            let thanh = '', defs = '';
+            if (kieu === 'dung') {
+                thanh = the() + '<path d="M12 22V12h10M98 12h10v10M108 64v10H98M22 74H12V64" fill="none" stroke="#43c05a" stroke-width="2.5"/>';
+            } else if (kieu === 'nghieng') {
+                thanh = the('rotate(-20 60 43)');
+            } else if (kieu === 'loa') {
+                defs = '<radialGradient id="' + id + 'g"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset=".55" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>';
+                thanh = the() + '<ellipse cx="74" cy="34" rx="30" ry="22" fill="url(#' + id + 'g)"/>';
+            } else if (kieu === 'nhoe') {
+                defs = '<filter id="' + id + 'f" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.4"/></filter>';
+                thanh = the('', true);
+            } else {   // cat: thẻ lệch khỏi khung + ngón tay che góc
+                thanh = the('translate(24 6)') + '<ellipse cx="22" cy="68" rx="20" ry="11" fill="#e0b08a" stroke="#a67450" stroke-width="1"/>';
+            }
+            return '<svg viewBox="0 0 120 86" width="120" height="86" style="display:block;width:100%;height:auto" role="img" aria-label="Minh họa">' +
+                '<defs>' + defs + '</defs><rect width="120" height="86" fill="#2b3238"/>' + thanh + '</svg>';
+        }
+        const _MH_TEN = {
+            dung: ['ok', '✓ Đúng: vuông vắn, đủ 4 góc'], nghieng: ['sai', '✗ Sai: bị nghiêng'],
+            loa: ['sai', '✗ Sai: bị lóa sáng'], nhoe: ['sai', '✗ Sai: bị nhòe'], cat: ['sai', '✗ Sai: cắt góc / che tay'],
+        };
+        function minhHoaChup() {
+            return '<div class="gplx-mh-luoi">' + Object.keys(_MH_TEN).map(k =>
+                '<figure class="gplx-mh">' + _MINH_THE(k) + '<figcaption class="mh-' + _MH_TEN[k][0] + '">' + _MH_TEN[k][1] + '</figcaption></figure>').join('') + '</div>';
+        }
+
         const DEMO_HD = {
             vneid_main: {
                 ten: 'Ảnh 1 — màn hình "Căn cước điện tử" (phần trên)',
@@ -1244,6 +1281,19 @@
                 ]
             },
 
+            bang_that: {
+                ten: 'Chụp bằng lái thật (mặt trước + mặt sau)',
+                buoc: ['Đặt bằng <b>nằm phẳng</b> trên nền tối, đủ sáng',
+                       'Chụp <b>thẳng từ trên xuống</b>, thấy đủ <b>4 góc</b> — thẻ chiếm từ 70% khung ảnh',
+                       '<b>Tắt flash</b>, tránh đèn chiếu thẳng làm lóa',
+                       'Giữ chắc tay, <b>chạm vào màn hình để lấy nét</b> cho chữ không nhòe',
+                       '<b>Không che tay</b> lên thẻ. Mặt sau phải đọc rõ <b>bảng hạng và ngày</b>'],
+                luuy: 'Chụp 2 ảnh: mặt trước, rồi mặt sau. Ảnh quá nhỏ sẽ bị từ chối; ảnh nhòe/lóa sẽ có cảnh báo để bạn chụp lại.',
+                canh: ['dung', 'nghieng', 'loa', 'nhoe', 'cat'].map(k =>
+                    '<div class="dp-appbar dark">MÁY ẢNH</div><div style="padding:10px 8px">' + _MINH_THE(k) +
+                    '<div class="' + (k === 'dung' ? 'dp-ok' : 'dp-ok" style="color:#a61b12') + '">' + _MH_TEN[k][1] + '</div></div>')
+            },
+
             vnt_home: {
                 ten: 'Ảnh trang chủ VNeTraffic',
                 buoc: ['Tải app <b>VNeTraffic</b> (Cục CSGT) trên CH Play / App Store',
@@ -1342,7 +1392,276 @@
             }
         }
 
-        ['files_vneid_main','files_vneid_sub','files_gplx_moto','files_gplx_oto','files_vnetraffic'].forEach(id => {
+        // ============================================================
+        // BẰNG LÁI: chọn "VNeTraffic" hoặc "chụp bằng thật 2 mặt" + kiểm chất lượng ảnh (2026-10-19)
+        // Dùng chung cho Trang 2 (tienTo 'files_'), Trang 3 ('lai_files_') và màn bổ sung ('bs_files_').
+        // ============================================================
+        // Ngưỡng kiểm ảnh. Hiệu chỉnh trên ảnh thẻ giả tự sinh (Pillow): sắc nét phải đạt,
+        // GaussianBlur(3) phải bị báo nhòe, mảng trắng >= 8% phải bị báo lóa.
+        const KT_ANH = {
+            canhToiThieu: 800,     // cạnh dài < 800 px  -> CHẶN
+            canhNen: 1200,         // cạnh dài < 1200 px -> cảnh báo
+            canhPhanTich: 800,     // thu về cạnh dài này trước khi đo
+            nhoe: 80,              // phương sai Laplacian < ngưỡng -> nhòe
+            loa: 0.08,             // tỉ lệ điểm ảnh >= 245 ở vùng giữa 80% khung > ngưỡng -> lóa
+            diemSang: 245,
+            toi: 50,               // độ sáng trung bình < 50 -> tối
+            tiLeDoc: 1.9           // ảnh dọc cao/rộng >= 1,9 -> nghi ảnh chụp màn hình
+        };
+        const KT_NHAN = {
+            qua_nho: 'Ảnh quá nhỏ (cạnh dài dưới 800 px), chữ sẽ không đọc được. Hãy chụp lại, đưa máy gần hơn.',
+            nho: 'Ảnh hơi nhỏ, chữ có thể khó đọc.',
+            nhoe: 'Ảnh bị nhòe. Giữ chắc tay, chạm màn hình để lấy nét rồi chụp lại.',
+            loa: 'Ảnh bị lóa sáng. Tắt flash, tránh đèn chiếu thẳng vào thẻ.',
+            toi: 'Ảnh quá tối. Chụp ở nơi đủ sáng.',
+            anh_man_hinh: 'Có vẻ đây là ảnh chụp màn hình, không phải ảnh bằng thật.'
+        };
+
+        // Giải mã ảnh thành bitmap/Image; lỗi (HEIC...) thì ném ngoại lệ
+        async function _giaiMaAnh(file) {
+            if (window.createImageBitmap) {
+                try { return await createImageBitmap(file); } catch (e) { /* thử đường Image */ }
+            }
+            return await new Promise((ok, loi) => {
+                const url = URL.createObjectURL(file);
+                const im = new Image();
+                im.onload = () => { URL.revokeObjectURL(url); ok(im); };
+                im.onerror = () => { URL.revokeObjectURL(url); loi(new Error('khong_giai_ma')); };
+                im.src = url;
+            });
+        }
+
+        window.kiemTraAnhThe = async function (file) {
+            const khong = { chan: false, canh_bao: ['khong_kiem_duoc'], so_do: {} };
+            try {
+                if (!file || /hei[cf]/i.test((file.type || '') + ' ' + (file.name || ''))) return khong;
+                const bm = await _giaiMaAnh(file);
+                const W = bm.width || bm.naturalWidth, H = bm.height || bm.naturalHeight;
+                if (!W || !H) return khong;
+                const canhDai = Math.max(W, H);
+                const canh = [];
+                let chan = false;
+                if (canhDai < KT_ANH.canhToiThieu) { chan = true; canh.push('qua_nho'); }
+                else if (canhDai < KT_ANH.canhNen) canh.push('nho');
+                if (H / W >= KT_ANH.tiLeDoc) canh.push('anh_man_hinh');
+                // Thu về cạnh dài tối đa 800 px rồi đo trên ảnh xám
+                const k = Math.min(1, KT_ANH.canhPhanTich / canhDai);
+                const w = Math.max(8, Math.round(W * k)), h = Math.max(8, Math.round(H * k));
+                const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+                const cx = cv.getContext('2d', { willReadFrequently: true });
+                cx.drawImage(bm, 0, 0, w, h);
+                if (bm.close) { try { bm.close(); } catch (e) {} }
+                const px = cx.getImageData(0, 0, w, h).data;
+                const xam = new Float32Array(w * h);
+                let tong = 0;
+                for (let i = 0, j = 0; i < px.length; i += 4, j++) {
+                    const g = 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
+                    xam[j] = g; tong += g;
+                }
+                const sang = tong / (w * h);
+                // Nhòe: phương sai Laplacian (nhân 4 láng giềng)
+                let s1 = 0, s2 = 0, n = 0;
+                for (let y = 1; y < h - 1; y++) {
+                    for (let x = 1; x < w - 1; x++) {
+                        const j = y * w + x;
+                        const lap = xam[j - 1] + xam[j + 1] + xam[j - w] + xam[j + w] - 4 * xam[j];
+                        s1 += lap; s2 += lap * lap; n++;
+                    }
+                }
+                const nhoe = n ? (s2 / n - (s1 / n) * (s1 / n)) : 0;
+                // Lóa: tỉ lệ điểm rất sáng ở vùng giữa 80% khung
+                const x0 = Math.floor(w * 0.1), x1 = Math.ceil(w * 0.9), y0 = Math.floor(h * 0.1), y1 = Math.ceil(h * 0.9);
+                let chay = 0, tongVung = 0;
+                for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) { tongVung++; if (xam[y * w + x] >= KT_ANH.diemSang) chay++; }
+                const loa = tongVung ? chay / tongVung : 0;
+                if (nhoe < KT_ANH.nhoe) canh.push('nhoe');
+                if (loa > KT_ANH.loa) canh.push('loa');
+                if (sang < KT_ANH.toi) canh.push('toi');
+                return { chan, canh_bao: canh, so_do: { w: W, h: H, nhoe: Math.round(nhoe * 10) / 10, loa: Math.round(loa * 1000) / 1000, sang: Math.round(sang) } };
+            } catch (e) {
+                return khong;
+            }
+        };
+
+        // Dựng khối chọn: (a) VNeTraffic · (b) chụp bằng thật 2 mặt. id ô ảnh = tienTo + 'gplx_' + nhom [+ _truoc/_sau]
+        function dungKhoiGplx(nhom, tienTo, banBb) {
+            const id = tienTo + 'gplx_' + nhom;
+            const ten = nhom === 'moto' ? 'mô tô' : 'ô tô';
+            const the = (iid, kieu, tieuDe, phu, multiple) =>
+                '<div class="upload-card" id="c_' + iid + '"><div class="title">' + tieuDe + '</div><div class="subtitle">' + phu + '</div>' +
+                '<input type="file" id="' + iid + '" data-kieu="' + kieu + '" accept="image/*"' + (multiple ? ' multiple' : '') + '></div>';
+            return '<div class="gplx-chon" data-nhom="' + nhom + '" data-tt="' + tienTo + '"' + (banBb ? ' data-bb-gplx="1"' : '') + '>' +
+                (banBb ? '<input type="text" class="gplx-chua-chon" data-bb readonly tabindex="-1" aria-hidden="true" value="">' : '') +
+                '<div class="gplx-opts" role="radiogroup" aria-label="Cách gửi ảnh bằng ' + ten + '">' +
+                '<label class="gplx-opt"><input type="radio" name="kieu_' + id + '" value="vnt"><span><b>Bằng có trong VNeTraffic</b><br>Chụp màn hình thẻ trên ứng dụng</span></label>' +
+                '<label class="gplx-opt"><input type="radio" name="kieu_' + id + '" value="that"><span><b>Không có trên VNeTraffic</b><br>Bằng GIẤY cũ hoặc thẻ PET chưa lên hệ thống: chụp bằng thật, đủ 2 mặt</span></label>' +
+                '</div>' +
+                '<div class="gplx-pa gplx-pa-vnt hidden"><div class="upload-grid"><div class="gplx-cot">' +
+                the(id, 'vnt', '[+] Thẻ trong VNeTraffic', '1 hoặc 2 ảnh chụp màn hình', true) +
+                '<button type="button" class="kt-nut kt-phu" onclick="moHuongDan(\'bang_lai\')">? Xem hướng dẫn chụp màn hình</button></div></div></div>' +
+                '<div class="gplx-pa gplx-pa-that hidden">' +
+                '<div class="note" style="margin-bottom:10px;"><b>Cách chụp bằng thật:</b>' +
+                '<ul class="gplx-quy-tac"><li>Đặt phẳng trên nền tối, đủ sáng, thấy đủ 4 góc</li>' +
+                '<li>Chụp thẳng từ trên xuống; thẻ chiếm từ 70% khung ảnh</li>' +
+                '<li>Tắt flash, tránh đèn chiếu thẳng; giữ chắc tay, chạm màn hình để lấy nét</li>' +
+                '<li>Không che tay; mặt sau phải đọc rõ bảng hạng và ngày</li></ul>' +
+                minhHoaChup() +
+                '<button type="button" class="kt-nut kt-phu" onclick="moHuongDan(\'bang_that\')">? Xem hướng dẫn chi tiết</button></div>' +
+                '<div class="upload-grid">' +
+                '<div class="gplx-cot">' + the(id + '_truoc', 'that', '[+] Mặt TRƯỚC', 'Ảnh, số bằng, họ tên', false) + '<div class="kt-hop hidden" data-kt-hop></div></div>' +
+                '<div class="gplx-cot">' + the(id + '_sau', 'that', '[+] Mặt SAU', 'Bảng hạng + ngày cấp', false) + '<div class="kt-hop hidden" data-kt-hop></div></div>' +
+                '</div></div></div>';
+        }
+
+        function _rootCua(el) {
+            return el.closest('#step2, #inline-xacnhan, #form-bo-sung, #step3') || document;
+        }
+        function gplxKieu(wrap) {
+            const r = wrap.querySelector('input[type=radio]:checked');
+            return r ? r.value : '';
+        }
+        function gplxDoiKieu(wrap) {
+            const kieu = gplxKieu(wrap);
+            wrap.querySelector('.gplx-pa-vnt').classList.toggle('hidden', kieu !== 'vnt');
+            wrap.querySelector('.gplx-pa-that').classList.toggle('hidden', kieu !== 'that');
+            wrap.querySelectorAll('.gplx-opt').forEach(l => l.classList.toggle('on', l.querySelector('input').checked));
+            const bb = wrap.hasAttribute('data-bb-gplx');
+            // Chỉ ô của lựa chọn đang chọn mới bắt buộc
+            wrap.querySelectorAll('input[type=file]').forEach(inp => {
+                if (bb && inp.dataset.kieu === kieu) inp.setAttribute('data-bb', ''); else inp.removeAttribute('data-bb');
+            });
+            const mk = wrap.querySelector('.gplx-chua-chon');
+            if (mk) mk.value = kieu;
+            capNhatThieu(_rootCua(wrap));
+        }
+
+        async function gplxKiemAnh(inp) {
+            const wrap = inp.closest('.gplx-chon');
+            const cot = inp.closest('.gplx-cot');
+            const hop = cot && cot.querySelector('[data-kt-hop]');
+            if (!hop) return;
+            inp._canhBaoChua = false; hop.className = 'kt-hop hidden'; hop.innerHTML = '';
+            const f = inp.files && inp.files[0];
+            if (!f) { inp._dangKiem = false; capNhatThieu(_rootCua(wrap)); return; }
+            inp._dangKiem = true;
+            const kq = await window.kiemTraAnhThe(f);
+            if (!inp.files || inp.files[0] !== f) return;   // người dùng đã đổi ảnh khác
+            inp._dangKiem = false;
+            const ds = kq.canh_bao || [];
+            const loiKiem = ds.indexOf('khong_kiem_duoc') >= 0;
+            const that = ds.filter(c => c !== 'khong_kiem_duoc');
+            if (loiKiem && !that.length) {
+                hop.className = 'kt-hop nhe';
+                hop.textContent = 'Không kiểm tra được ảnh này, vẫn gửi được.';
+            } else if (that.length) {
+                hop.className = 'kt-hop';
+                hop.innerHTML = '<b>' + (kq.chan ? '⛔ Ảnh không dùng được' : '⚠ Ảnh có thể khó đọc') + '</b><ul class="gplx-quy-tac">' +
+                    that.map(c => '<li>' + _esc(KT_NHAN[c] || c) + '</li>').join('') + '</ul>' +
+                    '<div class="kt-nut-hang"><button type="button" class="kt-nut" data-kt="lai">Chụp lại</button>' +
+                    (kq.chan ? '' : '<button type="button" class="kt-nut kt-phu" data-kt="dung">Ảnh đã rõ, vẫn dùng</button>') + '</div>';
+                if (kq.chan) { _gplxXoaAnh(wrap, inp); }
+                else inp._canhBaoChua = true;      // chưa bấm "vẫn dùng" thì ô còn tính là thiếu
+            }
+            capNhatThieu(_rootCua(wrap));
+        }
+        function _gplxXoaAnh(wrap, inp) {
+            wrap._bo = true;
+            inp.value = '';
+            inp.dispatchEvent(new Event('change', { bubbles: true }));
+            wrap._bo = false;
+            inp._canhBaoChua = false;
+        }
+
+        function gplxKhoiTao(root) {
+            (root || document).querySelectorAll('.gplx-chon:not([data-da])').forEach(wrap => {
+                wrap.setAttribute('data-da', '1');
+                wrap.addEventListener('change', e => {
+                    if (wrap._bo) return;
+                    const t = e.target;
+                    if (t.type === 'radio') { gplxDoiKieu(wrap); return; }
+                    if (t.type === 'file') {
+                        const card = t.closest('.upload-card');
+                        if (card) card.classList.toggle('has-file', !!(t.files && t.files.length));
+                        if (t.dataset.kieu === 'that') gplxKiemAnh(t);
+                    }
+                });
+                wrap.addEventListener('click', e => {
+                    const nut = e.target.closest && e.target.closest('.kt-nut[data-kt]');
+                    if (!nut) return;
+                    const cot = nut.closest('.gplx-cot');
+                    const inp = cot && cot.querySelector('input[type=file]');
+                    if (!inp) return;
+                    if (nut.dataset.kt === 'lai') {
+                        _gplxXoaAnh(wrap, inp);
+                        cot.querySelector('[data-kt-hop]').className = 'kt-hop hidden';
+                        capNhatThieu(_rootCua(wrap));
+                        inp.click();
+                    } else {
+                        inp._canhBaoChua = false;
+                        cot.querySelector('[data-kt-hop]').className = 'kt-hop hidden';
+                        capNhatThieu(_rootCua(wrap));
+                    }
+                });
+                gplxDoiKieu(wrap);
+            });
+        }
+
+        // Gộp ảnh bằng lái mới vào `anh` (bản sao anh_data cũ `cu`): nhóm nào có ảnh mới thì THAY cả nhóm
+        // (xóa khóa cũ cùng nhóm, khớp với backend `_thay_nhom_anh`); nhóm không có ảnh mới thì giữ nguyên.
+        function gplxGopAnhData(anh, cu, gMoi) {
+            ['moto', 'oto'].forEach(nh => {
+                const ks = ['files_gplx_' + nh, 'files_gplx_' + nh + '_truoc', 'files_gplx_' + nh + '_sau'];
+                const coMoi = ks.some(k => gMoi[k] && gMoi[k].length);
+                if (!coMoi) { ks.forEach(k => { if (cu[k] !== undefined) anh[k] = cu[k]; }); return; }
+                ks.forEach(k => { anh[k] = gMoi[k] || []; });
+            });
+            return anh;
+        }
+
+        // Còn ô ảnh đang chờ người dùng xác nhận cảnh báo (hoặc đang kiểm) trong vùng `root` (chỉ ô đang hiện)?
+        function gplxCoCanhBaoChua(root) {
+            const r = root || document;
+            return Array.from(r.querySelectorAll('.gplx-chon input[type=file]'))
+                .some(i => (i._canhBaoChua || i._dangKiem) && !_anDi(i, r));
+        }
+
+        // Bằng thật (b): đã chọn ít nhất 1 mặt thì PHẢI đủ cả 2 (gửi ảnh mới thay cả nhóm cũ → thiếu 1 mặt là mất mặt kia).
+        // Thiếu → báo mặt nào, cuộn tới ô thiếu, trả true (chặn gửi). Nhóm chưa chọn ảnh nào thì không bắt.
+        function gplxThieuMat(root) {
+            const r = root || document;
+            const wraps = Array.from(r.querySelectorAll('.gplx-chon')).filter(w => !_anDi(w, r) && gplxKieu(w) === 'that');
+            for (const w of wraps) {
+                const tr = w.querySelector('input[type=file][id$="_truoc"]');
+                const sa = w.querySelector('input[type=file][id$="_sau"]');
+                if (!tr || !sa) continue;
+                const coTr = !!(tr.files && tr.files.length), coSa = !!(sa.files && sa.files.length);
+                if (coTr === coSa) continue;
+                const thieu = coTr ? sa : tr;
+                alert('Bằng thật cần đủ 2 mặt: còn thiếu ảnh mặt ' + (coTr ? 'SAU' : 'TRƯỚC') + '. Gửi ảnh mới sẽ thay cả nhóm ảnh bằng lái cũ nên không thể gửi thiếu 1 mặt.');
+                const cot = thieu.closest('.gplx-cot') || thieu;
+                try { cot.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+                return true;
+            }
+            return false;
+        }
+
+        // Tải ảnh của 1 nhóm (moto|oto) theo lựa chọn đang chọn, đổ vào `out` bằng khóa anh_data.
+        // `up(inputId, tienToTen)` = hàm tải lên. Trả 'vnt' | 'that' | ''.
+        async function gplxTaiLen(root, tienTo, nhom, out, up) {
+            const id = tienTo + 'gplx_' + nhom;
+            const wrap = (root || document).querySelector('.gplx-chon[data-nhom="' + nhom + '"][data-tt="' + tienTo + '"]');
+            const kieu = wrap ? gplxKieu(wrap) : '';
+            const ten = 'gplx_' + nhom;
+            if (kieu === 'that') {
+                out['files_gplx_' + nhom + '_truoc'] = await up(id + '_truoc', ten + '_truoc');
+                out['files_gplx_' + nhom + '_sau'] = await up(id + '_sau', ten + '_sau');
+            } else if (kieu === 'vnt') {
+                out['files_gplx_' + nhom] = await up(id, ten);
+            }
+            return kieu;
+        }
+
+        ['files_vneid_main','files_vneid_sub','files_vnetraffic'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.addEventListener('change', e => {
                 const count = e.target.files.length;
@@ -1356,6 +1675,10 @@
             });
         });
 
+        // Khối chọn kiểu ảnh bằng lái (VNeTraffic / bằng thật 2 mặt) cho Trang 2
+        document.getElementById('gplx_slot_moto').innerHTML = dungKhoiGplx('moto', 'files_', true);
+        document.getElementById('gplx_slot_oto').innerHTML = dungKhoiGplx('oto', 'files_', true);
+        gplxKhoiTao(document.getElementById('step2'));
         // Ô bắt buộc + ô ảnh có xem trước cho Trang 1/2 (Trang 3 khởi tạo trong hienThiFormXacNhan)
         khoiTaoOAnh(document.getElementById('step1'));
         khoiTaoOAnh(document.getElementById('step2'));
@@ -1834,18 +2157,10 @@
             const hasOto = document.getElementById('cb_co_bang_oto').checked;
             const hang = document.getElementById('hang_dk').value;
 
-            // Validate: phải có hoặc tick bằng + up ảnh, hoặc up VNeTraffic
-            if (hasMoto) {
-                if (document.getElementById('files_gplx_moto').files.length === 0) {
-                    alert("Bạn đã tick 'có bằng mô tô' — vui lòng tải ảnh bằng mô tô!");
-                    return;
-                }
-            }
-            if (hasOto) {
-                if (document.getElementById('files_gplx_oto').files.length === 0) {
-                    alert("Bạn đã tick 'có bằng ô tô' — vui lòng tải ảnh bằng ô tô (hạng cao nhất)!");
-                    return;
-                }
+            // Ảnh bằng: mỗi nhóm đã tick phải chọn cách gửi và đủ ảnh (diToiThieu ở trên đã chặn — đây là lớp phòng thủ)
+            if (gplxCoCanhBaoChua(document.getElementById('step2'))) {
+                alert("Có ảnh bằng lái đang cảnh báo — hãy chụp lại hoặc bấm 'Ảnh đã rõ, vẫn dùng'.");
+                return;
             }
             // VNeTraffic LUÔN BẮT BUỘC với mọi hạng
             if (document.getElementById('files_vnetraffic').files.length === 0) {
@@ -1872,8 +2187,12 @@
                 const curAnh = cur.anh_data || {};
 
                 // Upload các ảnh còn lại (GPLX + VNeTraffic) — VNeID đã upload ở Page 1
-                const gplxMoto  = hasMoto ? await uploadFiles('files_gplx_moto', 'gplx_moto') : [];
-                const gplxOto   = hasOto  ? await uploadFiles('files_gplx_oto',  'gplx_oto')  : [];
+                const anhGplx = {};
+                const upTrang2 = (iid, ten) => uploadFiles(iid, ten);
+                if (hasMoto) await gplxTaiLen(document.getElementById('step2'), 'files_', 'moto', anhGplx, upTrang2);
+                if (hasOto)  await gplxTaiLen(document.getElementById('step2'), 'files_', 'oto',  anhGplx, upTrang2);
+                const gplxMoto  = anhGplx.files_gplx_moto || [];
+                const gplxOto   = anhGplx.files_gplx_oto  || [];
                 const vntraffic = await uploadFiles('files_vnetraffic', 'vt');
 
                 const anh = {
@@ -1881,6 +2200,8 @@
                     files_vneid_sub:  curAnh.files_vneid_sub  || [],
                     files_gplx_moto: gplxMoto,
                     files_gplx_oto:  gplxOto,
+                    // Bằng thật 2 mặt (chỉ có khi chọn "không có trên VNeTraffic")
+                    ...Object.fromEntries(Object.entries(anhGplx).filter(([k]) => /_(truoc|sau)$/.test(k))),
                     files_vnetraffic: vntraffic,
                     files_cccd: [],
                     files_chan_dung: [],
@@ -2048,7 +2369,7 @@
         function _oBatBuocTrong(root) {
             return Array.from(root.querySelectorAll('[data-bb]')).filter(el => {
                 if (_anDi(el, root)) return false;
-                if (el.type === 'file') return !(el.files && el.files.length);
+                if (el.type === 'file') return !(el.files && el.files.length) || el._canhBaoChua === true || el._dangKiem === true;
                 return !String(el.value || '').trim();
             });
         }
@@ -2241,33 +2562,41 @@
                 the('vneid_main', '[+] Căn cước điện tử — phần trên', 'Ảnh, số định danh, họ tên') +
                 the('vneid_sub', '[+] Căn cước điện tử — cuộn xuống', 'Ngày cấp / SĐT / CMND cũ') +
                 the('vnetraffic', '[+] VNeTraffic — Trang chủ', 'Ảnh màn hình sau khi đăng nhập') +
-                the('gplx_moto', '[+] GPLX Mô tô', 'Bằng mô tô đã có') +
-                (motoOnly ? '' : the('gplx_oto', '[+] GPLX Ô tô', 'Bằng ô tô đã có (hạng cao nhất)')) +
-                '</div><button type="button" class="btn-main" data-act="gui-anh-lai">GỬI ẢNH MỚI &amp; ĐỌC LẠI</button>';
+                '</div>' +
+                '<div class="section-title" style="margin-top:16px;">Bằng lái đã có</div>' +
+                dungKhoiGplx('moto', 'lai_files_', false) +
+                (motoOnly ? '' : dungKhoiGplx('oto', 'lai_files_', false)) +
+                '<button type="button" class="btn-main" data-act="gui-anh-lai">GỬI ẢNH MỚI &amp; ĐỌC LẠI</button>';
             return kh;
         }
 
         async function guiAnhMoiOcrLai(formDiv) {
             const hs = window.temp_hs_bosung || {};
             const hsId = hs.id || window._hs_id_xacnhan;
-            const LOAI = ['vneid_main', 'vneid_sub', 'vnetraffic', 'gplx_moto', 'gplx_oto'];
-            const co = LOAI.some(l => { const e = formDiv.querySelector('#lai_files_' + l); return e && e.files.length; });
+            const LOAI = ['vneid_main', 'vneid_sub', 'vnetraffic'];
+            const coGplx = Array.from(formDiv.querySelectorAll('.gplx-chon input[type=file]'))
+                .some(e => e.files && e.files.length && !_anDi(e, formDiv));
+            const co = coGplx || LOAI.some(l => { const e = formDiv.querySelector('#lai_files_' + l); return e && e.files.length; });
             if (!co) return alert('Bạn chưa chọn ảnh mới nào. Hãy bấm vào ô ảnh cần chụp/chọn lại.');
+            if (gplxCoCanhBaoChua(formDiv)) return alert("Có ảnh bằng lái đang cảnh báo — hãy chụp lại hoặc bấm 'Ảnh đã rõ, vẫn dùng'.");
+            if (gplxThieuMat(formDiv)) return;
             const btn = formDiv.querySelector('[data-act="gui-anh-lai"]');
             btn.disabled = true; btn.innerText = 'ĐANG TẢI ẢNH LÊN...';
             try {
                 _sessionId = '';
                 const moi = {};
                 for (const l of LOAI) moi[l] = await uploadBoSungFiles('lai_files_' + l, l, formDiv);
+                const upLai = (iid, ten) => uploadBoSungFiles(iid, ten, formDiv);
+                const gMoi = {};
+                for (const nh of ['moto', 'oto']) await gplxTaiLen(formDiv, 'lai_files_', nh, gMoi, upLai);
                 let cu = hs.anh_data || {};
                 if (typeof cu === 'string') { try { cu = JSON.parse(cu); } catch (e) { cu = {}; } }
                 const anh = Object.assign({}, cu, {
                     files_vneid_main: [...(cu.files_vneid_main || cu.files_vneid || []), ...moi.vneid_main],
                     files_vneid_sub:  [...(cu.files_vneid_sub || []), ...moi.vneid_sub],
                     files_vnetraffic: [...(cu.files_vnetraffic || []), ...moi.vnetraffic],
-                    files_gplx_moto:  [...(cu.files_gplx_moto || cu.files_gplx || []), ...moi.gplx_moto],
-                    files_gplx_oto:   [...(cu.files_gplx_oto || []), ...moi.gplx_oto],
                 });
+                gplxGopAnhData(anh, cu, gMoi);
                 const cot = docFormXacNhan(formDiv);
                 const truong = cotKhachSua(cot, hs);
                 // Đề xuất đã nhận mà không có ô trên form → ghi kèm
@@ -2521,6 +2850,7 @@
                 btnFinal.parentNode.insertBefore(khAnh, btnFinal);
                 khAnh.querySelector('[data-act="gui-anh-lai"]').onclick = () => guiAnhMoiOcrLai(formDiv);
             }
+            gplxKhoiTao(formDiv);
             khoiTaoOAnh(formDiv);
             khoiTaoBatBuoc(formDiv, btnFinal);
 
@@ -2902,24 +3232,12 @@
                                     <div></div>
                                 </div>
 
-                                <!-- GPLX cũ — mô tô / ô tô tách riêng -->
-                                <div style="font-family:var(--font-mono);font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">GPLX đã có (nếu có)</div>
-                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
-                                    <div class="upload-card" id="bs_card_gplx_moto" style="padding:14px;border:1px dashed #888;position:relative;cursor:pointer;">
-                                        <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] GPLX Mô tô</div>
-                                        <div style="font-size:11px;color:#888;">Bằng mô tô đã có (A1, A...)</div>
-                                        <input type="file" id="bs_files_gplx_moto" accept="image/*" multiple style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;"
-                                            onchange="bsMarkCard(this,'bs_card_gplx_moto')">
-                                        <div class="bs-status" style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
-                                    </div>
-                                    <div class="upload-card" id="bs_card_gplx_oto" style="padding:14px;border:1px dashed #888;position:relative;cursor:pointer;">
-                                        <div style="font-weight:bold;font-size:12px;font-family:var(--font-mono);">[+] GPLX Ô tô</div>
-                                        <div style="font-size:11px;color:#888;">Bằng ô tô đã có (B, C...)</div>
-                                        <input type="file" id="bs_files_gplx_oto" accept="image/*" multiple style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;"
-                                            onchange="bsMarkCard(this,'bs_card_gplx_oto')">
-                                        <div class="bs-status" style="font-size:11px;font-weight:bold;margin-top:6px;color:#009faa;"></div>
-                                    </div>
-                                </div>
+                                <!-- GPLX đã có — mô tô / ô tô: VNeTraffic hoặc bằng thật 2 mặt -->
+                                <div style="font-family:var(--font-mono);font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">GPLX đã có (nếu có)</div>
+                                <div style="margin-bottom:6px;font-size:12px;color:#6b7280;">Bằng mô tô</div>
+                                ${dungKhoiGplx('moto', 'bs_files_', false)}
+                                <div style="margin-bottom:6px;font-size:12px;color:#6b7280;">Bằng ô tô (hạng cao nhất)</div>
+                                ${dungKhoiGplx('oto', 'bs_files_', false)}
 
                                 <!-- CCCD + Chân dung -->
                                 <div style="font-family:var(--font-mono);font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Giấy tờ khác</div>
@@ -2953,6 +3271,7 @@
 
                 // Ô ảnh có xem trước + thẻ kết quả đọc lại ảnh (nếu lần trước còn đề xuất chưa xem)
                 const fbs = document.getElementById('form-bo-sung');
+                gplxKhoiTao(fbs);
                 khoiTaoOAnh(fbs);
                 window._de_xuat_nhan = {};
                 const theBS = dungTheDeXuat(document, hs, O_FORM_BOSUNG);
@@ -3125,6 +3444,12 @@
             // Cột học viên vừa sửa → agent đẩy xuống SQL TRƯỚC khi đọc lại ảnh (khỏi mất chữ gõ tay)
             const truongSua = Object.keys(moi).filter(c => typeof moi[c] === 'string' && moi[c].trim() && moi[c].trim() !== String(cu[c] || '').trim());
 
+            if (gplxCoCanhBaoChua(document.getElementById('form-bo-sung'))) {
+                alert("Có ảnh bằng lái đang cảnh báo — hãy chụp lại hoặc bấm 'Ảnh đã rõ, vẫn dùng'.");
+                return;
+            }
+            if (gplxThieuMat(document.getElementById('form-bo-sung'))) return;
+
             document.getElementById('btn-luu-bosung').innerText = 'ĐANG LƯU...';
             document.getElementById('btn-luu-bosung').disabled = true;
 
@@ -3134,13 +3459,23 @@
                 const anh_vneid_main  = await uploadBoSungFiles('bs_files_vneid_main',  'vneid_main');
                 const anh_vneid_sub   = await uploadBoSungFiles('bs_files_vneid_sub',   'vneid_sub');
                 const anh_vnetraffic  = await uploadBoSungFiles('bs_files_vnetraffic',  'vnetraffic');
-                const anh_gplx_moto   = await uploadBoSungFiles('bs_files_gplx_moto',   'gplx_moto');
-                const anh_gplx_oto    = await uploadBoSungFiles('bs_files_gplx_oto',    'gplx_oto');
+                if (gplxCoCanhBaoChua(document.getElementById('form-bo-sung'))) {
+                    alert("Có ảnh bằng lái đang cảnh báo — hãy chụp lại hoặc bấm 'Ảnh đã rõ, vẫn dùng'.");
+                    document.getElementById('btn-luu-bosung').innerText = 'LƯU BỔ SUNG';
+                    document.getElementById('btn-luu-bosung').disabled = false;
+                    return;
+                }
+                const gMoi = {};
+                const upBs = (iid, ten) => uploadBoSungFiles(iid, ten);
+                for (const nh of ['moto', 'oto']) await gplxTaiLen(document.getElementById('form-bo-sung'), 'bs_files_', nh, gMoi, upBs);
+                const anh_gplx_moto = gMoi.files_gplx_moto || [];
+                const anh_gplx_oto  = gMoi.files_gplx_oto  || [];
+                const soAnhGplxThat = ['moto', 'oto'].reduce((n, nh) => n + (gMoi['files_gplx_' + nh + '_truoc'] || []).length + (gMoi['files_gplx_' + nh + '_sau'] || []).length, 0);
                 const anh_cccd        = await uploadBoSungFiles('bs_files_cccd',         'cccd');
                 const anh_cd          = await uploadBoSungFiles('bs_files_chan_dung',    'cd');
 
                 const co_anh_moi = anh_vneid_main.length + anh_vneid_sub.length + anh_vnetraffic.length +
-                                   anh_gplx_moto.length + anh_gplx_oto.length + anh_cccd.length + anh_cd.length > 0;
+                                   anh_gplx_moto.length + anh_gplx_oto.length + soAnhGplxThat + anh_cccd.length + anh_cd.length > 0;
 
                 // Gộp ảnh mới vào anh_data cũ
                 let anh_data_cu = window._hs_hien_tai.anh_data || {};
@@ -3154,11 +3489,12 @@
                     files_vneid_main:  [...(anh_data_cu.files_vneid_main  || anh_data_cu.files_vneid || []), ...anh_vneid_main],
                     files_vneid_sub:   [...(anh_data_cu.files_vneid_sub   || []), ...anh_vneid_sub],
                     files_vnetraffic:  [...(anh_data_cu.files_vnetraffic  || []), ...anh_vnetraffic],
-                    files_gplx_moto:   [...(anh_data_cu.files_gplx_moto   || anh_data_cu.files_gplx || []), ...anh_gplx_moto],
-                    files_gplx_oto:    [...(anh_data_cu.files_gplx_oto    || []), ...anh_gplx_oto],
                     files_cccd:        [...(anh_data_cu.files_cccd        || []), ...anh_cccd],
                     files_chan_dung:   [...(anh_data_cu.files_chan_dung   || []), ...anh_cd],
                 };
+
+                // Ảnh bằng lái: nhóm có ảnh mới thì THAY cả nhóm cũ; nhóm không có ảnh mới giữ nguyên
+                gplxGopAnhData(anh_data_moi, anh_data_cu, gMoi);
 
                 if (co_anh_moi) {
                     document.getElementById('btn-luu-bosung').innerText = 'ĐANG UPLOAD ẢNH...';
@@ -3296,7 +3632,7 @@
             const DB = [];                 // mỗi xã/phường một bản ghi
             const TINH = new Map();        // mã tỉnh -> {code,name,tinhN,tinhT}
             const DADU = new Set();        // mã tỉnh đã nạp xã xong
-            let _tong = 0, _napP = null, _napXong = false;
+            let _tong = 0, _napP = null, _napXong = false, _napThieu = false;   // _napThieu: nạp xong nhưng còn tỉnh lỗi
 
             function dcNorm(s) {
                 return String(s == null ? '' : s).toLowerCase().normalize('NFD')
@@ -3383,6 +3719,7 @@
                     };
                     await Promise.all([tho(), tho(), tho(), tho()]);
                     if (!DB.length) throw new Error('Không nạp được dữ liệu địa giới');
+                    _napThieu = loi > 0;
                     if (loi === 0) { dcLuuToanBo(); _napXong = true; }
                     else _napP = null;   // còn tỉnh lỗi -> lần mở sau thử lại (tỉnh đã có không nạp lại)
                 })();
@@ -3539,10 +3876,14 @@
                 const tai = dangTai ? 'Đang tải dữ liệu địa giới… (đã có ' + DADU.size + '/' + (_tong || 34) + ' tỉnh)' : '';
                 let msg = tai;
                 if (!_res.length) {
-                    if (q.trim()) msg = 'Không thấy kết quả — thử gõ khác hoặc ▸ Nhập tay' + (tai ? ' · ' + tai : '');
+                    if (q.trim()) msg = 'Không thấy kết quả — thử gõ khác hoặc mở \'Chọn theo danh sách\'' + (tai ? ' · ' + tai : '');
                     else if (!tai) msg = 'Gõ tên xã/phường hoặc tỉnh để tìm';
                 }
                 tt.textContent = msg;
+                // Dữ liệu nạp thiếu tỉnh mà vẫn không tìm ra gì -> chuyển sang gõ tay (iii)
+                if (!_res.length && _napThieu && !dangTai && !_dcThuCong && q.trim().length >= 3) {
+                    dcBatNhapTay('chưa tải đủ dữ liệu địa giới — vui lòng gõ tay');
+                }
             }
 
             function dcDatActive(i) {
@@ -3676,7 +4017,6 @@
                 $('dc-nhom-tim').style.display = bat ? 'none' : '';
                 $('dc-chon-ds').style.display = bat ? 'none' : '';
                 dcHienThe();
-                $('dc-btn-tay').textContent = bat ? '◂ Quay lại tìm theo tên' : '▸ Nhập tay';
                 if (bat) {
                     lb.innerHTML = 'Địa chỉ đầy đủ <span class="dc-ghichu">(' + (lyDo || 'nhập tay') + ')</span>';
                     st.placeholder = 'VD: Thôn Hà Luận 2, Phường Hòa Bình, Thành phố Hải Phòng';
@@ -3687,8 +4027,17 @@
                 }
                 dcUpdatePreview();
             }
-            window.dcToggleNhapTay = function() { dcDatNhapTay(!_dcThuCong); if (!_dcThuCong) $('dc-tim').focus(); };
-            function dcBatNhapTay() { dcDatNhapTay(true, 'mạng lỗi — vui lòng gõ tay'); }
+            // Không còn nút "Nhập tay": hệ thống TỰ chuyển sang gõ tay khi không dùng được dữ liệu địa giới
+            // (i) nạp lỗi + chỉ mục rỗng · (ii) quá 8 giây mà chỉ mục vẫn rỗng · (iii) nạp thiếu tỉnh và truy vấn 0 kết quả
+            function dcBatNhapTay(lyDo) {
+                const tim = $('dc-tim');
+                const dangGo = tim ? tim.value.trim() : '';
+                dcDatNhapTay(true, lyDo || 'không tải được dữ liệu địa giới — vui lòng gõ tay');
+                const st = $('dc-street');
+                if (st && dangGo && !st.value.trim()) { st.value = dangGo; dcUpdatePreview(); }   // giữ chữ vừa gõ
+            }
+            const CHO_CHI_MUC_MS = 8000;
+            let _henNhapTay = null;
 
             window.dcOpenPicker = function(targetId) {
                 _dcTarget = targetId;
@@ -3708,11 +4057,18 @@
                 tim.focus();
                 dcRender();
 
+                // (ii) quá 8 giây mà chỉ mục vẫn rỗng (mạng treo) -> gõ tay
+                clearTimeout(_henNhapTay);
+                _henNhapTay = setTimeout(() => {
+                    if ($('dc-picker-modal').classList.contains('show') && !_dcThuCong && !DB.length) dcBatNhapTay('dữ liệu địa giới tải quá lâu — vui lòng gõ tay');
+                }, CHO_CHI_MUC_MS);
+
                 dcNapToanBo().then(() => { dcDoSelTinh(); dcRender(); })
                     .catch(() => { if (!DB.length) dcBatNhapTay(); else dcRender(); });
             };
 
             window.dcClosePicker = function() {
+                clearTimeout(_henNhapTay);
                 $('dc-picker-modal').classList.remove('show');
             };
 
@@ -3793,9 +4149,6 @@
                     <ul id="dc-ds" class="dc-ds" role="listbox" aria-label="Gợi ý xã/phường"></ul>
                 </div>
                 <div class="dc-chon" id="dc-chon" style="display:none;"></div>
-                <div class="dc-tay-hang">
-                    <button type="button" class="dc-btn-tay" id="dc-btn-tay" onclick="dcToggleNhapTay()">▸ Nhập tay</button>
-                </div>
                 <details class="dc-chon-ds" id="dc-chon-ds">
                     <summary>Chọn theo danh sách (Tỉnh → Xã)</summary>
                     <div class="dc-field-group">
