@@ -537,6 +537,11 @@
         .thanh-thieu.du { background:#e3f4e5; border-color:var(--ok); color:#1b5e20; }
         .thanh-thieu .tt-di { padding:7px 14px; background:#14171a; color:#fff; border:1px solid #14171a; font-family:var(--font-mono); font-size:12px; font-weight:bold; cursor:pointer; }
         .thanh-thieu.du .tt-di { display:none; }
+        .gplx-de-xuat { background:#e6f4f8; border:1px solid #0781A7; border-left:4px solid #0781A7; color:#0b3a4a; padding:12px 14px; margin:0 0 14px; font-size:13px; line-height:1.55; }
+        .gplx-de-xuat .gdx-tieude { font-weight:bold; font-size:14px; margin-bottom:4px; }
+        .gplx-de-xuat ul { margin:4px 0 0 18px; padding:0; }
+        .gplx-de-xuat .gdx-nhom { margin-bottom:10px; }
+        .gdx-da-co { display:block; margin-top:6px; font-size:12px; font-weight:bold; color:#1b5e20; }
         .the-de-xuat { background:#fffaf0; border:1px solid #f5b98a; border-left:4px solid var(--warn); padding:14px 16px; margin-bottom:16px; font-size:13px; color:#3b2a14; }
         .the-de-xuat .tdx-tieude { font-weight:bold; font-size:15px; margin-bottom:6px; }
         .the-de-xuat .tdx-chip { display:inline-block; margin:2px 4px 2px 0; padding:2px 8px; background:#e3f4e5; border:1px solid #b6dcb9; color:#1b5e20; font-size:12px; }
@@ -1578,7 +1583,7 @@
                 wrap.addEventListener('change', e => {
                     if (wrap._bo) return;
                     const t = e.target;
-                    if (t.type === 'radio') { gplxDoiKieu(wrap); return; }
+                    if (t.type === 'radio') { gplxBoDeXuat(wrap); gplxDoiKieu(wrap); return; }
                     if (t.type === 'file') {
                         const card = t.closest('.upload-card');
                         if (card) card.classList.toggle('has-file', !!(t.files && t.files.length));
@@ -1606,14 +1611,83 @@
             });
         }
 
-        // Gộp ảnh bằng lái mới vào `anh` (bản sao anh_data cũ `cu`): nhóm nào có ảnh mới thì THAY cả nhóm
-        // (xóa khóa cũ cùng nhóm, khớp với backend `_thay_nhom_anh`); nhóm không có ảnh mới thì giữ nguyên.
+        // ===== ĐỀ XUẤT MỤC ẢNH CẦN GỬI (vòng 7, 2026-10-20) =====
+        // `anh_tom_tat` do agent ghi vào inbox (web không thấy anh_data vì Edge ẩn + agent làm rỗng).
+        // Hồ sơ đã có 1 mặt bằng → chọn sẵn "bằng thật", ghi nhớ mặt đã có ở wrap.dataset.coSan.
+        const GDX_LOAI = { pet: 'thẻ PET', giay: 'bằng giấy' };
+        function gplxBoDeXuat(wrap) {
+            if (!wrap || !wrap.dataset.coSan) return;
+            delete wrap.dataset.coSan;
+            wrap.querySelectorAll('.gdx-da-co').forEach(e => e.remove());
+            const hop = wrap.querySelector('.gplx-de-xuat-nhom'); if (hop) hop.remove();
+            capNhatThieu(_rootCua(wrap));
+        }
+        function gplxApDeXuat(wrap, nhomTT) {
+            if (!wrap) return;
+            delete wrap.dataset.coSan;
+            wrap.querySelectorAll('.gdx-da-co').forEach(e => e.remove());
+            const cu = wrap.querySelector('.gplx-de-xuat-nhom'); if (cu) cu.remove();
+            if (!nhomTT || typeof nhomTT !== 'object') return;
+            const coSan = (Array.isArray(nhomTT.co_san) ? nhomTT.co_san : []).filter(m => m === 'truoc' || m === 'sau');
+            if (coSan.length !== 1) return;
+            const matCo = coSan[0], matThieu = matCo === 'truoc' ? 'sau' : 'truoc';
+            const radio = wrap.querySelector('input[type=radio][value="that"]');
+            if (!radio) return;
+            wrap.dataset.coSan = matCo;
+            radio.checked = true;
+            const loai = GDX_LOAI[nhomTT.loai_doan];
+            const hop = document.createElement('div');
+            hop.className = 'gplx-de-xuat gplx-de-xuat-nhom';
+            hop.innerHTML = (loai ? 'Hệ thống đoán: <b>' + loai + '</b> — sai thì chọn lại cách gửi ở dưới.<br>' : '') +
+                'Đã có ảnh mặt <b>' + (matCo === 'truoc' ? 'TRƯỚC' : 'SAU') + '</b> gửi trước đó. Chỉ cần gửi thêm mặt <b>' +
+                (matThieu === 'truoc' ? 'TRƯỚC' : 'SAU') + '</b>. ' +
+                '<button type="button" class="kt-nut kt-phu" data-gdx="lai" style="margin-top:6px;">Chụp lại cả 2 mặt</button>';
+            hop.querySelector('[data-gdx="lai"]').onclick = () => gplxBoDeXuat(wrap);
+            wrap.insertBefore(hop, wrap.querySelector('.gplx-opts'));
+            // Thẻ của mặt đã có: ghi chú "không bắt buộc gửi lại"
+            const inpCo = wrap.querySelector('input[type=file][id$="_' + matCo + '"]');
+            const the = inpCo && inpCo.closest('.upload-card');
+            if (the) {
+                const g = document.createElement('span');
+                g.className = 'gdx-da-co';
+                g.textContent = 'Đã có ảnh gửi trước, chỉ gửi lại nếu muốn thay';
+                the.appendChild(g);
+            }
+            gplxDoiKieu(wrap);
+        }
+        // Dựng hộp "Đề xuất mục cần gửi" ở đầu khối ảnh `khoi` + áp đề xuất cho từng nhóm bằng lái
+        function hienDeXuatAnh(khoi, tt) {
+            if (!khoi) return;
+            if (typeof tt === 'string') { try { tt = JSON.parse(tt); } catch (e) { tt = null; } }
+            khoi.querySelectorAll('.gplx-de-xuat-tong').forEach(e => e.remove());
+            const nhomTT = (tt && tt.nhom) || {};
+            khoi.querySelectorAll('.gplx-chon').forEach(w => gplxApDeXuat(w, tt ? nhomTT[w.dataset.nhom] : null));
+            const thieu = tt && Array.isArray(tt.thieu) ? tt.thieu : [];
+            if (!thieu.length) return;
+            const box = document.createElement('div');
+            box.className = 'gplx-de-xuat gplx-de-xuat-tong';
+            box.innerHTML = '<div class="gdx-tieude">Đề xuất mục cần gửi</div>Hồ sơ của bạn còn thiếu:<ul>' +
+                thieu.map(t => '<li>' + _esc(t.nhan || t.ma) + '</li>').join('') + '</ul>';
+            const moc = khoi.children[1];
+            if (moc) moc.after(box); else khoi.insertBefore(box, khoi.firstChild);
+        }
+
+        // Gộp ảnh bằng lái mới vào `anh` (bản sao anh_data cũ `cu`). Nhóm không có ảnh mới thì giữ nguyên.
+        // Gửi ĐỦ 2 mặt hoặc ảnh đơn (VNeTraffic) → thay cả nhóm. Gửi CHỈ 1 mặt → chỉ thêm khóa của mặt đó
+        // (backend `anh_gplx.gop_anh_gplx` giữ mặt kia, không xóa ảnh cũ).
         function gplxGopAnhData(anh, cu, gMoi) {
             ['moto', 'oto'].forEach(nh => {
-                const ks = ['files_gplx_' + nh, 'files_gplx_' + nh + '_truoc', 'files_gplx_' + nh + '_sau'];
-                const coMoi = ks.some(k => gMoi[k] && gMoi[k].length);
-                if (!coMoi) { ks.forEach(k => { if (cu[k] !== undefined) anh[k] = cu[k]; }); return; }
-                ks.forEach(k => { anh[k] = gMoi[k] || []; });
+                const ka = 'files_gplx_' + nh, kt = ka + '_truoc', ks = ka + '_sau';
+                const ks3 = [ka, kt, ks];
+                const co = k => !!(gMoi[k] && gMoi[k].length);
+                if (!ks3.some(co)) { ks3.forEach(k => { if (cu[k] !== undefined) anh[k] = cu[k]; }); return; }
+                if (!co(ka) && co(kt) !== co(ks)) {
+                    ks3.forEach(k => { if (cu[k] !== undefined) anh[k] = cu[k]; });
+                    const k = co(kt) ? kt : ks;
+                    anh[k] = gMoi[k];
+                    return;
+                }
+                ks3.forEach(k => { anh[k] = gMoi[k] || []; });
             });
             return anh;
         }
@@ -1625,7 +1699,7 @@
                 .some(i => (i._canhBaoChua || i._dangKiem) && !_anDi(i, r));
         }
 
-        // Bằng thật (b): đã chọn ít nhất 1 mặt thì PHẢI đủ cả 2 (gửi ảnh mới thay cả nhóm cũ → thiếu 1 mặt là mất mặt kia).
+        // Bằng thật (b): nhóm đã chọn ảnh mới thì số mặt = mặt mới + mặt ĐÃ CÓ (wrap.dataset.coSan) phải đủ 2.
         // Thiếu → báo mặt nào, cuộn tới ô thiếu, trả true (chặn gửi). Nhóm chưa chọn ảnh nào thì không bắt.
         function gplxThieuMat(root) {
             const r = root || document;
@@ -1634,10 +1708,15 @@
                 const tr = w.querySelector('input[type=file][id$="_truoc"]');
                 const sa = w.querySelector('input[type=file][id$="_sau"]');
                 if (!tr || !sa) continue;
-                const coTr = !!(tr.files && tr.files.length), coSa = !!(sa.files && sa.files.length);
+                const moiTr = !!(tr.files && tr.files.length), moiSa = !!(sa.files && sa.files.length);
+                if (!moiTr && !moiSa) continue;
+                const coSan = w.dataset.coSan || '';
+                if (coSan) continue;   // đã có 1 mặt gửi trước: gửi bất kỳ mặt đơn nào cũng được (backend gộp, không mất ảnh)
+                const coTr = moiTr || coSan === 'truoc', coSa = moiSa || coSan === 'sau';
                 if (coTr === coSa) continue;
                 const thieu = coTr ? sa : tr;
-                alert('Bằng thật cần đủ 2 mặt: còn thiếu ảnh mặt ' + (coTr ? 'SAU' : 'TRƯỚC') + '. Gửi ảnh mới sẽ thay cả nhóm ảnh bằng lái cũ nên không thể gửi thiếu 1 mặt.');
+                alert('Bằng thật cần đủ 2 mặt: còn thiếu ảnh mặt ' + (coTr ? 'SAU' : 'TRƯỚC') + '.' +
+                    (coSan ? '' : ' Gửi ảnh mới sẽ thay cả nhóm ảnh bằng lái cũ nên không thể gửi thiếu 1 mặt.'));
                 const cot = thieu.closest('.gplx-cot') || thieu;
                 try { cot.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
                 return true;
@@ -2851,6 +2930,8 @@
                 khAnh.querySelector('[data-act="gui-anh-lai"]').onclick = () => guiAnhMoiOcrLai(formDiv);
             }
             gplxKhoiTao(formDiv);
+            // Đề xuất mục ảnh còn thiếu (anh_tom_tat) — sau gplxKhoiTao để gắn đúng nhóm
+            try { hienDeXuatAnh(formDiv.querySelector('[data-khoi="anh-lai"]'), hs.anh_tom_tat); } catch (e) { console.warn('Đề xuất ảnh lỗi', e); }
             khoiTaoOAnh(formDiv);
             khoiTaoBatBuoc(formDiv, btnFinal);
 
@@ -3273,6 +3354,7 @@
                 const fbs = document.getElementById('form-bo-sung');
                 gplxKhoiTao(fbs);
                 khoiTaoOAnh(fbs);
+                try { hienDeXuatAnh(fbs.querySelector('.khoi-anh'), hs.anh_tom_tat); } catch (e) { console.warn('Đề xuất ảnh lỗi', e); }
                 window._de_xuat_nhan = {};
                 const theBS = dungTheDeXuat(document, hs, O_FORM_BOSUNG);
                 if (theBS) {
@@ -3394,6 +3476,7 @@
                             i.value = ''; i.dispatchEvent(new Event('change'));
                         });
                         window._de_xuat_nhan = {};
+                        try { hienDeXuatAnh(document.querySelector('#form-bo-sung .khoi-anh'), data.anh_tom_tat); } catch (e) {}
                         const box = document.getElementById('bs-de-xuat');
                         box.innerHTML = '';
                         const the = dungTheDeXuat(document, data, O_FORM_BOSUNG);
